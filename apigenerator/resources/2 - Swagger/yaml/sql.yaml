@@ -1,0 +1,486 @@
+tags:
+  - name: SQL
+    description: SQL context
+
+paths:
+  /sql:
+    get:
+      tags:
+        - SQL
+      summary: Get SQL Query
+      operationId: getSQLQuery
+      parameters:
+        - name: query
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                Query:
+                  value:
+                    - id_client: string
+                      name: string
+              schema:
+                type: array
+                description: ''
+                minItems: 1
+                uniqueItems: true
+                items:
+                  type: object
+                  properties: ''
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid SQL syntax:
+                  value:
+                    ErrorMessage: Invalid syntax for SQL query
+                Malformed input data:
+                  value:
+                    ErrorMessage: Malformed input data
+                Invalid SQL query:
+                  value:
+                    ErrorMessage: Invalid SQL query
+                Possible SQL injection:
+                  value:
+                    ErrorMessage: SQL query blocked, possible injection attributes
+                Invalid SQL method:
+                  value:
+                    ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid access token:
+                  value:
+                    ErrorMessage: Invalid Access Token
+                Groups not allowed:
+                  value:
+                    ErrorMessage: The groups you belong to are not allowed on this route
+                Token expired:
+                  value:
+                    ErrorMessage: Access Token has expired
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Table does not exist:
+                  value:
+                    ErrorMessage: Table does not exist
+      description: Route responsible for retrieving a SQL Query
+    post:
+      tags:
+        - SQL
+      summary: Insert SQL Query
+      operationId: insertSQLQuery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: ''
+              properties:
+                Query:
+                  type: string
+                  minLength: 1
+              required:
+                - Query
+            examples:
+              SQL Query:
+                value:
+                  Query: INSERT INTO client (id_client) VALUES ('value_1')
+        required: true
+        description: Body to send post sql data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  Message:
+                    type: string
+                    minLength: 1
+                required:
+                  - Message
+              examples:
+                Query successfully persisted:
+                  value:
+                    Message: Query successfully persisted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid SQL syntax:
+                  value:
+                    ErrorMessage: Invalid syntax for SQL query
+                Invalid SQL query:
+                  value:
+                    ErrorMessage: Invalid SQL query
+                Possible SQL injection:
+                  value:
+                    ErrorMessage: SQL query blocked, possible injection attributes
+                Invalid SQL method:
+                  value:
+                    ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid access token:
+                  value:
+                    ErrorMessage: Invalid Access Token
+                Groups not allowed:
+                  value:
+                    ErrorMessage: The groups you belong to are not allowed on this route
+                Token expired:
+                  value:
+                    ErrorMessage: Access Token has expired
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Table does not exist:
+                  value:
+                    ErrorMessage: Table does not exist
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Malformed input data:
+                  value:
+                    ErrorMessage: Malformed input data
+      description: Route responsible for inserting a SQL Query
+    patch:
+      tags:
+        - SQL
+      summary: Update SQL Query
+      operationId: updateSQLQuery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: ''
+              properties:
+                Query:
+                  type: string
+                  minLength: 1
+              required:
+                - Query
+            examples:
+              SQL Query:
+                value:
+                  Query: UPDATE client SET name = 'name_2' WHERE id_client = 'value_1'
+        required: true
+        description: Body to send patch sql data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  Message:
+                    type: string
+                    minLength: 1
+                required:
+                  - Message
+              examples:
+                Query successfully persisted:
+                  value:
+                    Message: Query successfully persisted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid SQL syntax:
+                  value:
+                    ErrorMessage: Invalid syntax for SQL query
+                Invalid SQL query:
+                  value:
+                    ErrorMessage: Invalid SQL query
+                Possible SQL injection:
+                  value:
+                    ErrorMessage: SQL query blocked, possible injection attributes
+                Invalid SQL method:
+                  value:
+                    ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
+                Where clause required:
+                  value:
+                    ErrorMessage: Missing WHERE clause
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid access token:
+                  value:
+                    ErrorMessage: Invalid Access Token
+                Groups not allowed:
+                  value:
+                    ErrorMessage: The groups you belong to are not allowed on this route
+                Token expired:
+                  value:
+                    ErrorMessage: Access Token has expired
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Table does not exist:
+                  value:
+                    ErrorMessage: Table does not exist
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Malformed input data:
+                  value:
+                    ErrorMessage: Malformed input data
+      description: Route responsible for updating a SQL Query
+    delete:
+      tags:
+        - SQL
+      summary: Delete SQL Query by Full Match Object
+      operationId: deleteSQLQueryByFullMatch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: ''
+              properties:
+                Query:
+                  type: string
+                  minLength: 1
+              required:
+                - Query
+            examples:
+              SQL Query:
+                value:
+                  Query: DELETE FROM client WHERE id_client='value_1'
+        required: true
+        description: Body to send delete sql data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  Message:
+                    type: string
+                    minLength: 1
+                required:
+                  - Message
+              examples:
+                Query successfully persisted:
+                  value:
+                    Message: Query successfully persisted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid SQL syntax:
+                  value:
+                    ErrorMessage: Invalid syntax for SQL query
+                Invalid SQL query:
+                  value:
+                    ErrorMessage: Invalid SQL query
+                Possible SQL injection:
+                  value:
+                    ErrorMessage: SQL query blocked, possible injection attributes
+                Invalid SQL method:
+                  value:
+                    ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
+                Where clause required:
+                  value:
+                    ErrorMessage: Missing WHERE clause
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Invalid access token:
+                  value:
+                    ErrorMessage: Invalid Access Token
+                Groups not allowed:
+                  value:
+                    ErrorMessage: The groups you belong to are not allowed on this route
+                Token expired:
+                  value:
+                    ErrorMessage: Access Token has expired
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Table does not exist:
+                  value:
+                    ErrorMessage: Table does not exist
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  ErrorMessage:
+                    type: string
+                    minLength: 1
+                required:
+                  - ErrorMessage
+              examples:
+                Malformed input data:
+                  value:
+                    ErrorMessage: Malformed input data
+      description: Route responsible for deleting a SQL Query

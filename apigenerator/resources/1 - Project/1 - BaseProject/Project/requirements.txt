@@ -1,0 +1,10 @@
+chardet
+enforce-typing
+flask
+flask-swagger-ui
+marshmallow-sqlalchemy
+pyyaml
+regex
+requests
+sqlalchemy
+ujson

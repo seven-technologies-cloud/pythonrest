@@ -1,0 +1,359 @@
+/meta_string:
+  get:
+    tags:
+      - DeclarativeMeta
+    summary: Get DeclarativeMeta Set
+    operationId: getDeclarativeMetaSet
+    parameters:
+      - name: select
+        in: header
+        schema:
+          type: string
+        description: Used to select which attributes to retrieve
+      - name: orderby
+        in: header
+        schema:
+          type: string
+        description: Used to order by specific attribute
+      - name: limit
+        in: header
+        schema:
+          type: string
+        description: Used to limit the number of objects
+      - name: page
+        in: header
+        schema:
+          type: string
+        description: Used to define the page to retrieve
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              description: ''
+              minItems: 1
+              uniqueItems: true
+              items:
+                type: object
+                properties: ''
+      '400':
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorMessage:
+                  type: string
+                  minLength: 1
+              required:
+                - ErrorMessage
+            examples:
+              Unexpected select header attribute:
+                value:
+                  ErrorMessage: select got an unexpected keyword argument 'unexpected_attribute'
+              Unexpected orderby header value type:
+                value:
+                  ErrorMessage: orderby got an unexpected keyword argument 'unexpected_attribute'
+              Unexpected orderby header order:
+                value:
+                  ErrorMessage: '''unexpected_order'' not a valid argument. Must be either ''asc'' or ''desc'''
+              Limit header not integer:
+                value:
+                  ErrorMessage: '''string'' is not an integer'
+              Unexpected query key:
+                value:
+                  ErrorMessage: meta_string got an unexpected keyword argument 'unexpected_argument'
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorMessage:
+                  type: string
+                  minLength: 1
+              required:
+                - ErrorMessage
+            examples:
+              Invalid access token:
+                value:
+                  ErrorMessage: Invalid Access Token
+              Groups not allowed:
+                value:
+                  ErrorMessage: The groups you belong to are not allowed on this route
+              Token expired:
+                value:
+                  ErrorMessage: Access Token has expired
+    description: Route responsible for retrieving a meta_string set
+  post:
+    tags:
+      - DeclarativeMeta
+    summary: Insert DeclarativeMeta Set
+    operationId: insertDeclarativeMetaSet
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            description: ''
+            minItems: 1
+            uniqueItems: true
+            items:
+              type: object
+              properties: ''
+              required: post_required
+      required: true
+      description: Body to send post meta_string data
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                Message:
+                  type: string
+                  minLength: 1
+              required:
+                - Message
+      '400':
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorList:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    required:
+                      - ErrorMessage
+                    properties:
+                      Body:
+                        type: object
+                        properties: ''
+                      ErrorMessage:
+                        type: string
+                        minLength: 1
+              required:
+                - ErrorList
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorMessage:
+                  type: string
+                  minLength: 1
+              required:
+                - ErrorMessage
+            examples:
+              Invalid access token:
+                value:
+                  ErrorMessage: Invalid Access Token
+              Groups not allowed:
+                value:
+                  ErrorMessage: The groups you belong to are not allowed on this route
+              Token expired:
+                value:
+                  ErrorMessage: Access Token has expired
+      '406':
+        description: Not Acceptable
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorList:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    required:
+                      - ErrorMessage
+                    properties:
+                      Body:
+                        type: object
+                        properties: ''
+                      ErrorMessage:
+                        type: string
+                        minLength: 1
+              required:
+                - ErrorList
+            examples:
+              JSON body empty:
+                value:
+                  ErrorMessage: JSON body empty
+              Column cannot be null:
+                value:
+                  errorlist:
+                    body:
+                      id_client: 58dcfc4a-fb3d-4b85-8d33-840adf6bfb0f
+                    error: "Column 'not_nullable_column' cannot be null"
+              Malformed input data:
+                value:
+                  ErrorMessage: Malformed input data
+              Invalid attribute value type:
+                value:
+                  ErrorMessage: 'Expected type ''str'' for attribute ''name'' but received type ''int'''
+    description: Route responsible for inserting a meta_string set
+  delete:
+    tags:
+      - DeclarativeMeta
+    summary: Delete DeclarativeMeta by Full Match Object
+    operationId: deleteDeclarativeMetaByFullMatch
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: array
+            description: ''
+            minItems: 1
+            uniqueItems: true
+            items:
+              type: object
+              properties: ''
+      description: Body to send delete meta_string data
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                Message:
+                  type: string
+                  minLength: 1
+              required:
+                - Message
+      '400':
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorList:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    required:
+                      - ErrorMessage
+                    properties:
+                      Body:
+                        type: object
+                        properties: ''
+                      ErrorMessage:
+                        type: string
+                        minLength: 1
+              required:
+                - ErrorList
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorMessage:
+                  type: string
+                  minLength: 1
+              required:
+                - ErrorMessage
+            examples:
+              Invalid access token:
+                value:
+                  ErrorMessage: Invalid Access Token
+              Groups not allowed:
+                value:
+                  ErrorMessage: The groups you belong to are not allowed on this route
+              Token expired:
+                value:
+                  ErrorMessage: Access Token has expired
+      '404':
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorList:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    required:
+                      - ErrorMessage
+                    properties:
+                      Body:
+                        type: object
+                        properties: ''
+                      ErrorMessage:
+                        type: string
+                        minLength: 1
+              required:
+                - ErrorList
+            examples:
+              No match to delete:
+                value:
+                  errorlist:
+                    body:
+                      id_client: id_not_registered_in_table
+                      client_name: name_not_registered_in_table
+                    error: No match found to delete
+      '406':
+        description: Not Acceptable
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                ErrorList:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    required:
+                      - ErrorMessage
+                    properties:
+                      Body:
+                        type: object
+                        properties: ''
+                      ErrorMessage:
+                        type: string
+                        minLength: 1
+              required:
+                - ErrorList
+            examples:
+              JSON body empty:
+                value:
+                  ErrorMessage: JSON body empty
+              Malformed input data:
+                value:
+                  ErrorMessage: Malformed input data
+              Invalid attribute value type:
+                value:
+                  ErrorMessage: 'Expected type ''str'' for attribute ''name'' but received type ''int'''
+    description: Route responsible for deleting a meta_string set
