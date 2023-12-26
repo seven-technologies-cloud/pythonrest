@@ -165,7 +165,20 @@ def add_methods_to_flaskbuilder(result, domain_name):
 
 
 def modify_swagger_related_files(result, domain_path, script_absolute_path):
+    print('Creating SwaggerBuilder functions')
     domain_list = get_domain_files_list(domain_path)
+
+    if not os.path.exists(os.path.join(result, 'src\\a_Presentation\\d_Swagger\\SwaggerController.py')):
+        shutil.copytree(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/a_Presentation/d_Swagger'),
+                        os.path.join(result, 'src\\a_Presentation\\d_Swagger'), dirs_exist_ok=True)
+
+    if not os.path.exists(os.path.join(result, 'src\\e_Infra\\b_Builders\\a_Swagger\\SwaggerBuilder.py')):
+        shutil.copytree(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/a_Swagger'),
+                        os.path.join(result, 'src\\e_Infra\\b_Builders\\a_Swagger'), dirs_exist_ok=True)
+
+    if not os.path.exists(os.path.join(result, 'src\\e_Infra\\b_Builders\\FlaskBuilder.py')):
+        shutil.copy(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/FlaskBuilder.py'),
+                        os.path.join(result, 'src\\e_Infra\\b_Builders\\FlaskBuilder.py'))
 
     for domain in domain_list:
         domain_name = domain[:-3]

@@ -34,5 +34,5 @@ def install_sql_swagger(result, script_absolute_path):
 
 
 def finalize_project(result, script_absolute_path):
+    print('Adding SQL routes')
     install_sql_route(result, script_absolute_path)
-    install_sql_swagger(result, script_absolute_path)

@@ -6,8 +6,9 @@ from apigenerator.g_Utils.OpenFileExeHandler import open
 
 def install_environment_variables(result, us_datetime, db, db_params, script_absolute_path):
 # Installs and configures environment variables in environment variables file.
+    print('Adding Environment Variables to API')
     copytree(os.path.join(script_absolute_path, 'apigenerator/resources/3 - Variables/EnvironmentVariablesFile'),
-             os.path.join(result, 'src\\e_Infra\\g_Environment'))
+             os.path.join(result, 'src\\e_Infra\\g_Environment'), dirs_exist_ok=True)
 
     with open(os.path.join(result, 'src\\e_Infra\\g_Environment\\EnvironmentVariables.py'), 'r') as env_in:
         content = env_in.readlines()

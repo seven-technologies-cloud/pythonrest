@@ -8,13 +8,13 @@ Already listed within ./requirements.txt
 - 'PyYAML==6.0.1'
 - 'parse==1.20.0'
 - 'mergedeep==1.3.4'
-- 'pymysql==1.1.0',
+- 'pymysql==1.1.0'
 - 'psycopg2==2.9.9'
 - 'psycopg2-binary==2.9.9'
 - 'pymssql==2.2.10'
 - 'pyinstaller==6.3.0'
 
-To run and build this project, you need to have the above libraries installed on your machine, which you can do with:
+To run and build this project, you need to have the above libraries installed on your machine, which you can do running the below command on the project root directory:
 ```commandline
 pip install -r requirements.txt
 ```
