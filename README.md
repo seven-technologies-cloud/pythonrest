@@ -14,7 +14,8 @@ Already listed within ./requirements.txt
 - 'pymssql==2.2.10'
 - 'pyinstaller==6.3.0'
 
-To run and build this project, you need to have the above libraries installed on your machine, which you can do running the below command on the project root directory:
+To run and build this project, you need to have the above libraries installed on your machine, which you can do running 
+the below command on the project root directory:
 ```commandline
 pip install -r requirements.txt
 ```
@@ -102,7 +103,7 @@ pyinstaller ^
 ```
 
 ## Build exe, installer and uninstaller
-run from project root folder:
+run from windowsinstaller/ folder:
 ```powershell
 .\generate_pythonrest_executables.ps1
 ```

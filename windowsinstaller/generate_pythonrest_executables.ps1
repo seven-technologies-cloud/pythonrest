@@ -23,17 +23,10 @@ try {
 }
 
 # Building the CLI exe pyinstaller command
-Run-Command "pyinstaller --onefile --add-data 'pythonrest.py;.' --add-data 'databaseconnector;databaseconnector' --add-data 'domaingenerator;domaingenerator' --add-data 'apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data '../pythonrest.py;.' --add-data '../databaseconnector;databaseconnector' --add-data '../domaingenerator;domaingenerator' --add-data '../apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql ../pythonrest.py"
 
 try {
-    Move-Item "$scriptPath\dist\pythonrest.exe" "$scriptPath\windowsinstaller" -Force
-} catch {
-    Write-Host "Error: $_"
-    exit 1
-}
-
-try {
-    Set-Location "$scriptPath\windowsinstaller"
+    Move-Item "$scriptPath\dist\pythonrest.exe" "$scriptPath" -Force
 } catch {
     Write-Host "Error: $_"
     exit 1
@@ -64,12 +57,9 @@ if (-not (Test-Path -Path $executablesDir -PathType Container)) {
     }
 }
 
-# Set location back to the original root directory
-Set-Location $scriptPath
-
 try {
-    Move-Item "$scriptPath\windowsinstaller\dist\PythonRESTInstaller.exe" "$executablesDir" -Force
-    Move-Item "$scriptPath\windowsinstaller\dist\PythonRESTUninstaller.exe" "$executablesDir" -Force
+    Move-Item "$scriptPath\dist\PythonRESTInstaller.exe" "$executablesDir" -Force
+    Move-Item "$scriptPath\dist\PythonRESTUninstaller.exe" "$executablesDir" -Force
 } catch {
     Write-Host "Error: $_"
     exit 1
@@ -84,14 +74,6 @@ try {
     exit 1
 }
 
-try {
-    Remove-Item -Path "$scriptPath\windowsinstaller\build" -Recurse -Force
-    Remove-Item -Path "$scriptPath\windowsinstaller\dist" -Recurse -Force
-} catch {
-    Write-Host "Error: $_"
-    exit 1
-}
-
 # Remove all spec files in the root folder
 try {
     Remove-Item -Path "$scriptPath\*.spec" -Force
@@ -100,17 +82,9 @@ try {
     exit 1
 }
 
-# Remove all spec files in the windowsinstaller folder
+# Remove any remaining exe files in the folder
 try {
-    Remove-Item -Path "$scriptPath\windowsinstaller\*.spec" -Force
-} catch {
-    Write-Host "Error: $_"
-    exit 1
-}
-
-# Remove any remaining exe files in the windowsinstaller folder
-try {
-    Remove-Item -Path "$scriptPath\windowsinstaller\*.exe" -Force
+    Remove-Item -Path "$scriptPath\*.exe" -Force
 } catch {
     Write-Host "Error: $_"
     exit 1
