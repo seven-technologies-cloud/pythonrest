@@ -43,7 +43,7 @@ def get_column_arguments_string(column):
     if column['unique']:
         arguments_string = arguments_string + ', unique=True'
     if column['auto_increment']:
-        arguments_string = arguments_string + ', auto_increment=True'
+        arguments_string = arguments_string + ', autoincrement=True'
     if column['default_value'] is not None:
         arguments_string = arguments_string + ', default=' + str(column['default_value'])
 
