@@ -67,29 +67,6 @@
               Unexpected query key:
                 value:
                   ErrorMessage: meta_string got an unexpected keyword argument 'unexpected_argument'
-      '401':
-        description: Unauthorized
-        content:
-          application/json:
-            schema:
-              description: ''
-              type: object
-              properties:
-                ErrorMessage:
-                  type: string
-                  minLength: 1
-              required:
-                - ErrorMessage
-            examples:
-              Invalid access token:
-                value:
-                  ErrorMessage: Invalid Access Token
-              Groups not allowed:
-                value:
-                  ErrorMessage: The groups you belong to are not allowed on this route
-              Token expired:
-                value:
-                  ErrorMessage: Access Token has expired
     description: Route responsible for retrieving a meta_string set
   post:
     tags:
@@ -148,29 +125,6 @@
                         minLength: 1
               required:
                 - ErrorList
-      '401':
-        description: Unauthorized
-        content:
-          application/json:
-            schema:
-              description: ''
-              type: object
-              properties:
-                ErrorMessage:
-                  type: string
-                  minLength: 1
-              required:
-                - ErrorMessage
-            examples:
-              Invalid access token:
-                value:
-                  ErrorMessage: Invalid Access Token
-              Groups not allowed:
-                value:
-                  ErrorMessage: The groups you belong to are not allowed on this route
-              Token expired:
-                value:
-                  ErrorMessage: Access Token has expired
       '406':
         description: Not Acceptable
         content:
@@ -267,29 +221,6 @@
                         minLength: 1
               required:
                 - ErrorList
-      '401':
-        description: Unauthorized
-        content:
-          application/json:
-            schema:
-              description: ''
-              type: object
-              properties:
-                ErrorMessage:
-                  type: string
-                  minLength: 1
-              required:
-                - ErrorMessage
-            examples:
-              Invalid access token:
-                value:
-                  ErrorMessage: Invalid Access Token
-              Groups not allowed:
-                value:
-                  ErrorMessage: The groups you belong to are not allowed on this route
-              Token expired:
-                value:
-                  ErrorMessage: Access Token has expired
       '404':
         description: Not Found
         content:
