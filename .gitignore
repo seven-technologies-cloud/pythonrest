@@ -1,6 +1,10 @@
 # Generated API Folder
 PythonRestAPI
 
+#Generated Binaries Folders
+windowsinstaller/PythonRestExecutables
+linuxinstaller/PythonRestExecutables
+
 # exe files
 *.exe
 

@@ -12,7 +12,6 @@ function Run-Command($command) {
     }
 }
 
-# Get the absolute path of the current script
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 try {
@@ -22,7 +21,6 @@ try {
     exit 1
 }
 
-# Building the CLI exe pyinstaller command
 Run-Command "pyinstaller --onefile --add-data '../pythonrest.py;.' --add-data '../databaseconnector;databaseconnector' --add-data '../domaingenerator;domaingenerator' --add-data '../apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql ../pythonrest.py"
 
 try {
@@ -32,10 +30,8 @@ try {
     exit 1
 }
 
-# Building the Installer exe pyinstaller command
 Run-Command "pyinstaller --onefile --add-data 'pythonrest.exe;.' --add-data 'install_pythonrest.py;.' --add-data 'addpythonresttouserpath.ps1;.' --name PythonRESTInstaller install_pythonrest.py"
 
-# Building the Uninstaller exe pyinstaller command
 Run-Command "pyinstaller --onefile --add-data 'uninstall_pythonrest.py;.' --add-data 'removepythonrestfromuserpath.ps1;.' --name PythonRESTUninstaller uninstall_pythonrest.py"
 
 $executablesDir = "$scriptPath\PythonRestExecutables"
@@ -65,25 +61,10 @@ try {
     exit 1
 }
 
-# Delete the 'build' and 'dist' folders
 try {
     Remove-Item -Path "$scriptPath\build" -Recurse -Force
     Remove-Item -Path "$scriptPath\dist" -Recurse -Force
-} catch {
-    Write-Host "Error: $_"
-    exit 1
-}
-
-# Remove all spec files in the root folder
-try {
     Remove-Item -Path "$scriptPath\*.spec" -Force
-} catch {
-    Write-Host "Error: $_"
-    exit 1
-}
-
-# Remove any remaining exe files in the folder
-try {
     Remove-Item -Path "$scriptPath\*.exe" -Force
 } catch {
     Write-Host "Error: $_"

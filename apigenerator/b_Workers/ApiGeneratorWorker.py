@@ -9,13 +9,13 @@ from apigenerator.b_Workers.DirectoryManager import copy_domain_files
 def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists):
     try:
         print('Preparing to generate API...')
-        proj_domain_folder = os.path.join(result_full_path, 'src\\c_Domain')
+        proj_domain_folder = os.path.join(result_full_path, 'src', 'c_Domain')
         script_absolute_path = define_script_path_based_on_run_context()
 
         # ------------------------------- Start project ---------------------------------- #
         if not base_project_exists:
             start_project(result_full_path)
-        copy_domain_files(result_full_path, generated_domains_path)
+        copy_domain_files(proj_domain_folder, generated_domains_path)
 
         # ---------------------------- Copying Database Files ---------------------------- #
         if not base_project_exists:

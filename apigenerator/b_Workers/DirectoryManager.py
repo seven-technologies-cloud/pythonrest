@@ -53,9 +53,7 @@ def copy_proj_base_dir(result_full_path, symlinks=False, ignore=None):
 
 
 # Method copies domain files into proper folder of result hierarchy #
-def copy_domain_files(result_full_path, generated_domains_path, symlinks=False, ignore=None):
-    # Accessing domain folder #
-    proj_domain_folder = os.path.join(result_full_path, 'src\\c_Domain')
+def copy_domain_files(proj_domain_folder, generated_domains_path, symlinks=False, ignore=None):
     # Iterating over domain directory #
     for item in os.listdir(generated_domains_path):
         src_folder = os.path.join(generated_domains_path, item)

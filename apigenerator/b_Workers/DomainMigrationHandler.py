@@ -11,10 +11,10 @@ def handle_domain_migration_multiple_swagger_files(result, proj_domain_folder, s
     try:
         class_generic_path = os.path.join(script_absolute_path, get_directory_data()['class_generic_path'])
 
-        if not os.path.exists(os.path.join(result, 'config\\swagger.yaml')):
+        if not os.path.exists(os.path.join(result, 'config', 'swagger.yaml')):
             shutil.copy(os.path.join(script_absolute_path,
                                      'apigenerator/resources/1 - Project/1 - BaseProject/Project/config/swagger.yaml'),
-                        os.path.join(result, 'config\\swagger.yaml'))
+                        os.path.join(result, 'config', 'swagger.yaml'))
 
         if not os.path.exists(os.path.join(result, 'app.py')):
             shutil.copy(os.path.join(script_absolute_path,

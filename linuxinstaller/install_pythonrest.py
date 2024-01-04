@@ -3,7 +3,8 @@ import shutil
 import sys
 import subprocess
 import time
-import ctypes
+import getpass
+
 
 def move_exe_to_program_files(executable_path, target_folder):
     try:
@@ -14,39 +15,44 @@ def move_exe_to_program_files(executable_path, target_folder):
         input('Press Enter to exit...')
         sys.exit(1)
 
-def run_powershell_script(script_path):
-    try:
-        powershell_command = [
-            'powershell.exe',
-            '-ExecutionPolicy', 'Bypass',
-            '-File', script_path
-        ]
 
-        subprocess.run(powershell_command, check=True)
+def run_bash_script(script_path):
+    try:
+        bash_command = [
+            'bash',
+            script_path
+        ]
+        subprocess.run(bash_command, check=True)
         print('PythonREST has been successfully added to your user PATH.')
         print('PythonREST installation completed successfully.')
-        print('You can now run "pythonrest version" to verify its installation.')
+        print('You can now run "sudo pythonrest version" to verify its installation.')
     except Exception as e:
         print(f'Error: Unable to set PythonREST on user PATH. {e}')
         input('Press Enter to exit...')
         sys.exit(1)
 
+
 if __name__ == "__main__":
     try:
-        if not ctypes.windll.shell32.IsUserAnAdmin():
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        if getpass.getuser() != "root":
+            print("Please run this script with sudo or as a root user.")
             sys.exit()
 
         script_directory = os.path.dirname(os.path.abspath(__file__))
-        install_directory = os.path.join(os.environ['PROGRAMFILES'], 'PythonREST')
+        install_directory = '/usr/local/bin'
+
         os.makedirs(install_directory, exist_ok=True)
-        executable_path = os.path.join(script_directory, 'pythonrest.exe')
+
+        executable_path = os.path.join(script_directory, 'pythonrest')
+
         move_exe_to_program_files(executable_path, install_directory)
 
         time.sleep(1)
-        powershell_script_name = 'addpythonresttouserpath.ps1'
-        powershell_script_path = os.path.join(script_directory, powershell_script_name)
-        run_powershell_script(powershell_script_path)
+
+        bash_script_name = 'addpythonresttouserpath.sh'
+        bash_script_path = os.path.join(script_directory, bash_script_name)
+
+        run_bash_script(bash_script_path)
 
     except Exception as e:
         print(f'Error: {e}')
