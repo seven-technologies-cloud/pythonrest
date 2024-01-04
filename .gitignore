@@ -1,3 +1,16 @@
+# Generated API Folder
+PythonRestAPI
+
+#Generated Binaries Folders
+windowsinstaller/PythonRestExecutables
+linuxinstaller/PythonRestExecutables
+
+# exe files
+*.exe
+
+# PyCharm Files
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

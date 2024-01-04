@@ -488,7 +488,7 @@ def execute_sql_stored_procedure(stored_procedure_name, stored_procedure_args):
         return handle_custom_exception(get_system_message('invalid_connection_parameters'))
 
     with engine.connect() as con:
-        # Set OUT parameters as variables in the MySQL session
+        # Set OUT parameters as variables in the SQL session
         out_params = stored_procedure_args.get("out", {})
         for key, value in out_params.items():
             con.execute(text(f"SET @{key} = {value}"))
@@ -496,7 +496,7 @@ def execute_sql_stored_procedure(stored_procedure_name, stored_procedure_args):
         in_values = ', '.join([f"'{value}'" for value in stored_procedure_args.get("in", [])])
         call_proc = text(
             f"CALL {stored_procedure_name}({in_values}"
-            f"{', ' if out_params else ''}"
+            f"{', ' if (out_params and in_values) else ''}"
             f"{', '.join([f'@{key}' for key in out_params])})"
         )
 

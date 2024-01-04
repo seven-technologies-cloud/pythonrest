@@ -14,10 +14,10 @@ def install_database_files(result_full_path, db, script_absolute_path):
     print('installing selected database files and adding library to requirements...')
 
     copy_database_files(os.path.join(script_absolute_path, '{}/{}'.format(db_conn_files, db)),
-                        os.path.join(result_full_path, 'src\\d_Repository\\d_DbConnection'))
+                        os.path.join(result_full_path, 'src', 'd_Repository', 'd_DbConnection'))
 
     copy_database_files(os.path.join(script_absolute_path, '{}/{}'.format(db_conn_resolvers, db)),
-                        os.path.join(result_full_path, 'src\\e_Infra\\c_Resolvers'))
+                        os.path.join(result_full_path, 'src', 'e_Infra', 'c_Resolvers'))
 
     if db == 'mysql':
         append_database_library_to_requirements_file(os.path.join(result_full_path, "requirements.txt"), "pymysql")

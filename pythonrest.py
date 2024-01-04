@@ -8,6 +8,7 @@ from databaseconnector.MySqlMetadataGeneratorWorker import generate_mysql_databa
 from databaseconnector.PostgreSqlMetadataGeneratorWorker import generate_postgresql_database_metadata
 from databaseconnector.SqlServerMetadataGeneratorWorker import generate_sqlserver_database_metadata
 from domaingenerator.DomainFilesGeneratorWorker import generate_domain_files
+from apigenerator.b_Workers.DirectoryManager import check_if_base_project_exists
 from apigenerator.b_Workers.ApiGeneratorWorker import generate_python_rest_api
 
 app = typer.Typer()
@@ -37,14 +38,17 @@ def generate(
 
     result_full_path = os.path.abspath(os.path.join(os.getcwd(), result_path))
 
-    # Check if the folder exists
-    if os.path.exists(result_full_path):
-        typer.echo(f"Cleaning up existing folder: {result_full_path}")
-        clean_directory(result_full_path)
+    # Create folder for API Generation if it does not exist
+    if not os.path.exists(result_full_path):
+        os.makedirs(result_full_path)
+        base_project_exists = False
 
     else:
-        # Create folder for API Generation if it does not exist
-        os.makedirs(result_full_path)
+        base_project_exists = check_if_base_project_exists(result_full_path)
+        if not base_project_exists:
+            typer.echo(f"Cleaning up existing folder: {result_full_path}")
+            clean_directory(result_full_path)
+
 
     if mysql_connection_parameters:
         try:
@@ -62,7 +66,7 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
 
@@ -82,7 +86,7 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
 
@@ -102,7 +106,7 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
 
@@ -122,7 +126,7 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
     else:

@@ -195,8 +195,8 @@ def is_verb(reduced_query, pre_index, post_index):
     return True
 
 
-# Method that executes a read SQL stored procedure on database
+# Method that executes a SQL stored procedure on database
 def execute_post_route_sql_stored_procedure(request_headers, request_body):
-    stored_procedure_name = request_headers.get('HTTP_STORED_PROCEDURE')
+    stored_procedure_name = request_headers.get('HTTP_STOREDPROCEDURE')
     stored_procedure_params = json.loads(json.dumps(request_body))
     return execute_sql_stored_procedure(stored_procedure_name, stored_procedure_params)

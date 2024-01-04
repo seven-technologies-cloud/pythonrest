@@ -6,10 +6,23 @@
 If you wish to run this project using a Python virtual environment, you can follow the steps below:
 
 1. Create a virtual environment:
+
+#### Windows:
+
 ```commandline
 python -m venv venv
 ```
 
+#### Linux:
+On Debian/Ubuntu systems, you need to have the python3-venv package installed, which you can do with the following commands:
+```bash
+apt-get update
+apt install python3.8-venv
+```
+And then you can create the venv with the following:
+```bash
+python3 -m venv venv
+```
 2. Activate the virtual environment:
 #### Windows:
 ```

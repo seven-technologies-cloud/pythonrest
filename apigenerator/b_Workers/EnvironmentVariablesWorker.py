@@ -6,12 +6,13 @@ from apigenerator.g_Utils.OpenFileExeHandler import open
 
 def install_environment_variables(result, us_datetime, db, db_params, script_absolute_path):
 # Installs and configures environment variables in environment variables file.
+    print('Adding Environment Variables to API')
     copytree(os.path.join(script_absolute_path, 'apigenerator/resources/3 - Variables/EnvironmentVariablesFile'),
-             os.path.join(result, 'src\\e_Infra\\g_Environment'))
+             os.path.join(result, 'src', 'e_Infra', 'g_Environment'), dirs_exist_ok=True)
 
-    with open(os.path.join(result, 'src\\e_Infra\\g_Environment\\EnvironmentVariables.py'), 'r') as env_in:
+    with open(os.path.join(result, 'src', 'e_Infra', 'g_Environment', 'EnvironmentVariables.py'), 'r') as env_in:
         content = env_in.readlines()
-    with open(os.path.join(result, 'src\\e_Infra\\g_Environment\\EnvironmentVariables.py'), 'w') as env_out:
+    with open(os.path.join(result, 'src', 'e_Infra', 'g_Environment', 'EnvironmentVariables.py'), 'w') as env_out:
         for line in content:
             if '# Database start configuration #' in line:
                 append_line = "os.environ['main_db_conn'] = '{}'\n".format(db)
@@ -30,9 +31,9 @@ def install_environment_variables(result, us_datetime, db, db_params, script_abs
 
 def install_datetime_masks(result, us_datetime):
     if us_datetime:
-        with open(os.path.join(result, 'src\\e_Infra\\g_Environment\\EnvironmentVariables.py'), 'r') as env_in:
+        with open(os.path.join(result, 'src', 'e_Infra', 'g_Environment', 'EnvironmentVariables.py'), 'r') as env_in:
             env_file_lines = env_in.readlines()
-        with open(os.path.join(result, 'src\\e_Infra\\g_Environment\\EnvironmentVariables.py'), 'w') as env_out:
+        with open(os.path.join(result, 'src', 'e_Infra', 'g_Environment', 'EnvironmentVariables.py'), 'w') as env_out:
             for line in env_file_lines:
                 env_out.write(line.replace("%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y",
                                            "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y"))

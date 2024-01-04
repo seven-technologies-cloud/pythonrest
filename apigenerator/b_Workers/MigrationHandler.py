@@ -9,33 +9,33 @@ def handle_generic_classes_migration(declarative_meta, meta_string, id_from_file
     if id_from_file:
         # Handling Meta Controller #
         handle_migration(declarative_meta, meta_string, id_from_file, class_generic_path,
-                         os.path.join(result, 'src\\a_Presentation\\a_Domain'),
+                         os.path.join(result, 'src', 'a_Presentation', 'a_Domain'),
                          "Controller")
     if not id_from_file:
         # Handling Meta Controller #
         handle_migration(declarative_meta, meta_string, id_from_file, class_generic_path,
-                         os.path.join(result, 'src\\a_Presentation\\a_Domain'),
+                         os.path.join(result, 'src', 'a_Presentation', 'a_Domain'),
                          "ControllerNoPK")
 
     # Handling Meta Repository #
     handle_migration(declarative_meta, meta_string, id_from_file, class_generic_path,
-                     os.path.join(result, 'src\\d_Repository\\a_Domain'),
+                     os.path.join(result, 'src', 'd_Repository', 'a_Domain'),
                      "Repository")
 
     if id_from_file:
         # Handling Meta Service #
         handle_migration(declarative_meta, meta_string, id_from_file, class_generic_path,
-                         os.path.join(result, 'src\\b_Application\\b_Service\\a_Domain'),
+                         os.path.join(result, 'src', 'b_Application', 'b_Service', 'a_Domain'),
                          "Service")
     if not id_from_file:
         # Handling Meta Service #
         handle_migration(declarative_meta, meta_string, id_from_file, class_generic_path,
-                         os.path.join(result, 'src\\b_Application\\b_Service\\a_Domain'),
+                         os.path.join(result, 'src', 'b_Application', 'b_Service', 'a_Domain'),
                          "ServiceNoPK")
 
     # Handling Meta Validator #
     handle_migration(declarative_meta, meta_string, id_from_file, class_generic_path,
-                     os.path.join(result, 'src\\e_Infra\\d_Validators\\a_Domain'),
+                     os.path.join(result, 'src', 'e_Infra', 'd_Validators', 'a_Domain'),
                      "Validator")
 
 

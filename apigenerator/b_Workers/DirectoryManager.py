@@ -21,10 +21,12 @@ def define_script_path_based_on_run_context():
 
 
 # Method removes all files under a certain directory #
-def clean_directory(directory):
-    # Iterating over working tree #
-    for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
+def clean_directory(directory, ignore_files=None):
+    ignore_files = set(ignore_files) if ignore_files else set()
+
+    files_to_process = [os.path.join(directory, filename) for filename in os.listdir(directory) if filename not in ignore_files]
+
+    for file_path in files_to_process:
         # Removing files #
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -51,9 +53,7 @@ def copy_proj_base_dir(result_full_path, symlinks=False, ignore=None):
 
 
 # Method copies domain files into proper folder of result hierarchy #
-def copy_domain_files(result_full_path, generated_domains_path, symlinks=False, ignore=None):
-    # Accessing domain folder #
-    proj_domain_folder = os.path.join(result_full_path, 'src\\c_Domain')
+def copy_domain_files(proj_domain_folder, generated_domains_path, symlinks=False, ignore=None):
     # Iterating over domain directory #
     for item in os.listdir(generated_domains_path):
         src_folder = os.path.join(generated_domains_path, item)
@@ -133,3 +133,38 @@ def append_database_library_to_requirements_file(file_path, new_dependency):
 
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
+
+
+# Check if base project folders exists and cleans those folders to regenerate their files
+def check_if_base_project_exists(result_full_path):
+    # List of directories and files to check relative to the base_path
+    base_project_directories_and_files = [
+        'src/c_Domain',
+        'src/a_Presentation/a_Domain',
+        'src/b_Application/b_Service/a_Domain',
+        'src/d_Repository/a_Domain',
+        'src/a_Presentation/d_Swagger',
+        'src/e_Infra/b_Builders/a_Swagger',
+        'src/e_Infra/d_Validators/a_Domain',
+        'src/e_Infra/g_Environment',
+        'src/e_Infra/b_Builders/FlaskBuilder.py',
+        'config',
+        'app.py'
+    ]
+
+    # Check if all directories and files exist
+    base_project_exists = all(os.path.exists(os.path.join(result_full_path, item)) for item in base_project_directories_and_files)
+
+    if base_project_exists:
+        # Clean all directories and delete files
+        for item in base_project_directories_and_files:
+            full_path = os.path.join(result_full_path, item)
+
+            if os.path.isdir(full_path):
+                # If it's a directory, clean it
+                clean_directory(full_path, ignore_files=['__init__.py'])
+            elif os.path.isfile(full_path):
+                # If it's a file, delete it
+                os.remove(full_path)
+
+    return base_project_exists

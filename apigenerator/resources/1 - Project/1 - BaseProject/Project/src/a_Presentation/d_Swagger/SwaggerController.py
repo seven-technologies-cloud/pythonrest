@@ -15,11 +15,6 @@ def swagger_route():
 
         yaml_file = open("config/swagger.yaml")
         data = yaml.safe_load(yaml_file)
-
-        try:
-            stage = request.aws_stage_name
-        except:
-            stage = None
-        data['servers'] = [{"url": "/" + stage}] if stage is not None else [{"url": ''}]
+        data['servers'] = [{"url": ''}]
 
         return json.dumps(data), 200, {'Content-Type': 'application/json'}
