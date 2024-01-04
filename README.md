@@ -1,4 +1,4 @@
-# pythonrest CLI
+# PythonREST CLI
 
 ## Requirements
 
