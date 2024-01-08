@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>pythonrest</id>
+    <version>0.1.0</version>
+    <title>pythonrest</title>
+    <authors>seven-technologies-cloud</authors>
+    <owners>seven-technologies-cloud</owners>
+    <projectUrl>https://github.com/daflongustavo/pythonrest</projectUrl>
+    <licenseUrl>https://github.com/daflongustavo/pythonrest/blob/main/LICENSE</licenseUrl>
+    <packageSourceUrl>https://github.com/daflongustavo/pythonrest</packageSourceUrl>
+    <bugTrackerUrl>https://github.com/seven-technologies-cloud/pythonrest/issues</bugTrackerUrl>
+    <docsUrl>https://github.com/daflongustavo/pythonrest/blob/main/README.md</docsUrl>
+    <iconUrl>https://avatars.githubusercontent.com/u/106111090?v=4</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>First release for pythonrest, a Seven Technologies Cloud CLI tool.</summary>
+    <description>pythonrest CLI tool was designed to generate an API from a database (mysql, postgres, mariaDB, sqlserver and aurora).</description>
+    <releaseNotes>First release. Commands version and generate(the one to connect to a database and generate the API based on it).</releaseNotes>
+    <copyright>Copyright (c) 2023</copyright>
+    <tags>python cli db mysql postgres database sqlserver apirest lambda api mariadb</tags>
+  </metadata>
+  <files>
+    <file src="./dist/pythonrest.exe" target="tools" />
+    <file src="./tools/VERIFICATION.txt" target="tools" />
+    <file src="./tools/LICENSE.txt" target="tools" />
+  </files>
+</package>
