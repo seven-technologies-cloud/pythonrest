@@ -9,7 +9,7 @@ parameters:
       leonardoviana@seventechnologies.cloud
 
 variables:
-- group: python-cli-example-lib
+- group: pythonrest-cli
 
 jobs:
 - job: CheckProjectVersionAndPublish
