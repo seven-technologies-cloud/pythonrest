@@ -1,3 +1,6 @@
+trigger: 
+  - main
+
 stages:
 - stage: CheckAndPublish
   jobs:
