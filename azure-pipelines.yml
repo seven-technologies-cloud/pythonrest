@@ -21,20 +21,16 @@ jobs:
       latest_version=$(curl -s https://pypi.org/pypi/$(app_name)/json | jq -r '.info.version' 2>/dev/null)
       echo "Latest version on PyPI: $latest_version"
 
-      if [ -z "$latest_version" ]; then
-        echo "No project found, starting deployment..."
-      else
-        local_version=$(grep -oP "(?<=version=')[^']+" setup.py)
-        echo "Local version in setup.py: $local_version"
+      local_version=$(python3 -c "from setuptools import setup; print(setup().get_version())")
+      echo "Local version in setup.py: $local_version"
 
-        if [ "$latest_version" != "$local_version" ]; then
-          echo "Versions are different. Uploading to PyPI."
-          pip3 install twine
-          python3 setup.py sdist
-          python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
-        else
-          echo "Versions are the same. Skipping PyPI upload."
-        fi
+      if [ "$latest_version" != "$local_version" ]; then
+        echo "Versions are different. Uploading to PyPI."
+        pip3 install twine
+        python3 setup.py sdist
+        python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
+      else
+        echo "Versions are the same. Skipping PyPI upload."
       fi
 
 - job: CheckChocoCLIVersion
