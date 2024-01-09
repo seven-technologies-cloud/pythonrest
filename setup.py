@@ -1,14 +1,20 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='PythonREST',
+    name='pythonrest',  # Nome no PyPI
     version='0.1.0',
     description='PythonRestCLI tool, created and managed by Seven Technologies Cloud.\nIt generates a complete API based on a connection string for relational databases as mysql, mssql, maria db, aurora and postgres',
     author='Seven Technologies Cloud',
     author_email='admin@seventechnologies.cloud',
     maintainer='Seven Technologies Cloud',
     keywords=['api', 'rest api', 'database', 'python', 'mysql', 'mssql', 'postgres', 'aurora', 'mariadb'],
+    py_modules=['pythonrest'],
     packages=find_packages(),
+    package_dir={
+        'domaingenerator': 'domaingenerator',
+        'databaseconnector': 'databaseconnector',
+        'apigenerator': 'apigenerator',
+    },
     install_requires=[
         'typer==0.9.0',
         'PyYAML==6.0.1',
@@ -21,7 +27,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'pythonrest=app:cli',
+            'pythonrest=pythonrest:app',
         ],
     },
 )
