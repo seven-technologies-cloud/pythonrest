@@ -1,4 +1,4 @@
-desired_entry='/usr/bin/python-rest'
+desired_entry='/usr/local/bin/pythonrest'
 old_path=$PATH
 IFS=':' read -r -a old_path_entry_list <<< "$old_path"
 new_path_entry_list=()

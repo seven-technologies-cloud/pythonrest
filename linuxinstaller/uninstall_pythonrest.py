@@ -2,7 +2,6 @@ import os
 import subprocess
 import sys
 import time
-import getpass
 
 
 def remove_pythonrest_from_program_files(install_path):
@@ -31,8 +30,9 @@ def run_bash_script(script_path):
 
 if __name__ == "__main__":
     try:
-        if getpass.getuser() != "root":
-            print("Please run this script with sudo or as a root user.")
+        if os.geteuid() != 0:
+            print("This installer requires sudo privileges to run. Please type your sudo password")
+            os.system(f'sudo {sys.executable} {" ".join(sys.argv)}')
             sys.exit()
 
         script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -46,6 +46,8 @@ if __name__ == "__main__":
         bash_script_path = os.path.join(script_directory, bash_script_name)
 
         run_bash_script(bash_script_path)
+
+        os.chmod(bash_script_path, 0o755)
 
     except Exception as e:
         print(f'Error: {e}')

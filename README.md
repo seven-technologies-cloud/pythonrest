@@ -78,6 +78,7 @@ pyinstaller --onefile ^
     --collect-submodules psycopg2 ^
     --collect-submodules psycopg2-binary ^
     --collect-submodules pymssql ^
+    --icon=pythonrestlogo.ico ^
     pythonrest.py
 ```
 it will generate a dist folder with the pythonrest.exe file 
@@ -97,6 +98,7 @@ pyinstaller ^
 --add-data "pythonrest.exe;." ^
 --add-data "install_pythonrest.py;." ^
 --add-data "addpythonresttouserpath.ps1;." ^
+--icon=../pythonrestlogo.ico ^
 --name PythonRESTInstaller install_pythonrest.py
 ```
 
@@ -107,6 +109,7 @@ pyinstaller ^
 --onefile ^
 --add-data "uninstall_pythonrest.py;." ^
 --add-data "removepythonrestfromuserpath.ps1;." ^
+--icon=../pythonrestlogo.ico ^
 --name PythonRESTUninstaller uninstall_pythonrest.py
 ```
 
@@ -177,15 +180,8 @@ run from linuxinstaller/ folder:
 ```
 This will take care of running the above pyinstaller commands, and it will generate both installer and uninstaller 
 binaries on PythonRestExecutables/ directory, which you can then run to install and/or uninstall the cli on your
-machine.
-The installer and uninstaller files must run with sudo to successfully install, so we run them like this:
+machine, like below:
 ```bash
-sudo ./PythonRESTInstaller
-sudo ./PythonRESTUninstaller
-```
-
-After installing, you can run the pythonrest commands, keep in mind that to run the cli you need to do it as sudo as well, like:
-```bash
-sudo pythonrest version
-sudo pythonrest generate --mysql-connection-string <mysql_connection_string>
+./PythonRESTInstaller
+./PythonRESTUninstaller
 ```

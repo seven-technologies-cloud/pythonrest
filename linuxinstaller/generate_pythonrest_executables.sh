@@ -40,6 +40,11 @@ run_command "mv '$script_path/dist/PythonRESTUninstaller' '$executables_dir' -f"
 
 run_command "rm -rf '$script_path/build' '$script_path/dist'"
 
-run_command "rm -f '$script_path/*.spec'"
+run_command "rm -f $script_path/*.spec"
+
+run_command "rm -f '$script_path/pythonrest'"
+
+chmod +x "$script_path/$executables_dir/PythonRESTInstaller"
+chmod +x "$script_path/$executables_dir/PythonRESTUninstaller"
 
 write_log "PythonRestExecutables successfully generated on path $executables_dir"
