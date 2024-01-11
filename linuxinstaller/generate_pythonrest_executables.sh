@@ -44,7 +44,7 @@ run_command "rm -f $script_path/*.spec"
 
 run_command "rm -f '$script_path/pythonrest'"
 
-chmod +x "$script_path/$executables_dir/PythonRESTInstaller"
-chmod +x "$script_path/$executables_dir/PythonRESTUninstaller"
+chmod +x "$executables_dir/PythonRESTInstaller"
+chmod +x "$executables_dir/PythonRESTUninstaller"
 
 write_log "PythonRestExecutables successfully generated on path $executables_dir"
