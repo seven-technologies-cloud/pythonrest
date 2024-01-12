@@ -25,7 +25,7 @@ def run_script_that_adds_pythonrest_to_path(script_path):
         subprocess.run(bash_command, check=True)
         print('PythonREST has been successfully added to your user PATH.')
         print('PythonREST installation completed successfully.')
-        print('You can now run "sudo pythonrest version" to verify its installation.')
+        print('You can now run "pythonrest version" to verify its installation.')
     except Exception as e:
         print(f'Error: Unable to set PythonREST on user PATH. {e}')
         input('Press Enter to exit...')
