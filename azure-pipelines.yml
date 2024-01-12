@@ -1,5 +1,5 @@
-# trigger:
-# - main
+trigger:
+- none
 
 parameters:
   - name: USERS_EMAILS_TO_NOTIFY
