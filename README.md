@@ -31,36 +31,45 @@ sudo pip install -r requirements.txt
 To make use of pythonrest, these are the commands available for use:
 
 Check the version:
+
 `pythonrest version`
 
 Connect to mysql:
+
 `pythonrest generate --mysql-connection-string <mysql_connection_string>`
 
 Connect to postgres:
+
 `pythonrest generate --postgres-connection-string <postgres_connection_string>`
 
 Connect to sqlserver:
+
 `pythonrest generate --sqlserver-connection-string <sqlserver_connection_string>`
 
 Connect to mariadb:
+
 `pythonrest generate --mariadb-connection-string <mariadb_connection_string>`
 
 ### Custom options
---result-path:
+#### --result-path:
 By default, PythonREST will generate the API on your current directory, under a PythonRestAPI folder, but there is also 
 a possibility to define a custom path to your generated API, following the below example:
+
 `pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\Users\<your_user_here>\Documents\PythonRestCustomFolder`
+
 The above will generate your API on the provided path, and if the folder does not exist the generator will create it, keep
 in mind that the provided folder will be cleaned before generating the API.
 
---use-pascal-case:
+#### --use-pascal-case:
 This option creates the Python Domain Classes with PascalCase pattern for their names, if this option is provided as
 --no-use-pascal-case, you will be prompted to provide a name of python class for each table of your database:
+
 `pythonrest generate --mysql-connection-string <mysql_connection_string> --no-use-pascal-case`
 
---us-datetime:
+#### --us-datetime:
 If you have a database with datetime formatted to the us pattern of mm-dd-yyyy, you can use this option so that the api
 will also respect that pattern when validating requests and responses:
+
 `pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
 
 # How to Build
