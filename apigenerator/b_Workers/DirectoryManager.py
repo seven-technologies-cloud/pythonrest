@@ -3,6 +3,7 @@ import sys
 import os
 import shutil
 from apigenerator.e_Enumerables.Enumerables import *
+import site
 
 
 # Check if script is running directly or via exe file to get the path
@@ -15,10 +16,25 @@ def define_script_path_based_on_run_context():
         # If it's an executable, use the '_MEIPASS' attribute
         script_absolute_path = getattr(sys, '_MEIPASS', os.path.dirname(script_path))
     else:
-        print('Caiu aqui no else hein! Fez a Elsa! Let it go!')
-        # If it's a script, use the directory of the script
-        script_absolute_path = os.path.dirname(script_path)
+        # If it's a script, check if it's installed via pip or running from source
+        if is_pip_installed('pythonrest'):
+            # If installed via pip or in a virtual environment, use the package directory
+            script_absolute_path = os.environ['PACKAGE_DIR']
+        else:
+            # If running from source, use the directory of the script
+            script_absolute_path = os.path.dirname(script_path)
     return script_absolute_path
+
+
+def is_pip_installed(package_name):
+    site_packages = site.getsitepackages()
+
+    for path in site_packages:
+        package_path = os.path.join(path, package_name)
+        if os.path.exists(package_path):
+            return True
+
+    return False
 
 
 # Method removes all files under a certain directory #
@@ -42,8 +58,6 @@ def clean_directory(directory, ignore_files=None):
 def copy_proj_base_dir(result_full_path, symlinks=False, ignore=None):
     directories = get_directory_data()
     script_absolute_path = define_script_path_based_on_run_context()
-    print('This probably where the error is')
-    print(script_absolute_path)
     src = os.path.join(script_absolute_path, directories['base_proj_path'])
     # Iterating over working tree #
     for item in os.listdir(src):
@@ -79,16 +93,6 @@ def copy_database_files(db_resources_folder, resources_folder, symlinks=False, i
         # Asssembling files into destination folder #
         if os.path.isdir(s):
             shutil.copytree(s, d, symlinks, ignore, dirs_exist_ok=True)
-        else:
-            shutil.copy2(s, d)
-
-
-def copytree(src, dst, symlinks=False, ignore=None):
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, symlinks, ignore)
         else:
             shutil.copy2(s, d)
 

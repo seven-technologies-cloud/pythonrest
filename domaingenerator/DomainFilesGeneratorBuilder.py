@@ -1,6 +1,8 @@
 import sys
 import os
 import json
+import site
+
 
 # Check if script is running directly or via exe file to get the path
 def define_script_path_based_on_run_context():
@@ -12,9 +14,25 @@ def define_script_path_based_on_run_context():
         # If it's an executable, use the '_MEIPASS' attribute
         script_absolute_path = getattr(sys, '_MEIPASS', os.path.dirname(script_path))
     else:
-        # If it's a script, use the directory of the script
-        script_absolute_path = os.path.dirname(script_path)
+        # If it's a script, check if it's installed via pip or running from source
+        if is_pip_installed('pythonrest'):
+            # If installed via pip or in a virtual environment, use the package directory
+            script_absolute_path = os.environ['PACKAGE_DIR']
+        else:
+            # If running from source, use the directory of the script
+            script_absolute_path = os.path.dirname(script_path)
     return script_absolute_path
+
+
+def is_pip_installed(package_name):
+    site_packages = site.getsitepackages()
+
+    for path in site_packages:
+        package_path = os.path.join(path, package_name)
+        if os.path.exists(package_path):
+            return True
+
+    return False
 
 
 def get_domain_list(json_metadata_path):
