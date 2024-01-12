@@ -15,6 +15,7 @@ def define_script_path_based_on_run_context():
         # If it's an executable, use the '_MEIPASS' attribute
         script_absolute_path = getattr(sys, '_MEIPASS', os.path.dirname(script_path))
     else:
+        print('Caiu aqui no else hein! Fez a Elsa! Let it go!')
         # If it's a script, use the directory of the script
         script_absolute_path = os.path.dirname(script_path)
     return script_absolute_path
@@ -41,6 +42,8 @@ def clean_directory(directory, ignore_files=None):
 def copy_proj_base_dir(result_full_path, symlinks=False, ignore=None):
     directories = get_directory_data()
     script_absolute_path = define_script_path_based_on_run_context()
+    print('This probably where the error is')
+    print(script_absolute_path)
     src = os.path.join(script_absolute_path, directories['base_proj_path'])
     # Iterating over working tree #
     for item in os.listdir(src):
