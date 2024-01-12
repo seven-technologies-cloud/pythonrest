@@ -26,20 +26,9 @@ pip install -r requirements.txt
 sudo pip install -r requirements.txt
 ```
 
-## Structure
+## Usage
 
-PrivatePythonRest/
-├── pythonrest/
-│   ├── __init__.py
-│   ├── pythonrest.py
-│   ├── connect_functions.py
-│   └── test.py
-├── setup.py
-└── README.md
-
-## Run our pythonrest CLI
-
-There are five available commands for now:
+To make use of pythonrest, these are the commands available for use:
 
 Check the version:
 `pythonrest version`
@@ -55,6 +44,24 @@ Connect to sqlserver:
 
 Connect to mariadb:
 `pythonrest generate --mariadb-connection-string <mariadb_connection_string>`
+
+### Custom options
+--result-path:
+By default, PythonREST will generate the API on your current directory, under a PythonRestAPI folder, but there is also 
+a possibility to define a custom path to your generated API, following the below example:
+`pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\Users\<your_user_here>\Documents\PythonRestCustomFolder`
+The above will generate your API on the provided path, and if the folder does not exist the generator will create it, keep
+in mind that the provided folder will be cleaned before generating the API.
+
+--use-pascal-case:
+This option creates the Python Domain Classes with PascalCase pattern for their names, if this option is provided as
+--no-use-pascal-case, you will be prompted to provide a name of python class for each table of your database:
+`pythonrest generate --mysql-connection-string <mysql_connection_string> --no-use-pascal-case`
+
+--us-datetime:
+If you have a database with datetime formatted to the us pattern of mm-dd-yyyy, you can use this option so that the api
+will also respect that pattern when validating requests and responses:
+`pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
 
 # How to Build
 
@@ -185,3 +192,30 @@ machine, like below:
 ./PythonRESTInstaller
 ./PythonRESTUninstaller
 ```
+
+## Build and install pythonrest local pip package
+Run from the root folder:
+```commandline
+pip install .
+```
+This will use the setup.py from the root folder to build a library of the pythonrest on the site-packages
+of the Python folder.
+One thing worth noting is that if you need to add a new folder to the project, e.g. apigenerator/c_NewFolder
+you need to add a new entry to the list of the packages property in the setup.py, like this:
+```python
+'pythonrest.apigenerator.c_NewFolder',
+```
+And if that folder has files that are not of .py extension, e.g. apigenerator/c_NewFolder/new.yaml and 
+apigenerator/c_NewFolder/new2.yaml, you need to add a new entry to the list of the package_data property in the 
+setup.py, like this:
+```python
+'pythonrest.apigenerator.c_NewFolder': ['new.yaml', 'new2.yaml'],
+```
+All of this must be done to successfully add those files to the pip generated and installed library
+To uninstall the local pip package, you can just use a common pip uninstall command:
+```commandline
+pip uninstall pythonrest
+```
+When reinstalling the local pip package for tests, make sure to delete the build folder generated on the root folder of the project,
+as retaining that folder can lead to the project being built using that folder and not catching any changes you made to
+the project files.

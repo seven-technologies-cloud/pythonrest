@@ -2,21 +2,12 @@ import shutil
 import yaml
 from mergedeep import merge
 import os
-
-
-def copytree(src, dst, symlinks=False, ignore=None):
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, symlinks, ignore)
-        else:
-            shutil.copy2(s, d)
+from shutil import copytree
 
 
 def install_sql_route(result, script_absolute_path):
     copytree(os.path.join(script_absolute_path, 'apigenerator/resources/4 - SQLRoute'),
-             os.path.join(result, 'src', 'a_Presentation', 'b_Custom'))
+             os.path.join(result, 'src', 'a_Presentation', 'b_Custom'), dirs_exist_ok=True)
 
 
 def install_sql_swagger(result, script_absolute_path):
