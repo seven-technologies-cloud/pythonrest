@@ -21,7 +21,7 @@ try {
     exit 1
 }
 
-Run-Command "pyinstaller --onefile --add-data '../pythonrest.py;.' --add-data '../databaseconnector;databaseconnector' --add-data '../domaingenerator;domaingenerator' --add-data '../apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql ../pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data '../pythonrest.py;.' --add-data '../databaseconnector;databaseconnector' --add-data '../domaingenerator;domaingenerator' --add-data '../apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql --icon=../pythonrestlogo.ico ../pythonrest.py"
 
 try {
     Move-Item "$scriptPath\dist\pythonrest.exe" "$scriptPath" -Force
@@ -30,9 +30,9 @@ try {
     exit 1
 }
 
-Run-Command "pyinstaller --onefile --add-data 'pythonrest.exe;.' --add-data 'install_pythonrest.py;.' --add-data 'addpythonresttouserpath.ps1;.' --name PythonRESTInstaller install_pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data 'pythonrest.exe;.' --add-data 'install_pythonrest.py;.' --add-data 'addpythonresttouserpath.ps1;.' --icon=../pythonrestlogo.ico --name PythonRESTInstaller install_pythonrest.py"
 
-Run-Command "pyinstaller --onefile --add-data 'uninstall_pythonrest.py;.' --add-data 'removepythonrestfromuserpath.ps1;.' --name PythonRESTUninstaller uninstall_pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data 'uninstall_pythonrest.py;.' --add-data 'removepythonrestfromuserpath.ps1;.' --icon=../pythonrestlogo.ico --name PythonRESTUninstaller uninstall_pythonrest.py"
 
 $executablesDir = "$scriptPath\PythonRestExecutables"
 if (-not (Test-Path -Path $executablesDir -PathType Container)) {
