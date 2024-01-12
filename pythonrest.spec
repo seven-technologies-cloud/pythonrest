@@ -3,7 +3,7 @@
 block_cipher = None
 
 a = Analysis(['pythonrest.py'],
-             pathex=['C:\\Projects\\pythonrest'],
+             pathex=['.'],
              binaries=[],
              datas=[('./databaseconnector', 'databaseconnector'), ('./apigenerator', 'apigenerator'), ('./domaingenerator', 'domaingenerator')],
              hiddenimports=['pymysql', 'psycopg2', 'pymssql', 'pymssql._mssql', 'parse', 'yaml', 'mergedeep', 'typer', 'typer.main', 'typer.models', 'typer.params', 'typer.utils', 'typer.decorators', 'typer.core', 'typer.errors', 'typer.completer', 'typer.prompting', 'typer.styles', 'typer.launcher'],
