@@ -11,7 +11,7 @@
     <packageSourceUrl>https://github.com/daflongustavo/pythonrest</packageSourceUrl>
     <bugTrackerUrl>https://github.com/seven-technologies-cloud/pythonrest/issues</bugTrackerUrl>
     <docsUrl>https://github.com/daflongustavo/pythonrest/blob/main/README.md</docsUrl>
-    <iconUrl>https://avatars.githubusercontent.com/u/106111090?v=4</iconUrl>
+    <iconUrl>https://private-user-images.githubusercontent.com/106110465/296319872-3f889d7c-6c2e-473d-b987-22f4a0d334df.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDUwODE5MjcsIm5iZiI6MTcwNTA4MTYyNywicGF0aCI6Ii8xMDYxMTA0NjUvMjk2MzE5ODcyLTNmODg5ZDdjLTZjMmUtNDczZC1iOTg3LTIyZjRhMGQzMzRkZi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwMTEyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDExMlQxNzQ3MDdaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jMmE3MmNmY2Q1MjBiM2Y3OGY0Yzc4ZGU5Mjg2NzEyYmIwYjk2Y2ZlNGI2N2Y0ZGRiNzE0OThiN2MwMWVkOGIwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.z06k61cIpPs1FX0Dasyy43RCQtR9sak4OX22aXFdzt0</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>First release for pythonrest, a Seven Technologies Cloud CLI tool.</summary>
     <description>pythonrest CLI tool was designed to generate an API from a database (mysql, postgres, mariaDB, sqlserver and aurora).</description>
