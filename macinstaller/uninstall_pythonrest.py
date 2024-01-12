@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 import os
 import subprocess
 import sys
 import time
 
 
-def remove_pythonrest_from_usr_local_bin(install_path):
+def remove_pythonrest_from_system_bin(install_path):
     try:
         os.remove(install_path)
         print(f'Successfully removed the PythonREST binary: {install_path}')
@@ -38,7 +39,7 @@ if __name__ == "__main__":
         script_directory = os.path.dirname(os.path.abspath(__file__))
         install_path = '/usr/local/bin/pythonrest'
 
-        remove_pythonrest_from_usr_local_bin(install_path)
+        remove_pythonrest_from_system_bin(install_path)
 
         time.sleep(1)
 

@@ -81,6 +81,7 @@ pyinstaller --onefile ^
     --collect-submodules yaml ^
     --collect-submodules parse ^
     --collect-submodules mergedeep ^
+    --collect-submodules site ^
     --collect-submodules pymysql ^
     --collect-submodules psycopg2 ^
     --collect-submodules psycopg2-binary ^
@@ -129,7 +130,7 @@ This will take care of running the above pyinstaller commands and it will genera
 executables on PythonRestExecutables/ directory, which you can then run to install and/or uninstall the cli on your
 machine.
 
-# Linux
+# Linux/Mac
 ## Building the CLI binary
 Run from the root folder:
 ```bash
@@ -144,6 +145,7 @@ pyinstaller --onefile \
     --collect-submodules yaml \
     --collect-submodules parse \
     --collect-submodules mergedeep \
+    --collect-submodules site \
     --collect-submodules pymysql \
     --collect-submodules psycopg2 \
     --collect-submodules psycopg2-binary \
@@ -160,7 +162,7 @@ The 'typing' package is an obsolete backport of a standard library package and i
 Just removing the package and retrying fixes that error.
 
 ## Building the Installer binary
-Move the pythonrest.exe file from the generated dist/ folder to the linuxinstaller/ folder and run from the latter folder:
+Move the pythonrest file from the generated dist/ folder to the linuxinstaller/ or macinstaller/ folder and run from it:
 ```bash
 pyinstaller \
     --onefile \
@@ -171,7 +173,7 @@ pyinstaller \
 ```
 
 ## Building the Uninstaller binary
-Run from the linuxinstaller/ folder:
+Run from the linuxinstaller/ or macinstaller/ folder:
 ```bash
 pyinstaller \
     --onefile \
@@ -181,7 +183,12 @@ pyinstaller \
 ```
 
 ## Build pythonrest, installer and uninstaller
-run from linuxinstaller/ folder:
+Go to linuxinstaller/ or macinstaller/ folder and from it add execute permission on the script:
+```bash
+chmod +x ./generate_pythonrest_executables.sh
+```
+
+Execute the script:
 ```bash
 ./generate_pythonrest_executables.sh
 ```
@@ -191,6 +198,24 @@ machine, like below:
 ```bash
 ./PythonRESTInstaller
 ./PythonRESTUninstaller
+```
+Known Issues:
+When executing ./generate_pythonrest_executables.sh, there is a possibility that something like this issue occurs:
+```bash
+./generate_pythonrest_executables.sh: line 2: $'\r': command not found                                                   
+./generate_pythonrest_executables.sh: line 3: syntax error near unexpected token `$'{\r''                                
+'/generate_pythonrest_executables.sh: line 3: `function write_log() {   
+```
+That issue is due to a difference in line endings between Windows (CRLF - Carriage Return and Line Feed) and Linux/Unix
+(LF - Line Feed) systems. When you transfer or use scripts created on Windows in a Linux environment, these line ending 
+characters can cause issues. To fix it you can install and run dos2unix in all of the sh files of the linuxinstaller
+folder:
+```bash
+sudo apt-get update
+sudo apt-get install dos2unix
+dos2unix generate_pythonrest_executables.sh
+dos2unix addpythonresttouserpath.sh
+dos2unix removepythonrestfromuserpath.sh
 ```
 
 ## Build and install pythonrest local pip package

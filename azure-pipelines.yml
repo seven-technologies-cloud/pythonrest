@@ -1,5 +1,4 @@
-trigger:
-- none
+trigger: none
 
 parameters:
   - name: USERS_EMAILS_TO_NOTIFY
@@ -12,7 +11,7 @@ variables:
 - group: pythonrest-cli
 
 jobs:
-- job: CheckProjectVersionAndPublish
+- job: CheckPipProjectVersionAndPublish
   pool:
     vmImage: ubuntu-latest
   steps:

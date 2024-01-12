@@ -5,7 +5,7 @@ import subprocess
 import time
 import ctypes
 
-def move_exe_to_program_files(executable_path, target_folder):
+def move_pythonrest_exe_to_program_files(executable_path, target_folder):
     try:
         shutil.move(executable_path, os.path.join(target_folder, os.path.basename(executable_path)))
         print(f'Successfully added PythonREST to your Programs in "{target_folder}".')
@@ -14,7 +14,7 @@ def move_exe_to_program_files(executable_path, target_folder):
         input('Press Enter to exit...')
         sys.exit(1)
 
-def run_powershell_script(script_path):
+def run_script_that_adds_pythonrest_to_path(script_path):
     try:
         powershell_command = [
             'powershell.exe',
@@ -41,12 +41,12 @@ if __name__ == "__main__":
         install_directory = os.path.join(os.environ['PROGRAMFILES'], 'PythonREST')
         os.makedirs(install_directory, exist_ok=True)
         executable_path = os.path.join(script_directory, 'pythonrest.exe')
-        move_exe_to_program_files(executable_path, install_directory)
+        move_pythonrest_exe_to_program_files(executable_path, install_directory)
 
         time.sleep(1)
         powershell_script_name = 'addpythonresttouserpath.ps1'
         powershell_script_path = os.path.join(script_directory, powershell_script_name)
-        run_powershell_script(powershell_script_path)
+        run_script_that_adds_pythonrest_to_path(powershell_script_path)
 
     except Exception as e:
         print(f'Error: {e}')

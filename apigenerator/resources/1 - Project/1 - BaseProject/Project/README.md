@@ -13,7 +13,7 @@ If you wish to run this project using a Python virtual environment, you can foll
 python -m venv venv
 ```
 
-#### Linux:
+#### Linux/Mac:
 On Debian/Ubuntu systems, you need to have the python3-venv package installed, which you can do with the following commands:
 ```bash
 apt-get update
