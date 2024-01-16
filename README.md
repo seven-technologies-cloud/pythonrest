@@ -1,4 +1,243 @@
 # PythonREST CLI
+<div style="display:flex;justify-content:center"><img src="https://private-user-images.githubusercontent.com/106110465/297185313-68f4ee8b-84e1-4442-8bc5-eab24a81a4e0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDU0Mzg0NzAsIm5iZiI6MTcwNTQzODE3MCwicGF0aCI6Ii8xMDYxMTA0NjUvMjk3MTg1MzEzLTY4ZjRlZThiLTg0ZTEtNDQ0Mi04YmM1LWVhYjI0YTgxYTRlMC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwMTE2JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDExNlQyMDQ5MzBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yN2I1YjNjOGVlOTkyNmJiMjlmMGQxOTM1ZDk3NzljMmY0OTIzN2RlNWZjMTdhYTg5YjVmNjE0MWJhZDUxNmY0JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.Qe_GSEvZDvIozllMJBEIcPRNP9OnOoCrugT9HLYKul4" alt="Logo" width="350"/></div>
+
+
+Introducing PythonREST - the revolutionary REST API Generator that takes your Python projects to new heights! With a single cli command, you can effortlessly build a complete application. Witness the magic of transforming months of project development into a matter of seconds.
+
+## Key features
+- Support for MySQL, PostgreSQL, SQLServer and MariaDB databases
+- Full [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification) (formerly known as Swagger) documentation
+to use for making queries inside the database.
+- Raw query execution via route requests
+- Simple Stored Procedure execution supported
+- Query filters(select, orderby, limit) on Get routes supported
+- Pagination of queries
+- Filter query results by each table field
+
+## Installation
+To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more 
+familiar with package managers, we have options for that below.
+
+### Windows
+
+### Chocolatey
+
+```ps
+choco install pythonrest --version=0.1.0
+```
+
+## Usage
+
+Here are some pythonrest usage examples:
+
+Check version:
+
+`pythonrest version`
+
+Generate API based on mysql database:
+
+`pythonrest generate --mysql-connection-string <mysql_connection_string>`
+
+Generate API based on postgres database:
+
+`pythonrest generate --postgres-connection-string <postgres_connection_string>`
+
+Generate API based on sqlserver database:
+
+`pythonrest generate --sqlserver-connection-string <sqlserver_connection_string>`
+
+Generate API based on mariadb database:
+
+`pythonrest generate --mariadb-connection-string <mariadb_connection_string>`
+
+### Custom options
+#### --result-path:
+By default, PythonREST will generate the API on your current directory, under a PythonRestAPI folder, but there is also 
+a possibility to define a custom path to your generated API, following the below example:
+
+`pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\Users\<your_user_here>\Documents\PythonRestCustomFolder`
+
+The above will generate your API on the provided path, and if the folder does not exist the generator will create i.
+The following folders/files will be modified(content deleted and recreated) if a PythonREST project is already in place:
+- src/c_Domain
+- src/a_Presentation/a_Domain
+- src/b_Application/b_Service/a_Domain
+- src/d_Repository/a_Domain
+- src/a_Presentation/d_Swagger
+- src/e_Infra/b_Builders/a_Swagger
+- src/e_Infra/d_Validators/a_Domain
+- src/e_Infra/g_Environment
+- src/e_Infra/b_Builders/FlaskBuilder.py
+- config
+- app.py
+This allows you to make customizations or enhancements on your generated API and new upgrades will only affect CRUD API feature folders
+## ⚠️ Disclaimer
+Keep in mind that the provided folder will have all of its files deleted before generating the API, except when a PythonREST project is already in place
+
+#### --use-pascal-case:
+This option creates the Python Domain Classes with PascalCase pattern for their names, if this option is provided as
+--no-use-pascal-case, you will be prompted to provide a name of python class for each table of your database:
+
+`pythonrest generate --mysql-connection-string <mysql_connection_string> --no-use-pascal-case`
+
+#### --us-datetime:
+If you have a database with datetime formatted to the us pattern of mm-dd-yyyy, you can use this option so that the api
+will also respect that pattern when validating requests and responses:
+
+`pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
+ 
+This behavior can be modified on the project's environment variable file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Valid values are:
+- "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" -> This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
+- "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" -> This value accepts dates on YYYY-DD-MM, MM-DD-YYYY, YYYY/DD/MM and MM/DD/YYYY formats
+
+### How to Run
+
+#### venv run
+If you wish to run this project using a Python virtual environment, you can follow the steps below:
+
+1. Create a virtual environment:
+
+#### Windows:
+
+```commandline
+python -m venv venv
+```
+
+#### Linux/Mac:
+On Debian/Ubuntu systems, you need to have the python3-venv package installed, which you can do with the following commands:
+```bash
+apt-get update
+apt install python3.8-venv
+```
+And then you can create the venv with the following:
+```bash
+python3 -m venv venv
+```
+2. Activate the virtual environment:
+#### Windows:
+```
+.\venv\Scripts\activate
+```
+
+#### Linux/Mac:
+```bash
+source venv/bin/activate
+```
+
+3. Install required libraries for API to run:
+```commandline
+pip install -r requirements.txt
+```
+
+4. Run app.py:
+```commandline
+python app.py
+```
+
+#### Run and Debug using venv with VSCode
+If you wish to go deep and debug the API, or simply wishes to run from VSCode Python extension, you'll want to configure
+a launch.json file for the API, to do that you'll go to the top bar of VSCode -> Run(if run is not visible, you may find
+it in the "..." on the title bar) -> Add Configuration.
+Doing that will generate your launch.json, in which you'll want to add a "python" key, similar to the example below:
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "python": "${command:python.<full_path_to_your_venv_python_exe_file>}",
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
+```
+
+## API Usage
+When running the API, it will provide you with a localhost url, that's how you access the API routes, which are:
+#### /swagger
+That's the base route for viewing swagger, it contains the documentation of the SQL routes present on the application
+
+#### /swagger/tablename
+For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in flatcase(all words together in lower case with no separators)
+
+### Postman/cURL
+If you're familiar with Postman or using cURL requests directly, you can make requests to the routes shown in the open api specification, using the examples of usage present on it to build your request.
+For example, a table user with id_user, username and date_joined fields would have a POST cURL request like:
+```bash
+curl -X 'POST' \
+  'http://localhost:5000/user' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '[
+  {
+    "id_user": 1,
+    "username": "first_user",
+    "date_joined": "2024-01-01 12:00:00"
+  }
+]'
+```
+
+### Use cases
+For more detailed use cases, you can check our [docs](https://readthedocs.org/projects/pythonrest/)
+
+## API Environment Variables
+Generated API environment variables can be found on src/e_Infra/g_Environment/EnvironmentVariables.py and each one has the following utility:
+- **domain_like_left** – Defines SQL's "LIKE" operator's behavior in relation to specified table columns. Columns defined here will have "%COLUMN_VALUE" search behavior whenever it's value is defined on a query parameter.
+Example:
+- Test
+- 1Test
+- NameTest
+- Example-Test
+
+- **domain_like_right** – Defines SQL's "LIKE" operator's behavior in relation to specified table columns. Columns defined here will have "COLUMN_VALUE%" search behavior whenever it's value is defined on a query parameter.
+Example:
+- Test
+- Test1
+- Test Name
+- Test-Example
+
+- **domain_like_full** – Defines SQL's "LIKE" operator's behavior in relation to specified table columns. Columns defined here will have "%COLUMN_VALUE%" search behavior whenever a it's value is defined on a query parameter.
+Example:
+- Test
+- Test1
+- TestName
+- Test-Example
+- 1Test
+- NameTest
+- Example-Test
+
+- **date_valid_masks** – Specifies the date formats accepted by the API. Valid values are: 
+- "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
+- "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
+
+## ⚠️ Disclaimer
+The previous behavior affects all fields from all database tables, is is not possible at this point to specify these rules for specific table columns
+
+- **time_valid_masks** – Specifies the time formats accepted by the API. Valid values are:
+- "%H:%M:%S" This value accepts times on HH:MM:SS format
+- "%I:%M:%S %p" This value accepts times on HH:MM:SS AM/PM format 
+- "%H:%M" This value accepts times on HH:MM format
+- "%I:%M %p" This value accepts times on HH:MM AM/PM format
+- "%I:%M:%S%p" This value accepts times on HH:MM:SSAM/PM format
+- "%I:%M%p" This value accepts times on HH:MMAM/PM format
+Your end result can be a combination of two or more of the previous options, like the following example(default API generation behavior):
+- "%H:%M:%S, %I:%M:%S %p, %H:%M, %I:%M %p, %I:%M:%S%p, %I:%M%p"
+
+## ⚠️ Disclaimer
+The previous behavior affects all fields from all database tables, is is not possible at this point to specify these rules for specific table columns
+
+- **query_limit** – Global result limiting of GET requests CRUD routes can return. Default value '*' means your CRUD GET requests won't have a maximum limit and will retrieve all data from a specified query even if your pagination or query limit parameters are not set. Valid values are any integer natural numbers (greater than 0) or '*'
+
+- **display_stacktrace_on_error** – When enabled, the original Python exception appears in the JSON response when an error occurs in the request. Valid values are "True" or "False"
+
+- **origins** – Defines allowed CORS origins, separated by comma.
+
+- **headers** – Defines allowed CORS origins headers values, separated by comma.
+
 
 ## Requirements
 
@@ -21,56 +260,10 @@ the below command on the project root directory:
 pip install -r requirements.txt
 ```
 
-# Linux
+# Linux/Mac
 ```bash
 sudo pip install -r requirements.txt
 ```
-
-## Usage
-
-To make use of pythonrest, these are the commands available for use:
-
-Check the version:
-
-`pythonrest version`
-
-Connect to mysql:
-
-`pythonrest generate --mysql-connection-string <mysql_connection_string>`
-
-Connect to postgres:
-
-`pythonrest generate --postgres-connection-string <postgres_connection_string>`
-
-Connect to sqlserver:
-
-`pythonrest generate --sqlserver-connection-string <sqlserver_connection_string>`
-
-Connect to mariadb:
-
-`pythonrest generate --mariadb-connection-string <mariadb_connection_string>`
-
-### Custom options
-#### --result-path:
-By default, PythonREST will generate the API on your current directory, under a PythonRestAPI folder, but there is also 
-a possibility to define a custom path to your generated API, following the below example:
-
-`pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\Users\<your_user_here>\Documents\PythonRestCustomFolder`
-
-The above will generate your API on the provided path, and if the folder does not exist the generator will create it, keep
-in mind that the provided folder will be cleaned before generating the API.
-
-#### --use-pascal-case:
-This option creates the Python Domain Classes with PascalCase pattern for their names, if this option is provided as
---no-use-pascal-case, you will be prompted to provide a name of python class for each table of your database:
-
-`pythonrest generate --mysql-connection-string <mysql_connection_string> --no-use-pascal-case`
-
-#### --us-datetime:
-If you have a database with datetime formatted to the us pattern of mm-dd-yyyy, you can use this option so that the api
-will also respect that pattern when validating requests and responses:
-
-`pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
 
 # How to Build
 
@@ -253,3 +446,6 @@ pip uninstall pythonrest
 When reinstalling the local pip package for tests, make sure to delete the build folder generated on the root folder of the project,
 as retaining that folder can lead to the project being built using that folder and not catching any changes you made to
 the project files.
+
+Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
+Please rank this repo 5 starts if you like our job!
