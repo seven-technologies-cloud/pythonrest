@@ -6,11 +6,11 @@
     <title>pythonrest</title>
     <authors>seven-technologies-cloud</authors>
     <owners>seven-technologies-cloud</owners>
-    <projectUrl>https://github.com/daflongustavo/pythonrest</projectUrl>
-    <licenseUrl>https://github.com/daflongustavo/pythonrest/blob/main/LICENSE</licenseUrl>
-    <packageSourceUrl>https://github.com/daflongustavo/pythonrest</packageSourceUrl>
+    <projectUrl>https://github.com/seven-technologies-cloud/pythonrest</projectUrl>
+    <licenseUrl>https://github.com/seven-technologies-cloud/pythonrest/blob/main/LICENSE</licenseUrl>
+    <packageSourceUrl>https://github.com/seven-technologies-cloud/pythonrest</packageSourceUrl>
     <bugTrackerUrl>https://github.com/seven-technologies-cloud/pythonrest/issues</bugTrackerUrl>
-    <docsUrl>https://github.com/daflongustavo/pythonrest/blob/main/README.md</docsUrl>
+    <docsUrl>https://github.com/seven-technologies-cloud/pythonrest/blob/main/README.md</docsUrl>
     <iconUrl>https://raw.githubusercontent.com/seven-technologies-cloud/pythonrest/main/pythonrestlogo.ico</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>First release for pythonrest, a Seven Technologies Cloud CLI tool.</summary>
