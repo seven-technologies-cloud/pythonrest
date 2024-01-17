@@ -1,5 +1,5 @@
 # PythonREST CLI
-<div style="display:flex;justify-content:center"><img src="https://private-user-images.githubusercontent.com/106110465/297185313-68f4ee8b-84e1-4442-8bc5-eab24a81a4e0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDU0Mzg0NzAsIm5iZiI6MTcwNTQzODE3MCwicGF0aCI6Ii8xMDYxMTA0NjUvMjk3MTg1MzEzLTY4ZjRlZThiLTg0ZTEtNDQ0Mi04YmM1LWVhYjI0YTgxYTRlMC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwMTE2JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDExNlQyMDQ5MzBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yN2I1YjNjOGVlOTkyNmJiMjlmMGQxOTM1ZDk3NzljMmY0OTIzN2RlNWZjMTdhYTg5YjVmNjE0MWJhZDUxNmY0JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.Qe_GSEvZDvIozllMJBEIcPRNP9OnOoCrugT9HLYKul4" alt="Logo" width="350"/></div>
+<div style="display:flex;justify-content:center"><img src="https://private-user-images.githubusercontent.com/106110465/297185313-68f4ee8b-84e1-4442-8bc5-eab24a81a4e0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDU1MTQyMDMsIm5iZiI6MTcwNTUxMzkwMywicGF0aCI6Ii8xMDYxMTA0NjUvMjk3MTg1MzEzLTY4ZjRlZThiLTg0ZTEtNDQ0Mi04YmM1LWVhYjI0YTgxYTRlMC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwMTE3JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDExN1QxNzUxNDNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0zZDA1OWFlMzFjMDE0Yjc3NmUzOTRkZjAzMzUxNWIwZDU2M2Y2Y2E0NmY1NTA0MzQ2MjFkMGUzN2VlZDYxNzE0JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.z7RwUjsTEzwia6QEPGv9I0wQ_bHERFvPnRmvYzmu3FI" alt="Logo" width="350"/></div>
 
 
 Introducing PythonREST - the revolutionary REST API Generator that takes your Python projects to new heights! With a single cli command, you can effortlessly build a complete application. Witness the magic of transforming months of project development into a matter of seconds.
@@ -18,13 +18,21 @@ to use for making queries inside the database.
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more 
 familiar with package managers, we have options for that below.
 
-### Windows
-
 ### Chocolatey
 
 ```ps
 choco install pythonrest --version=0.1.0
 ```
+
+### Pip
+
+```bash
+pip install pythonrest3
+```
+
+## Prerequisites
+To use PythonREST, you must have Python 3.11 installed.
+You'll also need a database so that the generator can access and create an API on top of it. If you're not familiar with creating and connecting to databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies Clouds, on how to create a local database (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
 
 ## Usage
 
@@ -86,7 +94,7 @@ will also respect that pattern when validating requests and responses:
 
 `pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
  
-This behavior can be modified on the project's environment variable file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Valid values are:
+This behavior can be modified on the project's environment variables file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Valid values are:
 - "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" -> This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
 - "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" -> This value accepts dates on YYYY-DD-MM, MM-DD-YYYY, YYYY/DD/MM and MM/DD/YYYY formats
 
@@ -188,47 +196,54 @@ For more detailed use cases, you can check our [docs](https://readthedocs.org/pr
 Generated API environment variables can be found on src/e_Infra/g_Environment/EnvironmentVariables.py and each one has the following utility:
 - **domain_like_left** – Defines SQL's "LIKE" operator's behavior in relation to specified table columns. Columns defined here will have "%COLUMN_VALUE" search behavior whenever it's value is defined on a query parameter.
 Example:
-- Test
-- 1Test
-- NameTest
-- Example-Test
+    - Test
+    - 1Test
+    - NameTest
+    - Example-Test
 
 - **domain_like_right** – Defines SQL's "LIKE" operator's behavior in relation to specified table columns. Columns defined here will have "COLUMN_VALUE%" search behavior whenever it's value is defined on a query parameter.
 Example:
-- Test
-- Test1
-- Test Name
-- Test-Example
+    - Test
+    - Test1
+    - Test Name
+    - Test-Example
 
 - **domain_like_full** – Defines SQL's "LIKE" operator's behavior in relation to specified table columns. Columns defined here will have "%COLUMN_VALUE%" search behavior whenever a it's value is defined on a query parameter.
 Example:
-- Test
-- Test1
-- TestName
-- Test-Example
-- 1Test
-- NameTest
-- Example-Test
+    - Test
+    - Test1
+    - TestName
+    - Test-Example
+    - 1Test
+    - NameTest
+    - Example-Test
 
-- **date_valid_masks** – Specifies the date formats accepted by the API. Valid values are: 
-- "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
-- "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
+- **date_valid_masks** – Specifies the date formats accepted by the API. Valid values are:
+    - "%Y-%m-%d" - This value accepts dates on YYYY-MM-DD format
+    - "%d-%m-%Y" - This value accepts dates on DD-MM-YYYY format
+    - "%Y/%m/%d" - This value accepts dates on YYYY/MM/DD format
+    - "%d/%m/%Y" - This value accepts dates on DD/MM/YYYY format
+    - "%m-%d-%Y" - This value accepts dates on MM-DD-YYYY format
+    - "%m/%d/%Y" - This value accepts dates on MM/DD/YYYY format
+    Your end result can be a combination of two or more of the previous options, like the following examples:
+    - "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats(default API generation behavior with us-datetimes set to false)
+    - "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" This value accepts dates on YYYY-MM-DD, MM-DD-YYYY, YYYY/MM/DD and MM/DD/YYYY formats(default API generation behavior with us-datetimes set to true)
 
-## ⚠️ Disclaimer
-The previous behavior affects all fields from all database tables, is is not possible at this point to specify these rules for specific table columns
+    ⚠️ Disclaimer
+    The previous behavior affects all fields from all database tables, is is not possible at this point to specify these rules for specific table columns
 
 - **time_valid_masks** – Specifies the time formats accepted by the API. Valid values are:
-- "%H:%M:%S" This value accepts times on HH:MM:SS format
-- "%I:%M:%S %p" This value accepts times on HH:MM:SS AM/PM format 
-- "%H:%M" This value accepts times on HH:MM format
-- "%I:%M %p" This value accepts times on HH:MM AM/PM format
-- "%I:%M:%S%p" This value accepts times on HH:MM:SSAM/PM format
-- "%I:%M%p" This value accepts times on HH:MMAM/PM format
-Your end result can be a combination of two or more of the previous options, like the following example(default API generation behavior):
-- "%H:%M:%S, %I:%M:%S %p, %H:%M, %I:%M %p, %I:%M:%S%p, %I:%M%p"
+    - "%H:%M:%S" This value accepts times on HH:MM:SS format
+    - "%I:%M:%S %p" This value accepts times on HH:MM:SS AM/PM format 
+    - "%H:%M" This value accepts times on HH:MM format
+    - "%I:%M %p" This value accepts times on HH:MM AM/PM format
+    - "%I:%M:%S%p" This value accepts times on HH:MM:SSAM/PM format
+    - "%I:%M%p" This value accepts times on HH:MMAM/PM format
+    Your end result can be a combination of two or more of the previous options, like the following example(default API generation behavior):
+    - "%H:%M:%S, %I:%M:%S %p, %H:%M, %I:%M %p, %I:%M:%S%p, %I:%M%p"
 
-## ⚠️ Disclaimer
-The previous behavior affects all fields from all database tables, is is not possible at this point to specify these rules for specific table columns
+    ⚠️ Disclaimer
+    The previous behavior affects all fields from all database tables, is is not possible at this point to specify these rules for specific table columns
 
 - **query_limit** – Global result limiting of GET requests CRUD routes can return. Default value '*' means your CRUD GET requests won't have a maximum limit and will retrieve all data from a specified query even if your pagination or query limit parameters are not set. Valid values are any integer natural numbers (greater than 0) or '*'
 
@@ -237,6 +252,20 @@ The previous behavior affects all fields from all database tables, is is not pos
 - **origins** – Defines allowed CORS origins, separated by comma.
 
 - **headers** – Defines allowed CORS origins headers values, separated by comma.
+
+- main_db_conn - Specifies the database type (mysql, pgsql, mssql, mariadb) of the database your custom API accesses. Should not be messed around to avoid breaking the code. Valid values are: mysql, pgsql, mssql and mariadb
+
+- <project_database_type>_user - User to authenticate on API's database sessions.
+
+- <project_database_type>_password - Password to authenticate on API's database sessions.
+
+- <project_database_type>_host - The endpoint of your database.
+
+- <project_database_type>_port - Port that is allowed access to your database.
+
+- <project_database_type>_schema - On MySQL, MariaDB and SQLServer, this is the name of your database. On PostgreSQL, this is the schema inside of your database.
+
+- pgsql_database_name - On PostgreSQL, this is the database name in which your selected schema resides.
 
 
 ## Requirements
