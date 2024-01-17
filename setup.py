@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='pythonrest',
+    name='pythonrest3',
     version='0.1.0',
     description='PythonRestCLI tool, created and managed by Seven Technologies Cloud.\nIt generates a complete API based on a connection string for relational databases as mysql, mssql, maria db, aurora and postgres',
     author='Seven Technologies Cloud',
