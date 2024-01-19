@@ -2,7 +2,15 @@
 <div style="display:flex;justify-content:center"><img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRwXKtdeE8-HqRdDC2xuB42_glxttz2rFC_BJ-_zOTUA6Aa4DlebuFJcn1KkoBEi3rQKVuFxc2yQeNBmSX_1F_no-qHAA=w2880-h1508" alt="Logo" width="350"/></div>
 
 
-Introducing PythonREST - the revolutionary REST API Generator that takes your Python projects to new heights! With a single cli command, you can effortlessly build a complete application. Witness the magic of transforming months of project development into a matter of seconds.
+PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds based on your relational database on a single CLI command. This allows you to create your APIs from scratch and update your current API previously created with our tool to always match your latest database definitions.
+
+THIS WILL SAVE YOU MONTHS OF DEVELOPMENT TIME, GUARANTEED!
+
+Your new generated API will have full CRUD compatibility with your mapped database and full swagger documentation and specs available. With your new API in hand, you will be able to containerize or serverless deploy it to any local, private and public cloud providers of your choice and use it at will! If you're interested in taking your API to the next level and don't know how, please inquiry us on the email below for consultancies.
+
+This project is under active enhancement and we have several open GitHub issues so we can improve it even further, if you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! Get in touch via admin@seventechnologies if you have any doubts or suggestions and don't forget to star rate our repo! 
+
+if you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
 
 ## Key features
 - Support for MySQL, PostgreSQL, SQLServer and MariaDB databases
@@ -29,6 +37,36 @@ choco install pythonrest --version=0.1.0
 ```bash
 pip install pythonrest3
 ```
+
+## ⚠️ Disclaimer for Mac users
+As of now, pythonrest may fail on installation or present some errors when trying to use it, showing issues with the pymssql library, this is due to the latter having some issues to install on Mac machines, sometimes the library is installed but presents some errors on usage and other times it does not even complete installation. So, if you have issues with it to install/run pythonrest, follow the below steps to fix pymssql:
+- Uninstall any version of pymssql if applicable:
+```bash
+pip uninstall pymssql
+```
+
+- Install necessary software libraries (using brew) to run pymssql:
+```bash
+brew install FreeTDS
+brew install openssl
+```
+
+- Install and/or upgrade some pip libraries used to build pymssql library and used to run pymssql on the machine:
+```bash
+pip install --upgrade pip setuptools
+pip install cython --upgrade
+pip install –upgrade wheel
+pip install --upgrade pip
+```
+
+- Finally, install pymssql with the below commands:
+```bash
+export CFLAGS="-I$(brew --prefix openssl)/include"
+export LDFLAGS="-L$(brew --prefix openssl)/lib -L/usr/local/opt/openssl/lib"
+export CPPFLAGS="-I$(brew --prefix openssl)/include"
+pip install --pre --no-binary :all: pymssql --no-cache
+```
+After a successful installation of pymssql, you can then proceed with the installation of pythonrest using pip
 
 ## Prerequisites
 To use PythonREST, you must have Python 3.11 installed.
@@ -94,7 +132,7 @@ will also respect that pattern when validating requests and responses:
 
 `pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
  
-This behavior can be modified on the project's environment variables file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Valid values are:
+This behavior can be modified on the project's environment variables file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Some valid values are(more options and details on the API Environment Variables section below):
 - "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" -> This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
 - "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" -> This value accepts dates on YYYY-DD-MM, MM-DD-YYYY, YYYY/DD/MM and MM/DD/YYYY formats
 
@@ -164,13 +202,13 @@ Doing that will generate your launch.json, in which you'll want to add a "python
 }
 ```
 
-## API Usage
-When running the API, it will provide you with a localhost url, that's how you access the API routes, which are:
+## Swagger Overview
+When running the API, it will provide you with a localhost url, then you have the following swagger pages accessible:
 #### /swagger
 That's the base route for viewing swagger, it contains the documentation of the SQL routes present on the application
 
 #### /swagger/tablename
-For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in flatcase(all words together in lower case with no separators)
+For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in flatcase(all words together in lower case with no separators).
 
 ### Postman/cURL
 If you're familiar with Postman or using cURL requests directly, you can make requests to the routes shown in the open api specification, using the examples of usage present on it to build your request.
@@ -190,7 +228,13 @@ curl -X 'POST' \
 ```
 
 ### Use cases
-For more detailed use cases, you can check our [docs](https://readthedocs.org/projects/pythonrest/)
+#### select all table items
+Starting with a basic use, you go to your swagger/<table_name>, the first route is the get one, if you just hit "try it out" and then "execute", it will present you with a response equivalent to a SELECT * from <table_name> query. If you wish to, you can use the available filters to select only the attributes that you want to retrieve, limit the number of results, paginate your results and so on. If you still did not have anything on your database to retrieve, it will just be an empty list, now we can get to our next use case to solve that!
+
+#### insert table item
+From the same swagger page we were in, the next route is the post /<table_name>, in which when you hit "try it out" it will present you with a sample JSON body to insert an entry on your table. 
+
+For more detailed use cases, you can check our [blog](https://medium.com/@seventechnologiescloud/) and [readthedocs](https://readthedocs.org/projects/pythonrest/)
 
 ## API Environment Variables
 Generated API environment variables can be found on src/e_Infra/g_Environment/EnvironmentVariables.py and each one has the following utility:
@@ -476,5 +520,7 @@ When reinstalling the local pip package for tests, make sure to delete the build
 as retaining that folder can lead to the project being built using that folder and not catching any changes you made to
 the project files.
 
+If you find our solution helpful, we would appreciate your support through a donation to our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+
 Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
-Please rank this repo 5 starts if you like our job!
+Don't forget to star rate this repo if you like our job!

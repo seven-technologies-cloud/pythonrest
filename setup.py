@@ -10,7 +10,7 @@ setup(
     keywords=['api', 'rest api', 'database', 'python', 'mysql', 'mssql', 'postgres', 'aurora', 'mariadb'],
     package_data={
         'pythonrest.apigenerator.resources.1 - Project.1 - BaseProject.Project.config': ['swagger.yaml'],
-        'pythonrest.apigenerator.resources.1 - Project.1 - BaseProject.Project': ['README.md', 'requirements.txt'],
+        'pythonrest.apigenerator.resources.1 - Project.1 - BaseProject.Project': ['requirements.txt'],
         'pythonrest.apigenerator.resources.2 - Swagger.yaml': ['domain.yaml', 'domain_no_pk.yaml', 'sql.yaml'],
     },
     packages=[
