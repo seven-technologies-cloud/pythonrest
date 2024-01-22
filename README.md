@@ -1,5 +1,8 @@
 # PythonREST CLI
-<div style="display:flex;justify-content:center"><img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRwXKtdeE8-HqRdDC2xuB42_glxttz2rFC_BJ-_zOTUA6Aa4DlebuFJcn1KkoBEi3rQKVuFxc2yQeNBmSX_1F_no-qHAA=w2880-h1508" alt="Logo" width="350"/></div>
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRwXKtdeE8-HqRdDC2xuB42_glxttz2rFC_BJ-_zOTUA6Aa4DlebuFJcn1KkoBEi3rQKVuFxc2yQeNBmSX_1F_no-qHAA=w2880-h1508" alt="Logo" width="350"/>
+</div>
+
 
 
 PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds based on your relational database on a single CLI command. This allows you to create your APIs from scratch and update your current API previously created with our tool to always match your latest database definitions.
@@ -11,6 +14,23 @@ Your new generated API will have full CRUD compatibility with your mapped databa
 This project is under active enhancement and we have several open GitHub issues so we can improve it even further, if you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! Get in touch via admin@seventechnologies if you have any doubts or suggestions and don't forget to star rate our repo! 
 
 if you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+<br></br>
+
+# How Is PythonREST good for Developers?
+PythonREST allows you to have an entire CRUD API ready in minutes or seconds to fully manipulate your relational database. This will allow you to only need to write code specifically for functions that require third party integration or have super complex business rules. These are the project possibilities our project can provide you:
+
+- Create an API with PythonREST, add your own custom routes and update your CRUD routes at will keeping the best of both worlds.
+- Install PythonREST on your pipeline, containerize or serverless your new application and have entire APIs with no need for repositories for them.
+- Have your PythonREST API manage your CRUD operations and any other applications in any language manage the rest. This is a nice option if you're not a Python developer and wish the best from both worlds.
+<br></br>
+
+# How Is PythonREST good for your Business?
+PythonREST allows you to create Web, Mobile Apps, SaaS products or simply manage data transactions from your database in an easy and automated way. This will empower your teams and make your product lifecycles smoother and cleaner and will enable your to launch faster and more reliable products:
+
+- Save effort, energy and money by having your development team have more time to focus on business driven functionalities. Using PythonREST can save you more than 50% of a product development time.
+- Easy to use for free, consult us for Premium support and trainings on demand.
+- Cloud friendly and easily adaptable to any workflow, even for teams that do not use Python as a development language.
+<br></br>
 
 ## Key features
 - Support for MySQL, PostgreSQL, SQLServer and MariaDB databases
@@ -21,6 +41,7 @@ to use for making queries inside the database.
 - Query filters(select, orderby, limit) on Get routes supported
 - Pagination of queries
 - Filter query results by each table field
+<br></br>
 
 ## Installation
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more 
@@ -67,10 +88,12 @@ export CPPFLAGS="-I$(brew --prefix openssl)/include"
 pip install --pre --no-binary :all: pymssql --no-cache
 ```
 After a successful installation of pymssql, you can then proceed with the installation of pythonrest using pip
+<br></br>
 
 ## Prerequisites
 To use PythonREST, you must have Python 3.11 installed.
 You'll also need a database so that the generator can access and create an API on top of it. If you're not familiar with creating and connecting to databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies Clouds, on how to create a local database (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
+<br></br>
 
 ## Usage
 
@@ -135,8 +158,10 @@ will also respect that pattern when validating requests and responses:
 This behavior can be modified on the project's environment variables file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Some valid values are(more options and details on the API Environment Variables section below):
 - "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" -> This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
 - "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" -> This value accepts dates on YYYY-DD-MM, MM-DD-YYYY, YYYY/DD/MM and MM/DD/YYYY formats
+<br></br>
 
-### How to Run
+## How to Run Generated API
+After generating your API, you may open it on your desired IDE(VSCode, PyCharm, etc) or even the bash/cmd if you wish to, from there you may build your venv like bellow to run the project.
 
 #### venv run
 If you wish to run this project using a Python virtual environment, you can follow the steps below:
@@ -179,8 +204,9 @@ pip install -r requirements.txt
 ```commandline
 python app.py
 ```
+<br></br>
 
-#### Run and Debug using venv with VSCode
+## Run and Debug using venv with VSCode
 If you wish to go deep and debug the API, or simply wishes to run from VSCode Python extension, you'll want to configure
 a launch.json file for the API, to do that you'll go to the top bar of VSCode -> Run(if run is not visible, you may find
 it in the "..." on the title bar) -> Add Configuration.
@@ -201,6 +227,48 @@ Doing that will generate your launch.json, in which you'll want to add a "python
     ]
 }
 ```
+<br></br>
+
+## API Usage Examples
+#### select all table entries
+Starting with a basic use, you go to your swagger/<table_name>, the first route is the get one, if you just hit "try it out" and then "execute", it will present you with a response equivalent to a SELECT * from <table_name> query. If you wish to, you can use the available filters to select only the attributes that you want to retrieve, limit the number of results, paginate your results and so on. If you still did not have anything on your database to retrieve, it will just be an empty list, now we can get to our next use case to solve that!
+
+#### insert table entry
+From the same swagger page we were in, the next route is the post /<table_name>, in which when you hit "try it out" it will present you with a sample JSON body to insert an entry on your table. The JSON body sent on the request is a list, so if you wish to you can provide multiple entries at once on table with the same request, below is an example of a request inserting three entries on a user table:
+```json
+[
+  {
+    "id_user": 1,
+    "username": "user1",
+    "date_joined": "2000-01-01 12:00:00"
+  },
+  {
+    "id_user": 2,
+    "username": "user2",
+    "date_joined": "2000-01-01 12:00:00"
+  },
+  {
+    "id_user": 3,
+    "username": "user3",
+    "date_joined": "2000-01-01 12:00:00"
+  }
+]
+```
+
+#### delete table entry
+Now we're talking about the delete /user route, if you hit "try it out" it will also present you with a sample JSON body of a generic object of your table, you can then use that example, modify its values to suit an entry that exists on your database. Note that this is a delete by full match route, so you need to provide the correct values for all of the table collumns on your response, below is an example of JSON body to delete a user table entry that has 3 columns: id_user, username and date_joined:
+```json
+[
+  {
+    "id_user": 2,
+    "username": "user2",
+    "date_joined": "2000-01-01 12:00:00"
+  }
+]
+```
+For more detailed examples, please check our [blog](https://medium.com/@seventechnologiescloud/) and documentation at[readthedocs](https://readthedocs.org/projects/pythonrest/)
+<br></br>
+
 
 ## Swagger Overview
 When running the API, it will provide you with a localhost url, then you have the following swagger pages accessible:
@@ -209,8 +277,9 @@ That's the base route for viewing swagger, it contains the documentation of the
 
 #### /swagger/tablename
 For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in flatcase(all words together in lower case with no separators).
+<br></br>
 
-### Postman/cURL
+## Postman/cURL
 If you're familiar with Postman or using cURL requests directly, you can make requests to the routes shown in the open api specification, using the examples of usage present on it to build your request.
 For example, a table user with id_user, username and date_joined fields would have a POST cURL request like:
 ```bash
@@ -226,15 +295,7 @@ curl -X 'POST' \
   }
 ]'
 ```
-
-### Use cases
-#### select all table items
-Starting with a basic use, you go to your swagger/<table_name>, the first route is the get one, if you just hit "try it out" and then "execute", it will present you with a response equivalent to a SELECT * from <table_name> query. If you wish to, you can use the available filters to select only the attributes that you want to retrieve, limit the number of results, paginate your results and so on. If you still did not have anything on your database to retrieve, it will just be an empty list, now we can get to our next use case to solve that!
-
-#### insert table item
-From the same swagger page we were in, the next route is the post /<table_name>, in which when you hit "try it out" it will present you with a sample JSON body to insert an entry on your table. 
-
-For more detailed use cases, you can check our [blog](https://medium.com/@seventechnologiescloud/) and [readthedocs](https://readthedocs.org/projects/pythonrest/)
+<br></br>
 
 ## API Environment Variables
 Generated API environment variables can be found on src/e_Infra/g_Environment/EnvironmentVariables.py and each one has the following utility:
@@ -310,7 +371,7 @@ Example:
 - <project_database_type>_schema - On MySQL, MariaDB and SQLServer, this is the name of your database. On PostgreSQL, this is the schema inside of your database.
 
 - pgsql_database_name - On PostgreSQL, this is the database name in which your selected schema resides.
-
+<br></br>
 
 ## Requirements
 
@@ -328,17 +389,18 @@ Already listed within ./requirements.txt
 
 To run and build this project, you need to have the above libraries installed on your machine, which you can do running 
 the below command on the project root directory:
-# Windows
+## Windows
 ```commandline
 pip install -r requirements.txt
 ```
 
-# Linux/Mac
+## Linux/Mac
 ```bash
 sudo pip install -r requirements.txt
 ```
+<br></br>
 
-# How to Build
+# For Contributors: How to Build Your Own Binaries and Installers
 
 # Windows
 
@@ -404,6 +466,7 @@ run from windowsinstaller/ folder:
 This will take care of running the above pyinstaller commands and it will generate both installer and uninstaller 
 executables on PythonRestExecutables/ directory, which you can then run to install and/or uninstall the cli on your
 machine.
+<br></br>
 
 # Linux/Mac
 ## Building the CLI binary
