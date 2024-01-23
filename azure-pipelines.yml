@@ -19,7 +19,7 @@ jobs:
   steps:
   - checkout: self
   - script: |
-      latest_version=$(curl -s https://pypi.org/pypi/$(app_name)/json | jq -r '.info.version' 2>/dev/null)
+      latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null)
       echo "Latest version on PyPI: $latest_version"
 
       local_version=$(python3 -c "from setuptools import setup; print(setup().get_version())")
