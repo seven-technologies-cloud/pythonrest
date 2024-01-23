@@ -22,7 +22,7 @@ jobs:
       latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null)
       echo "Latest version on PyPI: $latest_version"
 
-      local_version=$(python3 -c "from distutils.core import run_setup; print(run_setup('setup.py').get_version())")
+      local_version=$(python3 setup.py --version)
       echo "Local version in setup.py: $local_version"
 
       if [ "$latest_version" != "$local_version" ]; then
