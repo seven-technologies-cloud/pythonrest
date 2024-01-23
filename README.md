@@ -190,20 +190,43 @@ This behavior can be modified on the project's environment variables file(src/e_
 <br></br>
 
 ## How to Run Generated API
-After generating your API, you may open it on your preferred IDE(VSCode, PyCharm, etc) or even the bash/cmd if you wish to, from there you may build your venv like bellow to run the project.
+After generating your API, you may open it on your preferred IDE(VSCode, PyCharm, etc) or even the bash/cmd if you wish to, from there you may build your venv like below to run the project.
 
-#### venv run
-If you wish to run this project using a Python virtual environment, you can follow the steps below:
-
-1. Create a virtual environment:
-
-#### Windows:
-
+### How to Run with venv (Python virtual environment)
+This project was initially built to run using a Python virtual environment, below we'll provide how to install the virtual environment and run the project on different systems:
+#### Windows(CMD/Powershell):
+1. Create the venv
+First of all, you should open this project on your terminal, from now on all the commands will be run from the root folder of the project.
+Below is the command to create a python venv:
 ```commandline
 python -m venv venv
 ```
+2. Activate the virtual environment
+The below command is how to activate your venv for use on your current terminal session:
+```commandline
+.\venv\Scripts\activate
+```
+The above command works fine for CMD or Powershell. If you are using GitBash to run these commands, the only change would be running the below command instead of the above one:
 
-#### Linux/Mac:
+```bash
+source venv/Scripts/activate
+```
+
+3. Install required libraries for API to run
+This project needs a number of libraries stored on PyPi to run, these are all listed on the requirements.txt file on the root folder of the generated project and to be installed you run the below command:
+```commandline
+pip install -r requirements.txt
+```
+
+4. Run app.py
+After the libraries installation is complete, you can use the below command to run the project:
+```commandline
+python app.py
+```
+From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at [readthedocs](https://readthedocs.org/projects/pythonrest/) 
+
+#### Linux/Mac(Bash/Zsh):
+1. Create the venv:
 On Debian/Ubuntu systems, you need to have the python3-venv package installed, which you can do with the following commands:
 ```bash
 apt-get update
@@ -213,26 +236,25 @@ And then you can create the venv with the following:
 ```bash
 python3 -m venv venv
 ```
-2. Activate the virtual environment:
-#### Windows:
-```
-.\venv\Scripts\activate
-```
 
-#### Linux/Mac:
+2. Activate the virtual environment
+The below command is how to activate your venv for use on your current terminal session:
 ```bash
 source venv/bin/activate
 ```
 
-3. Install required libraries for API to run:
-```commandline
+3. Install required libraries for API to run
+This project needs a number of libraries stored on PyPi to run, these are all listed on the requirements.txt file on the root folder of the generated project and to be installed you run the below command:
+```bash
 pip install -r requirements.txt
 ```
 
-4. Run app.py:
-```commandline
+4. Run app.py
+After the libraries installation is complete, you can use the below command to run the project:
+```bash
 python app.py
 ```
+From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at [readthedocs](https://readthedocs.org/projects/pythonrest/) 
 <br></br>
 
 ## Run and Debug using venv with VSCode
@@ -259,6 +281,7 @@ Doing that will generate your launch.json, in which you'll want to add a "python
 <br></br>
 
 ## API Usage Examples
+After following the **How to run** section to its final steps, with your project running you can finally test the routes it creates, to follow the below examples, if you have a table named user, you would want to access localhost:5000/swagger/user to check the routes provided to that table.
 #### select all table entries
 Starting with a basic use, you go to your swagger/<table_name>, the first route is the get one, if you just hit "try it out" and then "execute", it will present you with a response equivalent to a SELECT * from <table_name> query. If you wish to, you can use the available filters to select only the attributes that you want to retrieve, limit the number of results, paginate your results and so on. If you still did not have anything on your database to retrieve, it will just be an empty list, now we can get to our next use case to solve that!
 
@@ -407,6 +430,37 @@ Example:
 
 - pgsql_database_name - On PostgreSQL, this is the database name in which your selected schema resides.
 <br></br>
+
+# Generated API Directory Structure
+The generated API has a structure of a number of directories with sub-directories. This section will explain that division in order to enlighten the project for debugging and feature implementations. Taking from the root of the generated project, we have:
+- config/: This directory contains all of the swagger files of the project, the main one and each database table swagger page.
+- src/a_Presentation: This directory houses the controllers of the project, the files which are responsible for defining the routes of the project, creating functions for each route and defining the parameters used by them
+  - src/a_Presentation/a_Domain: Contains the controllers for all of the domains of the project, which are the tables scanned by PythonREST of your database.
+  - src/a_Presentation//b_Custom: Contains controllers of other sections of the project, like the SQL routes controllers, OPTIONS method conrollers(that deals with CORS and its related stuff), before request controller, which prints the request on terminal and exception handler controller, which prints the error on terminal and calls a function to build the response error to be returned as a response
+  - src/a_Presentation/d_Swagger: Contains the swagger routes controllers, which notifies the project which swagger file it should open when determined route is accessed.
+- src/b_Application: This directory houses the services and DTOs of the project.
+  - src/b_Application/a_DTO: This directory houses any custom DTOs(Data Transfer Objects are a structured and serializable object used to encapsulate and transport data between layers of an application or between different parts of a distributed system) that would be created for the project, separated by request(src/b_Application/a_DTO/a_Request) and response(src/b_Application/a_DTO-b_Response)
+  - src/b_Application/b_Service: The service files are contained here, which are the files responsible for data manipulation, validation, and communication with external systems.
+    - src/b_Application/b_Service/a_Domain: All of the service files for the domains are contained here
+    - src/b_Application/b_Service/b_Custom: All of the sql routes, before request and error handler services are contained here.
+- src/c_Domain: Contains all the main classes of the project domains, which define how each table is structured.
+- src/d_Repository: This directory houses the repositories of the project, they are the data access layer responsible for handling database interactions and they are involved in doing the direct CRUD (Create, Read, Update, Delete) operations on data entities.
+- src/d_Repository/GenericRepository.py: Contains functions responsible for each of the routes transactions, selecting objects(by id or just a select all), inserting objects, updating objects and deleting objects(by id or by full match) and applies necessary business logics or functionalities before executing the queries on the database.
+    - src/d_Repository/a_Domain: This directory contains files for each table, in which you can set your custom repositories for each one separately.
+    - src/d_Repository/b_Transactions: Contains functions responsible for each of the routes transactions, selecting objects(by id or just a select all), inserting objects, updating objects and deleting objects(by id or by full match) and on these calls the methods of the GenericRepository.py
+    - src/d_Repository/d_DbConnection: Contains the function responsible for creating a connection string to the database accessed by the project.
+- src/e_Infra: Contains files or components that deal with the foundational structure, setup and configuration of the project.
+  - src/e_Infra/a_Handlers: Contains files used to configure exceptions and system messages returned by the API
+  - src/e_Infra/b_Builders: Contains files used to configure and build date times, domain objects, flask, proxy responses, sql alchemy, strings
+    - src/e_Infra/b_Builders/a_Swagger: Contains the functions to build the Swagger blueprints that renders the Swagger page.
+  - src/e_Infra/c_Resolvers: Contains functions to deal with some logics and operations like creation of engine and session of a connected database and filtering queries with left like, right lke and the such.
+  - src/e_Infra/d_Validators: Contains functions that validates if given requests have correct data, like JSON bodies, datetimes values, types of table parameters.
+  - src/e_Infra/d_Validators/a_Domain: Contains functions for each domain in which custom validators can be set.
+  - src/e_Infra/f_Decorators: Contains decorator functions, which modify or extend the behavior of functions by wrapping them with additional functionality.
+  - src/e_Infra/g_Environment: Contains the environment variables used by the project.
+  - src/e_Infra/CustomVariables.py: Contains functions to return custom values used by the code, like empty dicts, empty lists and more.
+  - src/e_Infra/GlobalVariablesManager.py: Contains a function to call the environment variables if they exist or None if they don't.
+  - src/g_Tests: Directory to store the UnitTests created to test the project's functionalities. 
 
 ## Requirements
 
