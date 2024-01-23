@@ -1,18 +1,19 @@
 trigger:
 - none
 
-parameters:
-  - name: USERS_EMAILS_TO_NOTIFY
-    type: string
-    default: |
-      gustavodaflon@seventechnologies.cloud
-      leonardoviana@seventechnologies.cloud
+# parameters:
+#   - name: USERS_EMAILS_TO_NOTIFY
+#     type: string
+#     default: |
+#       gustavodaflon@seventechnologies.cloud
+#       leonardoviana@seventechnologies.cloud
 
 variables:
 - group: pythonrest-cli
 
 jobs:
-- job: CheckProjectVersionAndPublish
+- job: CheckPypiVersionBeforePublishing
+  displayName: Version Check to publish or not
   pool:
     vmImage: ubuntu-latest
   steps:
@@ -33,55 +34,55 @@ jobs:
         echo "Versions are the same. Skipping PyPI upload."
       fi
 
-- job: CheckChocoCLIVersion
-  displayName: 'Check CLI version'
-  pool:
-    vmImage: 'windows-latest'
-  variables:
-    NEEDS_MANUAL_APPROVAL: $[eq(variables['choco_cli_version'], variables['nuspecVersion'])]
-  steps:
-  - powershell: |
-      $nuspecVersion = [xml](Get-Content -Path .\$(app_name).nuspec).package.metadata.version
+# - job: CheckChocoCLIVersion
+#   displayName: 'Check Choco CLI version'
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   variables:
+#     NEEDS_MANUAL_APPROVAL: $[eq(variables['choco_cli_version'], variables['nuspecVersion'])]
+#   steps:
+#   - bash: |
+#       source .env
 
-      if ($env:choco_cli_version -lt $nuspecVersion) {
-          Write-Error "Value for variable choco_cli_version = '$($env:choco_cli_version)' does not match the one in .nuspec file: nuspec_version."
-          exit 1
-      }
-      elseif ($env:choco_cli_version -eq $nuspecVersion) {
-          Write-Host "The versions match. Proceeding to Manual Approval..."
-      }
-      else {
-          Write-Host "The choco_cli_version is greater than the version in .nuspec. No additional action needed."
-      }
-    displayName: 'Verify Version'
+#       nuspecVersion=$(grep -m 1 '<version>' $(app_name).nuspec | sed -n 's/.*<version>\(.*\)<\/version>.*/\1/p')
+#       cliVersion="$CLI_VERSION"
 
-- job: manual_approval
-  displayName: Manual Approval
-  pool: server
-  steps:
-  - task: ManualValidation@0
-    timeoutInMinutes: 1440
-    inputs:
-      notifyUsers: ${{ parameters.USERS_EMAILS_TO_NOTIFY }}
-      instructions: "Are you sure you want to update the CLI version? A new package will be generated and will be sent to Chocolatey's approval process."
-      onTimeout: "reject"
+#       if [ "$cliVersion" != "$nuspecVersion" ]; then
+#           echo "Value for variable choco_cli_version = '$CLI_VERSION' does not match the one in .nuspec file: nuspec_version."
+#           exit 1
+#       fi
 
-- job: PublishPackageToChocolatey
-  dependsOn: manual_approval
-  displayName: 'Publish Package to Chocolatey'
-  pool:
-    vmImage: 'windows-latest'
-  steps: 
-  - powershell: |
-      pip install pyinstaller
-      pyinstaller $(app_name).spec
+#       echo "The versions match. Proceeding to Manual Approval..."
+#     displayName: 'Verify Choco CLI Version'
 
-      $sha256Hash = Get-FileHash -Path "./dist/$(app_name).exe" -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-      $md5Hash = Get-FileHash "./dist/$(app_name).exe" -Algorithm MD5 | Select-Object -ExpandProperty Hash
+# - job: manual_approval
+#   dependsOn: CheckChocoCLIVersion
+#   displayName: Manual Approval
+#   pool: server
+#   steps:
+#   - task: ManualValidation@0
+#     timeoutInMinutes: 1440
+#     inputs:
+#       notifyUsers: ${{ parameters.USERS_EMAILS_TO_NOTIFY }}
+#       instructions: "Are you sure you want to update the CLI version? A new package will be generated and will be sent to Chocolatey's approval process."
+#       onTimeout: "reject"
 
-      $verificationPath = "./tools/VERIFICATION.txt"
-      (Get-Content -Path $verificationPath) -replace 'MD5: .+', "MD5: $md5Hash" -replace 'SHA-256: .+', "SHA-256: $sha256Hash" | Set-Content -Path $verificationPath
+# - job: PublishPackageToChocolatey
+#   dependsOn: manual_approval
+#   displayName: 'Publish Package to Chocolatey'
+#   pool:
+#     vmImage: 'windows-latest'
+#   steps: 
+#   - powershell: |
+#       pip install pyinstaller
+#       pyinstaller $(app_name).spec
 
-      choco pack
-      choco push $(app_name).$(choco_cli_version).nupkg -s https://chocolatey.org/ --api-key $(choco_api_key)
-    displayName: 'Continue After Manual Approval'
+#       $sha256Hash = Get-FileHash -Path "./dist/$(app_name).exe" -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+#       $md5Hash = Get-FileHash "./dist/$(app_name).exe" -Algorithm MD5 | Select-Object -ExpandProperty Hash
+
+#       $verificationPath = "./tools/VERIFICATION.txt"
+#       (Get-Content -Path $verificationPath) -replace 'MD5: .+', "MD5: $md5Hash" -replace 'SHA-256: .+', "SHA-256: $sha256Hash" | Set-Content -Path $verificationPath
+
+#       choco pack
+#       choco push $(app_name).$(choco_cli_version).nupkg -s https://chocolatey.org/ --api-key $(choco_api_key)
+#     displayName: 'Continue After Manual Approval'
