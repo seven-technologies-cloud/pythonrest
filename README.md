@@ -1,5 +1,5 @@
 # PythonREST CLI
-<div align="center">
+<div align="center" style="padding:0px 100px 0px 0px">
   <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRwXKtdeE8-HqRdDC2xuB42_glxttz2rFC_BJ-_zOTUA6Aa4DlebuFJcn1KkoBEi3rQKVuFxc2yQeNBmSX_1F_no-qHAA=w2880-h1508" alt="Logo" width="350"/>
 </div>
 
@@ -13,7 +13,7 @@ Your new generated API will have full CRUD compatibility with your mapped databa
 
 This project is under active enhancement and we have several open GitHub issues so we can improve it even further, if you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! Get in touch via admin@seventechnologies if you have any doubts or suggestions and don't forget to star rate our repo! 
 
-### if you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
 <br>
 
 # How Is PythonREST good for Developers?
@@ -30,7 +30,6 @@ PythonREST allows you to create Web, Mobile Apps, SaaS products or simply manage
 - Save effort, energy and money by having your development team have more time to focus on business driven functionalities. Using PythonREST can save you more than 50% of a product development time.
 - Easy to use for free, consult us for Premium support and trainings on demand.
 - Cloud friendly and easily adaptable to any workflow, even for teams that do not use Python as a development language.
-<br>
 
 ## Key features
 - Support for MySQL, PostgreSQL, SQLServer and MariaDB databases
@@ -41,7 +40,7 @@ to use for making queries inside the database.
 - Query filters(select, orderby, limit) on Get routes supported
 - Pagination of queries
 - Filter query results by each table field
-<br></br>
+<br>
 
 ## Installation
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more 
@@ -278,15 +277,34 @@ Doing that will generate your launch.json, in which you'll want to add a "python
     ]
 }
 ```
-<br></br>
+<br>
 
 ## API Usage Examples
 After following the **How to run** section to its final steps, with your project running you can finally test the routes it creates, to follow the below examples, if you have a table named user, you would want to access localhost:5000/swagger/user to check the routes provided to that table.
-#### select all table entries
+
+### Select All Table Entries
+<hr>
 Starting with a basic use, you go to your swagger/<table_name>, the first route is the get one, if you just hit "try it out" and then "execute", it will present you with a response equivalent to a SELECT * from <table_name> query. If you wish to, you can use the available filters to select only the attributes that you want to retrieve, limit the number of results, paginate your results and so on. If you still did not have anything on your database to retrieve, it will just be an empty list, now we can get to our next use case to solve that!
 
-#### insert table entry
+<br>
+
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRxL8hUgfencMlNjW35HP7fx_ZvlheJUuPjefCisGhDu6VxE2HUt9aOFSiBMOSpYXe8J5KKZZGN50VNt8VoleEz_GFw=w2880-h1404" alt="Swagger Select all Users"/>
+</div>
+
+### Insert Table Entry
+<hr>
 From the same swagger page we were in, the next route is the post /<table_name>, in which when you hit "try it out" it will present you with a sample JSON body to insert an entry on your table. The JSON body sent on the request is a list, so if you wish to you can provide multiple entries at once on table with the same request, below is an example of a request inserting three entries on a simple pre-designed USER table with 'id_user', 'username' and 'date_joined' fields:
+
+<br>
+
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYSKKVmPS5CH_OCAbonoV_DJbjXq2IS5wGx6Q-CPAn4dI7Jo2W-2kx193E5lOg3VSrPmFRtz_1G8sYld8hUjT6JuagQjkQ=w2880-h1404" alt="Swagger Insert User"/>
+</div>
+
+<br>
+
+Example JSON payload:
 ```json
 [
   {
@@ -307,8 +325,18 @@ From the same swagger page we were in, the next route is the post /<table_name>,
 ]
 ```
 
-#### delete table entry
+### Delete Table Entry
+<hr>
 Now we're talking about the delete /user route, if you hit "try it out" it will also present you with a sample JSON body of a generic object of your table, you can then use that example, modify its values to suit an entry that exists on your database. Note that this is a delete by full match route, so you need to provide the correct values for all of the table collumns on your response, below is an example of JSON body to delete a user table entry that has 3 columns: id_user, username and date_joined:
+
+<br>
+
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYTi11erJfknIMgb0R2auyanxd_g34kkoVcNYXfS5Kct20SRB-dsqOi7pMRG9UGXV_hAaiGOGvLf6CM8LQOxVMDedqGFXw=w2880-h1404" alt="Swagger Delete User"/>
+</div>
+
+<br>
+
 ```json
 [
   {
@@ -318,24 +346,28 @@ Now we're talking about the delete /user route, if you hit "try it out" it will 
   }
 ]
 ```
+
 For more detailed examples, please check our [blog](https://medium.com/@seventechnologiescloud/) and documentation at[readthedocs](https://readthedocs.org/projects/pythonrest/)
 <br></br>
 
 
 ## Swagger Overview
 When running the API, it will provide you with a localhost url, then you have the following swagger pages accessible:
-#### /swagger
+
+### /swagger
+<hr>
 That's the base route for viewing swagger, it contains the documentation of the SQL routes present on the application
 <div align="center">
   <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYR_dUffHUELqs1yay5iiqu0ltnAtbLqtPgjwjpsHv5IRhCRfZuhv0B5qVvPG5ZHm0ThT08xu99zsZuCRMblvjuFSasp=w2880-h1508" alt="Swagger Main Screen"/>
 </div>
 
-#### /swagger/tablename
-For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in flatcase(all words together in lower case with no separators).
+### /swagger/tablename
+<hr>
+For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in *flatcase* (**ALL WORDS TOGETHER IN LOWER CASE WITH NO SEPARATORS**).
 <div align="center">
   <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRfUGgCAiU0KSLZJjLGttaIuBCf5vRNWa8ioShBm7KQtm_EkwwLSHiW-G2hZbi-25SH-x_HtkLKjizLfxafbYMnJ-D0uA=w2880-h1508" alt="Swagger User Screen"/>
 </div> 
-<br></br>
+<br>
 
 ## Postman/cURL
 If you're familiar with Postman or using cURL requests directly, you can make requests to the routes shown in the open api specification, using the examples of usage present on it to build your request.
@@ -353,7 +385,7 @@ curl -X 'POST' \
   }
 ]'
 ```
-<br></br>
+<br>
 
 ## API Environment Variables
 Generated API environment variables can be found on src/e_Infra/g_Environment/EnvironmentVariables.py and each one has the following utility:
@@ -671,8 +703,6 @@ pip uninstall pythonrest
 When reinstalling the local pip package for tests, make sure to delete the build folder generated on the root folder of the project,
 as retaining that folder can lead to the project being built using that folder and not catching any changes you made to
 the project files.
-
-
 
 <br></br>
 ## If you find our solution helpful, consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
