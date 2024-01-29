@@ -17,7 +17,6 @@ def apply_caching(response):
         response.mimetype = 'application/json'
         response.status_code = 200
         response.data = b'{"Message": "Success"}'
-        response.json = {"Message": "Success"}
         response.response = list(response.data)
     else:
         response.headers["Access-Control-Allow-Origin"] = get_global_variable('origins')
