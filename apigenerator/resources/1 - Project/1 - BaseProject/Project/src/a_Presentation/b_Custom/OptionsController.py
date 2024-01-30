@@ -13,6 +13,7 @@ def apply_caching(response):
     if request.method == 'OPTIONS':
         response.headers["Access-Control-Allow-Origin"] = get_global_variable('origins')
         response.headers["Access-Control-Allow-Headers"] = get_global_variable('headers')
+        response.headers["Access-Control-Allow-Methods"] = response.allow
         response.content_type = 'application/json'
         response.mimetype = 'application/json'
         response.status_code = 200
