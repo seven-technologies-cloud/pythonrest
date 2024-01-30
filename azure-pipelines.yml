@@ -1,86 +1,84 @@
-trigger: none
+# parameters:
+#   - name: USERS_EMAILS_TO_NOTIFY
+#     type: string
+#     default: |
+#       gustavodaflon@seventechnologies.cloud
+#       leonardoviana@seventechnologies.cloud
 
-parameters:
-  - name: USERS_EMAILS_TO_NOTIFY
-    type: string
-    default: |
-      gustavodaflon@seventechnologies.cloud
-      leonardoviana@seventechnologies.cloud
+# variables:
+# - group: pythonrest-cli
 
-variables:
-- group: pythonrest-cli
+# jobs:
+# - job: CheckProjectVersionAndPublish
+#   pool:
+#     vmImage: ubuntu-latest
+#   steps:
+#   - checkout: self
+#   - script: |
+#       latest_version=$(curl -s https://pypi.org/pypi/$(app_name)/json | jq -r '.info.version' 2>/dev/null)
+#       echo "Latest version on PyPI: $latest_version"
 
-jobs:
-- job: CheckPipProjectVersionAndPublish
-  pool:
-    vmImage: ubuntu-latest
-  steps:
-  - checkout: self
-  - script: |
-      latest_version=$(curl -s https://pypi.org/pypi/$(app_name)/json | jq -r '.info.version' 2>/dev/null)
-      echo "Latest version on PyPI: $latest_version"
+#       local_version=$(python3 -c "from setuptools import setup; print(setup().get_version())")
+#       echo "Local version in setup.py: $local_version"
 
-      local_version=$(python3 -c "from setuptools import setup; print(setup().get_version())")
-      echo "Local version in setup.py: $local_version"
+#       if [ "$latest_version" != "$local_version" ]; then
+#         echo "Versions are different. Uploading to PyPI."
+#         pip3 install twine
+#         python3 setup.py sdist
+#         python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
+#       else
+#         echo "Versions are the same. Skipping PyPI upload."
+#       fi
 
-      if [ "$latest_version" != "$local_version" ]; then
-        echo "Versions are different. Uploading to PyPI."
-        pip3 install twine
-        python3 setup.py sdist
-        python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
-      else
-        echo "Versions are the same. Skipping PyPI upload."
-      fi
+# - job: CheckChocoCLIVersion
+#   displayName: 'Check CLI version'
+#   pool:
+#     vmImage: 'windows-latest'
+#   variables:
+#     NEEDS_MANUAL_APPROVAL: $[eq(variables['choco_cli_version'], variables['nuspecVersion'])]
+#   steps:
+#   - powershell: |
+#       $nuspecVersion = [xml](Get-Content -Path .\$(app_name).nuspec).package.metadata.version
 
-- job: CheckChocoCLIVersion
-  displayName: 'Check CLI version'
-  pool:
-    vmImage: 'windows-latest'
-  variables:
-    NEEDS_MANUAL_APPROVAL: $[eq(variables['choco_cli_version'], variables['nuspecVersion'])]
-  steps:
-  - powershell: |
-      $nuspecVersion = [xml](Get-Content -Path .\$(app_name).nuspec).package.metadata.version
+#       if ($env:choco_cli_version -lt $nuspecVersion) {
+#           Write-Error "Value for variable choco_cli_version = '$($env:choco_cli_version)' does not match the one in .nuspec file: nuspec_version."
+#           exit 1
+#       }
+#       elseif ($env:choco_cli_version -eq $nuspecVersion) {
+#           Write-Host "The versions match. Proceeding to Manual Approval..."
+#       }
+#       else {
+#           Write-Host "The choco_cli_version is greater than the version in .nuspec. No additional action needed."
+#       }
+#     displayName: 'Verify Version'
 
-      if ($env:choco_cli_version -lt $nuspecVersion) {
-          Write-Error "Value for variable choco_cli_version = '$($env:choco_cli_version)' does not match the one in .nuspec file: nuspec_version."
-          exit 1
-      }
-      elseif ($env:choco_cli_version -eq $nuspecVersion) {
-          Write-Host "The versions match. Proceeding to Manual Approval..."
-      }
-      else {
-          Write-Host "The choco_cli_version is greater than the version in .nuspec. No additional action needed."
-      }
-    displayName: 'Verify Version'
+# - job: manual_approval
+#   displayName: Manual Approval
+#   pool: server
+#   steps:
+#   - task: ManualValidation@0
+#     timeoutInMinutes: 1440
+#     inputs:
+#       notifyUsers: ${{ parameters.USERS_EMAILS_TO_NOTIFY }}
+#       instructions: "Are you sure you want to update the CLI version? A new package will be generated and will be sent to Chocolatey's approval process."
+#       onTimeout: "reject"
 
-- job: manual_approval
-  displayName: Manual Approval
-  pool: server
-  steps:
-  - task: ManualValidation@0
-    timeoutInMinutes: 1440
-    inputs:
-      notifyUsers: ${{ parameters.USERS_EMAILS_TO_NOTIFY }}
-      instructions: "Are you sure you want to update the CLI version? A new package will be generated and will be sent to Chocolatey's approval process."
-      onTimeout: "reject"
+# - job: PublishPackageToChocolatey
+#   dependsOn: manual_approval
+#   displayName: 'Publish Package to Chocolatey'
+#   pool:
+#     vmImage: 'windows-latest'
+#   steps: 
+#   - powershell: |
+#       pip install pyinstaller
+#       pyinstaller $(app_name).spec
 
-- job: PublishPackageToChocolatey
-  dependsOn: manual_approval
-  displayName: 'Publish Package to Chocolatey'
-  pool:
-    vmImage: 'windows-latest'
-  steps: 
-  - powershell: |
-      pip install pyinstaller
-      pyinstaller $(app_name).spec
+#       $sha256Hash = Get-FileHash -Path "./dist/$(app_name).exe" -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+#       $md5Hash = Get-FileHash "./dist/$(app_name).exe" -Algorithm MD5 | Select-Object -ExpandProperty Hash
 
-      $sha256Hash = Get-FileHash -Path "./dist/$(app_name).exe" -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-      $md5Hash = Get-FileHash "./dist/$(app_name).exe" -Algorithm MD5 | Select-Object -ExpandProperty Hash
+#       $verificationPath = "./tools/VERIFICATION.txt"
+#       (Get-Content -Path $verificationPath) -replace 'MD5: .+', "MD5: $md5Hash" -replace 'SHA-256: .+', "SHA-256: $sha256Hash" | Set-Content -Path $verificationPath
 
-      $verificationPath = "./tools/VERIFICATION.txt"
-      (Get-Content -Path $verificationPath) -replace 'MD5: .+', "MD5: $md5Hash" -replace 'SHA-256: .+', "SHA-256: $sha256Hash" | Set-Content -Path $verificationPath
-
-      choco pack
-      choco push $(app_name).$(choco_cli_version).nupkg -s https://chocolatey.org/ --api-key $(choco_api_key)
-    displayName: 'Continue After Manual Approval'
+#       choco pack
+#       choco push $(app_name).$(choco_cli_version).nupkg -s https://chocolatey.org/ --api-key $(choco_api_key)
+#     displayName: 'Continue After Manual Approval'

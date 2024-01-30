@@ -1,5 +1,5 @@
 # PythonREST CLI
-<div align="center">
+<div align="center" style="padding:0px 100px 0px 0px">
   <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRwXKtdeE8-HqRdDC2xuB42_glxttz2rFC_BJ-_zOTUA6Aa4DlebuFJcn1KkoBEi3rQKVuFxc2yQeNBmSX_1F_no-qHAA=w2880-h1508" alt="Logo" width="350"/>
 </div>
 
@@ -13,8 +13,8 @@ Your new generated API will have full CRUD compatibility with your mapped databa
 
 This project is under active enhancement and we have several open GitHub issues so we can improve it even further, if you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! Get in touch via admin@seventechnologies if you have any doubts or suggestions and don't forget to star rate our repo! 
 
-if you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
-<br></br>
+### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+<br>
 
 # How Is PythonREST good for Developers?
 PythonREST allows you to have an entire CRUD API ready in minutes or seconds to fully manipulate your relational database. This will allow you to only need to write code specifically for functions that require third party integration or have super complex business rules. These are the project possibilities our project can provide you:
@@ -30,7 +30,6 @@ PythonREST allows you to create Web, Mobile Apps, SaaS products or simply manage
 - Save effort, energy and money by having your development team have more time to focus on business driven functionalities. Using PythonREST can save you more than 50% of a product development time.
 - Easy to use for free, consult us for Premium support and trainings on demand.
 - Cloud friendly and easily adaptable to any workflow, even for teams that do not use Python as a development language.
-<br></br>
 
 ## Key features
 - Support for MySQL, PostgreSQL, SQLServer and MariaDB databases
@@ -41,7 +40,7 @@ to use for making queries inside the database.
 - Query filters(select, orderby, limit) on Get routes supported
 - Pagination of queries
 - Filter query results by each table field
-<br></br>
+<br>
 
 ## Installation
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more 
@@ -91,8 +90,8 @@ After a successful installation of pymssql, you can then proceed with the instal
 <br></br>
 
 ## Prerequisites
-To use PythonREST, you must have Python 3.11 installed.
-You'll also need a database so that the generator can access and create an API on top of it. If you're not familiar with creating and connecting to databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies Clouds, on how to create a local database (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
+To use PythonREST, you must have Python 3.11 installed on your machine.
+You'll also need access to the your desired database so that the generator can assess it and create your API. If you're not familiar with creating and connecting to relational databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies on how to create local databases (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
 <br></br>
 
 ## Usage
@@ -101,30 +100,55 @@ Here are some pythonrest usage examples:
 
 Check version:
 
-`pythonrest version`
+```bash
+pythonrest version
+```
 
-Generate API based on mysql database:
+Generate APIs based on MySQL databases:
 
-`pythonrest generate --mysql-connection-string <mysql_connection_string>`
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA>
+```
 
-Generate API based on postgres database:
+Generate APIs based on Postgres databases:
 
-`pythonrest generate --postgres-connection-string <postgres_connection_string>`
+```bash
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public
+```
 
-Generate API based on sqlserver database:
+Generate APIs based on SQLServer databases:
 
-`pythonrest generate --sqlserver-connection-string <sqlserver_connection_string>`
+```bash
+pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA>
+```
 
-Generate API based on mariadb database:
+Generate APIs based on DariaDB databases:
 
-`pythonrest generate --mariadb-connection-string <mariadb_connection_string>`
+```bash
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA>
+```
+
+Generate APIs based on Aurora MySQL databases:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA>
+```
+
+Generate APIs based on Aurora Postgres databases:
+
+```bash
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public
+```
+
 
 ### Custom options
 #### --result-path:
-By default, PythonREST will generate the API on your current directory, under a PythonRestAPI folder, but there is also 
-a possibility to define a custom path to your generated API, following the below example:
+By default, PythonREST will generate the API on your current directory under a PythonRestAPI folder. To define a custom 
+path to your generated API please follow the example below:
 
-`pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\Users\<your_user_here>\Documents\PythonRestCustomFolder`
+```bash
+pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\<YOUR_DESIRED_PATH_HERE>
+```
 
 The above will generate your API on the provided path, and if the folder does not exist the generator will create i.
 The following folders/files will be modified(content deleted and recreated) if a PythonREST project is already in place:
@@ -147,13 +171,17 @@ Keep in mind that the provided folder will have all of its files deleted before 
 This option creates the Python Domain Classes with PascalCase pattern for their names, if this option is provided as
 --no-use-pascal-case, you will be prompted to provide a name of python class for each table of your database:
 
-`pythonrest generate --mysql-connection-string <mysql_connection_string> --no-use-pascal-case`
+```bash
+pythonrest generate --mysql-connection-string <MYSQL_CONNECTION_STRING> --no-use-pascal-case
+```
 
 #### --us-datetime:
 If you have a database with datetime formatted to the us pattern of mm-dd-yyyy, you can use this option so that the api
 will also respect that pattern when validating requests and responses:
 
-`pythonrest generate --mysql-connection-string <mysql_connection_string> --us-datetime`
+```bash
+pythonrest generate --mysql-connection-string <MYSQL_CONNECTION_STRING> --us-datetime
+```
  
 This behavior can be modified on the project's environment variables file(src/e_Infra/g_Environment/EnvironmentVariables.py), modifying the date_valid_masks variable. Some valid values are(more options and details on the API Environment Variables section below):
 - "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" -> This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
@@ -161,20 +189,43 @@ This behavior can be modified on the project's environment variables file(src/e_
 <br></br>
 
 ## How to Run Generated API
-After generating your API, you may open it on your desired IDE(VSCode, PyCharm, etc) or even the bash/cmd if you wish to, from there you may build your venv like bellow to run the project.
+After generating your API, you may open it on your preferred IDE(VSCode, PyCharm, etc) or even the bash/cmd if you wish to, from there you may build your venv like below to run the project.
 
-#### venv run
-If you wish to run this project using a Python virtual environment, you can follow the steps below:
-
-1. Create a virtual environment:
-
-#### Windows:
-
+### How to Run with venv (Python virtual environment)
+This project was initially built to run using a Python virtual environment, below we'll provide how to install the virtual environment and run the project on different systems:
+#### Windows(CMD/Powershell):
+1. Create the venv
+First of all, you should open this project on your terminal, from now on all the commands will be run from the root folder of the project.
+Below is the command to create a python venv:
 ```commandline
 python -m venv venv
 ```
+2. Activate the virtual environment
+The below command is how to activate your venv for use on your current terminal session:
+```commandline
+.\venv\Scripts\activate
+```
+The above command works fine for CMD or Powershell. If you are using GitBash to run these commands, the only change would be running the below command instead of the above one:
 
-#### Linux/Mac:
+```bash
+source venv/Scripts/activate
+```
+
+3. Install required libraries for API to run
+This project needs a number of libraries stored on PyPi to run, these are all listed on the requirements.txt file on the root folder of the generated project and to be installed you run the below command:
+```commandline
+pip install -r requirements.txt
+```
+
+4. Run app.py
+After the libraries installation is complete, you can use the below command to run the project:
+```commandline
+python app.py
+```
+From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at [readthedocs](https://readthedocs.org/projects/pythonrest/) 
+
+#### Linux/Mac(Bash/Zsh):
+1. Create the venv:
 On Debian/Ubuntu systems, you need to have the python3-venv package installed, which you can do with the following commands:
 ```bash
 apt-get update
@@ -184,26 +235,25 @@ And then you can create the venv with the following:
 ```bash
 python3 -m venv venv
 ```
-2. Activate the virtual environment:
-#### Windows:
-```
-.\venv\Scripts\activate
-```
 
-#### Linux/Mac:
+2. Activate the virtual environment
+The below command is how to activate your venv for use on your current terminal session:
 ```bash
 source venv/bin/activate
 ```
 
-3. Install required libraries for API to run:
-```commandline
+3. Install required libraries for API to run
+This project needs a number of libraries stored on PyPi to run, these are all listed on the requirements.txt file on the root folder of the generated project and to be installed you run the below command:
+```bash
 pip install -r requirements.txt
 ```
 
-4. Run app.py:
-```commandline
+4. Run app.py
+After the libraries installation is complete, you can use the below command to run the project:
+```bash
 python app.py
 ```
+From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at [readthedocs](https://readthedocs.org/projects/pythonrest/) 
 <br></br>
 
 ## Run and Debug using venv with VSCode
@@ -227,14 +277,34 @@ Doing that will generate your launch.json, in which you'll want to add a "python
     ]
 }
 ```
-<br></br>
+<br>
 
 ## API Usage Examples
-#### select all table entries
+After following the **How to run** section to its final steps, with your project running you can finally test the routes it creates, to follow the below examples, if you have a table named user, you would want to access localhost:5000/swagger/user to check the routes provided to that table.
+
+### Select All Table Entries
+<hr>
 Starting with a basic use, you go to your swagger/<table_name>, the first route is the get one, if you just hit "try it out" and then "execute", it will present you with a response equivalent to a SELECT * from <table_name> query. If you wish to, you can use the available filters to select only the attributes that you want to retrieve, limit the number of results, paginate your results and so on. If you still did not have anything on your database to retrieve, it will just be an empty list, now we can get to our next use case to solve that!
 
-#### insert table entry
-From the same swagger page we were in, the next route is the post /<table_name>, in which when you hit "try it out" it will present you with a sample JSON body to insert an entry on your table. The JSON body sent on the request is a list, so if you wish to you can provide multiple entries at once on table with the same request, below is an example of a request inserting three entries on a user table:
+<br>
+
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRxL8hUgfencMlNjW35HP7fx_ZvlheJUuPjefCisGhDu6VxE2HUt9aOFSiBMOSpYXe8J5KKZZGN50VNt8VoleEz_GFw=w2880-h1404" alt="Swagger Select all Users"/>
+</div>
+
+### Insert Table Entry
+<hr>
+From the same swagger page we were in, the next route is the post /<table_name>, in which when you hit "try it out" it will present you with a sample JSON body to insert an entry on your table. The JSON body sent on the request is a list, so if you wish to you can provide multiple entries at once on table with the same request, below is an example of a request inserting three entries on a simple pre-designed USER table with 'id_user', 'username' and 'date_joined' fields:
+
+<br>
+
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYSKKVmPS5CH_OCAbonoV_DJbjXq2IS5wGx6Q-CPAn4dI7Jo2W-2kx193E5lOg3VSrPmFRtz_1G8sYld8hUjT6JuagQjkQ=w2880-h1404" alt="Swagger Insert User"/>
+</div>
+
+<br>
+
+Example JSON payload:
 ```json
 [
   {
@@ -255,8 +325,18 @@ From the same swagger page we were in, the next route is the post /<table_name>,
 ]
 ```
 
-#### delete table entry
+### Delete Table Entry
+<hr>
 Now we're talking about the delete /user route, if you hit "try it out" it will also present you with a sample JSON body of a generic object of your table, you can then use that example, modify its values to suit an entry that exists on your database. Note that this is a delete by full match route, so you need to provide the correct values for all of the table collumns on your response, below is an example of JSON body to delete a user table entry that has 3 columns: id_user, username and date_joined:
+
+<br>
+
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYTi11erJfknIMgb0R2auyanxd_g34kkoVcNYXfS5Kct20SRB-dsqOi7pMRG9UGXV_hAaiGOGvLf6CM8LQOxVMDedqGFXw=w2880-h1404" alt="Swagger Delete User"/>
+</div>
+
+<br>
+
 ```json
 [
   {
@@ -272,12 +352,21 @@ For more detailed examples, please check our [blog](https://medium.com/@seventec
 
 ## Swagger Overview
 When running the API, it will provide you with a localhost url, then you have the following swagger pages accessible:
-#### /swagger
-That's the base route for viewing swagger, it contains the documentation of the SQL routes present on the application
 
-#### /swagger/tablename
-For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in flatcase(all words together in lower case with no separators).
-<br></br>
+### /swagger
+<hr>
+That's the base route for viewing swagger, it contains the documentation of the SQL routes present on the application
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYR_dUffHUELqs1yay5iiqu0ltnAtbLqtPgjwjpsHv5IRhCRfZuhv0B5qVvPG5ZHm0ThT08xu99zsZuCRMblvjuFSasp=w2880-h1508" alt="Swagger Main Screen"/>
+</div>
+
+### /swagger/tablename
+<hr>
+For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in *flatcase* (**ALL WORDS TOGETHER IN LOWER CASE WITH NO SEPARATORS**).
+<div align="center">
+  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRfUGgCAiU0KSLZJjLGttaIuBCf5vRNWa8ioShBm7KQtm_EkwwLSHiW-G2hZbi-25SH-x_HtkLKjizLfxafbYMnJ-D0uA=w2880-h1508" alt="Swagger User Screen"/>
+</div> 
+<br>
 
 ## Postman/cURL
 If you're familiar with Postman or using cURL requests directly, you can make requests to the routes shown in the open api specification, using the examples of usage present on it to build your request.
@@ -295,7 +384,7 @@ curl -X 'POST' \
   }
 ]'
 ```
-<br></br>
+<br>
 
 ## API Environment Variables
 Generated API environment variables can be found on src/e_Infra/g_Environment/EnvironmentVariables.py and each one has the following utility:
@@ -360,18 +449,49 @@ Example:
 
 - main_db_conn - Specifies the database type (mysql, pgsql, mssql, mariadb) of the database your custom API accesses. Should not be messed around to avoid breaking the code. Valid values are: mysql, pgsql, mssql and mariadb
 
-- <project_database_type>_user - User to authenticate on API's database sessions.
+- <PROJECT_DATABASE_TYPE>_user - User to authenticate on API's database sessions.
 
-- <project_database_type>_password - Password to authenticate on API's database sessions.
+- <PROJECT_DATABASE_TYPE>_password - Password to authenticate on API's database sessions.
 
-- <project_database_type>_host - The endpoint of your database.
+- <PROJECT_DATABASE_TYPE>_host - The endpoint of your database.
 
-- <project_database_type>_port - Port that is allowed access to your database.
+- <PROJECT_DATABASE_TYPE>_port - Port that is allowed access to your database.
 
-- <project_database_type>_schema - On MySQL, MariaDB and SQLServer, this is the name of your database. On PostgreSQL, this is the schema inside of your database.
+- <PROJECT_DATABASE_TYPE>_schema - On MySQL, MariaDB and SQLServer, this is the name of your database. On PostgreSQL, this is the schema inside of your database.
 
 - pgsql_database_name - On PostgreSQL, this is the database name in which your selected schema resides.
 <br></br>
+
+# Generated API Directory Structure
+The generated API has a structure of a number of directories with sub-directories. This section will explain that division in order to enlighten the project for debugging and feature implementations. Taking from the root of the generated project, we have:
+- config/: This directory contains all of the swagger files of the project, the main one and each database table swagger page.
+- src/a_Presentation: This directory houses the controllers of the project, the files which are responsible for defining the routes of the project, creating functions for each route and defining the parameters used by them
+  - src/a_Presentation/a_Domain: Contains the controllers for all of the domains of the project, which are the tables scanned by PythonREST of your database.
+  - src/a_Presentation//b_Custom: Contains controllers of other sections of the project, like the SQL routes controllers, OPTIONS method conrollers(that deals with CORS and its related stuff), before request controller, which prints the request on terminal and exception handler controller, which prints the error on terminal and calls a function to build the response error to be returned as a response
+  - src/a_Presentation/d_Swagger: Contains the swagger routes controllers, which notifies the project which swagger file it should open when determined route is accessed.
+- src/b_Application: This directory houses the services and DTOs of the project.
+  - src/b_Application/a_DTO: This directory houses any custom DTOs(Data Transfer Objects are a structured and serializable object used to encapsulate and transport data between layers of an application or between different parts of a distributed system) that would be created for the project, separated by request(src/b_Application/a_DTO/a_Request) and response(src/b_Application/a_DTO-b_Response)
+  - src/b_Application/b_Service: The service files are contained here, which are the files responsible for data manipulation, validation, and communication with external systems.
+    - src/b_Application/b_Service/a_Domain: All of the service files for the domains are contained here
+    - src/b_Application/b_Service/b_Custom: All of the sql routes, before request and error handler services are contained here.
+- src/c_Domain: Contains all the main classes of the project domains, which define how each table is structured.
+- src/d_Repository: This directory houses the repositories of the project, they are the data access layer responsible for handling database interactions and they are involved in doing the direct CRUD (Create, Read, Update, Delete) operations on data entities.
+- src/d_Repository/GenericRepository.py: Contains functions responsible for each of the routes transactions, selecting objects(by id or just a select all), inserting objects, updating objects and deleting objects(by id or by full match) and applies necessary business logics or functionalities before executing the queries on the database.
+    - src/d_Repository/a_Domain: This directory contains files for each table, in which you can set your custom repositories for each one separately.
+    - src/d_Repository/b_Transactions: Contains functions responsible for each of the routes transactions, selecting objects(by id or just a select all), inserting objects, updating objects and deleting objects(by id or by full match) and on these calls the methods of the GenericRepository.py
+    - src/d_Repository/d_DbConnection: Contains the function responsible for creating a connection string to the database accessed by the project.
+- src/e_Infra: Contains files or components that deal with the foundational structure, setup and configuration of the project.
+  - src/e_Infra/a_Handlers: Contains files used to configure exceptions and system messages returned by the API
+  - src/e_Infra/b_Builders: Contains files used to configure and build date times, domain objects, flask, proxy responses, sql alchemy, strings
+    - src/e_Infra/b_Builders/a_Swagger: Contains the functions to build the Swagger blueprints that renders the Swagger page.
+  - src/e_Infra/c_Resolvers: Contains functions to deal with some logics and operations like creation of engine and session of a connected database and filtering queries with left like, right lke and the such.
+  - src/e_Infra/d_Validators: Contains functions that validates if given requests have correct data, like JSON bodies, datetimes values, types of table parameters.
+  - src/e_Infra/d_Validators/a_Domain: Contains functions for each domain in which custom validators can be set.
+  - src/e_Infra/f_Decorators: Contains decorator functions, which modify or extend the behavior of functions by wrapping them with additional functionality.
+  - src/e_Infra/g_Environment: Contains the environment variables used by the project.
+  - src/e_Infra/CustomVariables.py: Contains functions to return custom values used by the code, like empty dicts, empty lists and more.
+  - src/e_Infra/GlobalVariablesManager.py: Contains a function to call the environment variables if they exist or None if they don't.
+  - src/g_Tests: Directory to store the UnitTests created to test the project's functionalities. 
 
 ## Requirements
 
@@ -583,7 +703,7 @@ When reinstalling the local pip package for tests, make sure to delete the build
 as retaining that folder can lead to the project being built using that folder and not catching any changes you made to
 the project files.
 
-If you find our solution helpful, we would appreciate your support through a donation to our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
-
-Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
-Don't forget to star rate this repo if you like our job!
+<br></br>
+## If you find our solution helpful, consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+## Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
+## Don't forget to star rate this repo if you like our job!
