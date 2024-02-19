@@ -1,5 +1,5 @@
 Welcome to Python REST's documentation!
-===================================
+=======================================
 
 **Python REST** is a Python library to generate a complete CRUD Rest API for relational databases.
 It's a *simple* and *intuitive* CLI that requires only an existing database and its connection string to produce a Rest API with a swagger.
