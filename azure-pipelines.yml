@@ -1,3 +1,6 @@
+trigger:
+- none
+
 # parameters:
 #   - name: USERS_EMAILS_TO_NOTIFY
 #     type: string
@@ -5,54 +8,55 @@
 #       gustavodaflon@seventechnologies.cloud
 #       leonardoviana@seventechnologies.cloud
 
-# variables:
-# - group: pythonrest-cli
+variables:
+- group: pythonrest-cli
 
-# jobs:
-# - job: CheckProjectVersionAndPublish
-#   pool:
-#     vmImage: ubuntu-latest
-#   steps:
-#   - checkout: self
-#   - script: |
-#       latest_version=$(curl -s https://pypi.org/pypi/$(app_name)/json | jq -r '.info.version' 2>/dev/null)
-#       echo "Latest version on PyPI: $latest_version"
+jobs:
+- job: CheckPypiVersionBeforePublishing
+  displayName: Version Check to publish or not
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+  - script: |
+      latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null)
+      echo "Latest version on PyPI: $latest_version"
 
-#       local_version=$(python3 -c "from setuptools import setup; print(setup().get_version())")
-#       echo "Local version in setup.py: $local_version"
+      local_version=$(python3 setup.py --version)
+      echo "Local version in setup.py: $local_version"
 
-#       if [ "$latest_version" != "$local_version" ]; then
-#         echo "Versions are different. Uploading to PyPI."
-#         pip3 install twine
-#         python3 setup.py sdist
-#         python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
-#       else
-#         echo "Versions are the same. Skipping PyPI upload."
-#       fi
+      if [ "$latest_version" != "$local_version" ]; then
+        echo "Versions are different. Uploading to PyPI."
+        pip3 install twine
+        python3 setup.py sdist
+        python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
+      else
+        echo "Versions are the same. Skipping PyPI upload."
+      fi
 
 # - job: CheckChocoCLIVersion
-#   displayName: 'Check CLI version'
+#   displayName: 'Check Choco CLI version'
 #   pool:
-#     vmImage: 'windows-latest'
+#     vmImage: 'ubuntu-latest'
 #   variables:
 #     NEEDS_MANUAL_APPROVAL: $[eq(variables['choco_cli_version'], variables['nuspecVersion'])]
 #   steps:
-#   - powershell: |
-#       $nuspecVersion = [xml](Get-Content -Path .\$(app_name).nuspec).package.metadata.version
+#   - bash: |
+#       source .env
 
-#       if ($env:choco_cli_version -lt $nuspecVersion) {
-#           Write-Error "Value for variable choco_cli_version = '$($env:choco_cli_version)' does not match the one in .nuspec file: nuspec_version."
+#       nuspecVersion=$(grep -m 1 '<version>' $(app_name).nuspec | sed -n 's/.*<version>\(.*\)<\/version>.*/\1/p')
+#       cliVersion="$CLI_VERSION"
+
+#       if [ "$cliVersion" != "$nuspecVersion" ]; then
+#           echo "Value for variable choco_cli_version = '$CLI_VERSION' does not match the one in .nuspec file: nuspec_version."
 #           exit 1
-#       }
-#       elseif ($env:choco_cli_version -eq $nuspecVersion) {
-#           Write-Host "The versions match. Proceeding to Manual Approval..."
-#       }
-#       else {
-#           Write-Host "The choco_cli_version is greater than the version in .nuspec. No additional action needed."
-#       }
-#     displayName: 'Verify Version'
+#       fi
+
+#       echo "The versions match. Proceeding to Manual Approval..."
+#     displayName: 'Verify Choco CLI Version'
 
 # - job: manual_approval
+#   dependsOn: CheckChocoCLIVersion
 #   displayName: Manual Approval
 #   pool: server
 #   steps:

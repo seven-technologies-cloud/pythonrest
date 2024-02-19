@@ -1,13 +1,13 @@
-﻿
-Note: Include this file if including binaries you have the right to distribute. 
-Otherwise delete. this file. If you are the software author, you can change this
-mention you are the author of the software.
-
-===DELETE ABOVE THIS LINE AND THIS LINE===
-
-VERIFICATION
+﻿VERIFICATION
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
+
+To verify if the hashes matches, from your pythonrest.exe location, please run:
+
+Get-FileHash -Algorithm MD5 pythonrest.exe
+Get-FileHash -Algorithm SHA256 pythonrest.exe
+
+Their outputs should provide the same corresponding hashes as below:
  
-- MD5: A00B4539E45FD76AE50F3676EB35B250
-- SHA-256: F3C44FB65A6954264ED540A0BD826BF9C7ED05AD0C382590AEF851A3AC67DD6E
+- MD5: F8F699B9451EDB1BD5F1A09127616E6B
+- SHA-256: 910161F3D023847FD5167AF0C926BA003B984DF029604A76EFDD148EFC526938
