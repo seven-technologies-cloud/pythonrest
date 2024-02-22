@@ -73,8 +73,8 @@ brew install openssl
 ```bash
 pip install --upgrade pip setuptools
 pip install cython --upgrade
-pip install –upgrade wheel
-pip install --upgrade pip
+pip install wheel --upgrade
+pip install pip --upgrade
 ```
 
 - Finally, install pymssql with the below commands:
@@ -84,12 +84,12 @@ export LDFLAGS="-L$(brew --prefix openssl)/lib -L/usr/local/opt/openssl/lib"
 export CPPFLAGS="-I$(brew --prefix openssl)/include"
 pip install --pre --no-binary :all: pymssql --no-cache
 ```
-After a successful installation of pymssql, you can then proceed with the installation of pythonrest using pip
+After a successful installation of pymssql, you can then proceed with the installation of pythonrest using pip or the download on the website
 <br></br>
 
 ## Prerequisites
 To use PythonREST, you must have Python 3.11 installed on your machine.
-You'll also need access to the your desired database so that the generator can assess it and create your API. If you're not familiar with creating and connecting to relational databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies on how to create local databases (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
+You'll also need credentials that can connect to your desired database so that the generator can access it and create your API. If you're not familiar with creating and connecting to relational databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies on how to create local databases (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
 <br></br>
 
 ## Usage
@@ -120,7 +120,7 @@ Generate APIs based on SQLServer databases:
 pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA>
 ```
 
-Generate APIs based on DariaDB databases:
+Generate APIs based on MariaDB databases:
 
 ```bash
 pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA>
@@ -502,7 +502,7 @@ Already listed within ./requirements.txt
 - 'pymysql==1.1.0'
 - 'psycopg2==2.9.9'
 - 'psycopg2-binary==2.9.9'
-- 'pymssql==2.2.10'
+- 'pymssql==2.2.11'
 - 'pyinstaller==6.3.0'
 
 To run and build this project, you need to have the above libraries installed on your machine, which you can do running 
@@ -679,8 +679,7 @@ Run from the root folder:
 ```commandline
 pip install .
 ```
-This will use the setup.py from the root folder to build a library of the pythonrest on the site-packages
-of the Python folder.
+This will use the setup.py from the root folder to build a library of the pythonrest on the site-packages of the Python folder.
 One thing worth noting is that if you need to add a new folder to the project, e.g. apigenerator/c_NewFolder
 you need to add a new entry to the list of the packages property in the setup.py, like this:
 ```python

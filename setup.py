@@ -85,7 +85,7 @@ package_dir={'pythonrest': '.'},
         'mergedeep==1.3.4',
         'pymysql==1.1.0',
         'psycopg2-binary==2.9.9',
-        'pymssql==2.2.10',
+        'pymssql==2.2.11',
         'pyinstaller==6.3.0',
     ],
     entry_points={
