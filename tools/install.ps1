@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'; # stop on all errors
 $packageName = 'pythonREST'
-$url        = 'URL_DO_SEU_BINARIO'
+$url        = 'https://github.com/daflongustavo/pythonrest/releases/download/0.1.0/pythonrest.exe'
 $installDir = "C:\Program Files\$packageName"
 
 # Creates Installation path, if it does not exist
