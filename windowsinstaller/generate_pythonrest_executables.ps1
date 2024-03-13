@@ -21,7 +21,7 @@ try {
     exit 1
 }
 
-Run-Command "pyinstaller --onefile --add-data '../pythonrest.py;.' --add-data '../databaseconnector;databaseconnector' --add-data '../domaingenerator;domaingenerator' --add-data '../apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql --icon=../pythonrestlogo.ico ../pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data '../pythonrest.py;.' --add-data '../databaseconnector;databaseconnector' --add-data '../domaingenerator;domaingenerator' --add-data '../apigenerator;apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules site --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql --icon=../pythonrestlogo.ico ../pythonrest.py"
 
 try {
     Move-Item "$scriptPath\dist\pythonrest.exe" "$scriptPath" -Force

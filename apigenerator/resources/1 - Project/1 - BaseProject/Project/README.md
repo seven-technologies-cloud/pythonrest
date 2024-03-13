@@ -35,7 +35,7 @@ Below is the command to create a python venv:
     ```commandline
     python app.py
     ```
-    From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at[readthedocs](https://readthedocs.org/projects/pythonrest/) 
+    From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at [readthedocs](https://readthedocs.org/projects/pythonrest/) 
 
 <br>
 

@@ -16,7 +16,7 @@ def remove_pythonrest_from_user_program_files():
         sys.exit(1)
 
 
-def run_powershell_script(script_path):
+def run_script_that_removes_pythonrest_from_path(script_path):
     try:
         powershell_command = [
             'powershell.exe',
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         powershell_script_name = 'removepythonrestfromuserpath.ps1'
         powershell_script_path = os.path.join(script_directory, powershell_script_name)
 
-        run_powershell_script(powershell_script_path)
+        run_script_that_removes_pythonrest_from_path(powershell_script_path)
 
     except Exception as e:
         print(f'Error: {e}')
