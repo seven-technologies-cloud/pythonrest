@@ -3,16 +3,18 @@ import shutil
 import sys
 import subprocess
 import time
-import ctypes
 
-def move_pythonrest_exe_to_program_files(executable_path, target_folder):
+def move_exe_to_user_program_files(executable_path):
+    target_folder = os.path.join(os.environ['LOCALAPPDATA'], 'PythonREST')
+    os.makedirs(target_folder, exist_ok=True)
     try:
         shutil.move(executable_path, os.path.join(target_folder, os.path.basename(executable_path)))
-        print(f'Successfully added PythonREST to your Programs in "{target_folder}".')
+        print(f'Successfully added PythonREST to your local app data in "{target_folder}".')
     except Exception as e:
-        print(f'Error: Unable to add PythonREST to Programs. {e}')
+        print(f'Error: Unable to add PythonREST to local app data. {e}')
         input('Press Enter to exit...')
         sys.exit(1)
+    return target_folder
 
 def run_script_that_adds_pythonrest_to_path(script_path):
     try:
@@ -33,20 +35,15 @@ def run_script_that_adds_pythonrest_to_path(script_path):
 
 if __name__ == "__main__":
     try:
-        if not ctypes.windll.shell32.IsUserAnAdmin():
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-            sys.exit()
-
         script_directory = os.path.dirname(os.path.abspath(__file__))
-        install_directory = os.path.join(os.environ['PROGRAMFILES'], 'PythonREST')
-        os.makedirs(install_directory, exist_ok=True)
         executable_path = os.path.join(script_directory, 'pythonrest.exe')
-        move_pythonrest_exe_to_program_files(executable_path, install_directory)
+        install_directory = move_exe_to_user_program_files(executable_path)
 
         time.sleep(1)
         powershell_script_name = 'addpythonresttouserpath.ps1'
         powershell_script_path = os.path.join(script_directory, powershell_script_name)
-        run_script_that_adds_pythonrest_to_path(powershell_script_path)
+        # Modify the PowerShell script path if necessary
+        run_powershell_script(powershell_script_path)
 
     except Exception as e:
         print(f'Error: {e}')

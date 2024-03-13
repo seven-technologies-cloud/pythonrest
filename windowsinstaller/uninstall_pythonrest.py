@@ -1,15 +1,15 @@
 import os
 import shutil
-import subprocess
 import sys
+import subprocess
 import time
-import ctypes
 
 
-def remove_pythonrest_from_program_files(install_directory):
+def remove_pythonrest_from_user_program_files():
+    install_directory = os.path.join(os.environ['LOCALAPPDATA'], 'PythonREST')
     try:
         shutil.rmtree(install_directory)
-        print(f'Successfully removed the PythonREST installation from Program Files.')
+        print(f'Successfully removed the PythonREST installation from {install_directory}.')
     except Exception as e:
         print(f'Error: Unable to remove PythonREST installation folder. {e}')
         input('Press Enter to exit...')
@@ -33,14 +33,9 @@ def run_script_that_removes_pythonrest_from_path(script_path):
 
 if __name__ == "__main__":
     try:
-        if not ctypes.windll.shell32.IsUserAnAdmin():
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-            sys.exit()
-
         script_directory = os.path.dirname(os.path.abspath(__file__))
-        install_directory = os.path.join(os.environ['PROGRAMFILES'], 'PythonREST')
 
-        remove_pythonrest_from_program_files(install_directory)
+        remove_pythonrest_from_user_program_files()
 
         time.sleep(1)
 
