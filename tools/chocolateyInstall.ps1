@@ -9,7 +9,7 @@ if (-not (Test-Path $installDir)) {
 }
 
 # Download binary 
-Get-ChocolateyWebFile -PackageName $packageName -FileFullPath "$installDir\nomeDoSeuBinario.exe" -Url $url
+Get-ChocolateyWebFile -PackageName $packageName -FileFullPath "$installDir\pythonrest.exe" -Url $url
 
 # Update PATH env
 $envPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
@@ -18,4 +18,4 @@ if (-not ($envPath.Split(';') -contains $installDir)) {
 }
 
 # Post Installation Message
-Write-Host "Successful installation! Try $packageName executing 'pythonrest version' in your terminal"
+Write-Host "Successful installation! Try $packageName using the command 'pythonrest version' in your terminal"
