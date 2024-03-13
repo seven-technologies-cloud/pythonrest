@@ -1,4 +1,4 @@
-$desired_entry = 'C:\Program Files\PythonREST'
+$desired_entry = "$env:LOCALAPPDATA\PythonREST"
 $old_path = [Environment]::GetEnvironmentVariable('PATH', 'User')
 $old_path_entry_list = ($old_path).split(";")
 $new_path_entry_list = New-Object System.Collections.ArrayList

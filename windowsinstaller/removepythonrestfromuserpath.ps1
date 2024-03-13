@@ -1,4 +1,4 @@
-$desired_entry = 'C:\Program Files\PythonREST'
+$desired_entry = "$env:LOCALAPPDATA\PythonREST"
 
 $old_path = [Environment]::GetEnvironmentVariable('PATH', 'User')
 
