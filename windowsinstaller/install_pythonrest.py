@@ -16,7 +16,7 @@ def move_exe_to_user_program_files(executable_path):
         sys.exit(1)
     return target_folder
 
-def run_script_that_adds_pythonrest_to_path(script_path):
+def run_powershell_script(script_path):
     try:
         powershell_command = [
             'powershell.exe',
