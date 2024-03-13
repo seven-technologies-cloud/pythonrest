@@ -20,8 +20,6 @@
     <tags>python cli db mysql postgres database sqlserver apirest lambda api mariadb</tags>
   </metadata>
   <files>
-    <file src="./dist/pythonrest.exe" target="tools" />
-    <file src="./tools/VERIFICATION.txt" target="tools" />
-    <file src="./tools/LICENSE.txt" target="tools" />
+    <file src="tools\**" target="tools" />
   </files>
 </package>

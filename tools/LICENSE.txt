@@ -1,4 +1,4 @@
-From: https://github.com/daflongustavo/pythonrest/blob/main/LICENSE
+From: https://github.com/seven-technologies-cloud/pythonrest/blob/main/LICENSE
 
 LICENSE
 
