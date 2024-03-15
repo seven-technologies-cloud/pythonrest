@@ -1,22 +1,19 @@
-$ErrorActionPreference = 'Stop'; # stop on all errors
-$packageName = 'pythonREST'
-$url = 'https://github.com/daflongustavo/pythonrest/releases/download/0.1.0/pythonrest.exe'
-$installDir = Join-Path -Path 'C:\Program Files' -ChildPath $packageName
+$ErrorActionPreference = 'Stop';
 
-# Creates Installation path, if it does not exist
-if (-not (Test-Path $installDir)) {
-    New-Item -ItemType Directory -Path $installDir -Force
+$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$url64 = 'https://github.com/daflongustavo/pythonrest/releases/download/0.1.0/pythonrest.exe'
+$checksum64 = 'zDPNsTLfRPZ7s1ZoD0qU3wB/WWmWXw1A5GY4LQjq6O8='
+
+$packageArgs = @{
+  packageName    = $env:ChocolateyPackageName
+  unzipLocation  = $toolsDir
+  fileType       = 'exe'
+  url64bit       = $url64
+  softwareName   = 'pythonREST Command Line Interface*'
+  checksum64     = $checksum64
+  checksumType64 = 'sha256'
+  silentArgs     = "/qn /norestart /l*v `"$($env:TEMP)\$($packageName).$($env:chocolateyPackageVersion).ExeInstall.log`""
+  validExitCodes = @(0, 3010, 1641)
 }
 
-# Download binary
-Get-ChocolateyWebFile -PackageName $packageName -FileFullPath "$installDir\pythonrest.exe" -Url $url
-
-# Update PATH env
-$envPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
-if (-not ($envPath -split ';' -contains $installDir)) {
-    $newPath = "$envPath;$installDir"
-    [Environment]::SetEnvironmentVariable('Path', $newPath, [EnvironmentVariableTarget]::Machine)
-}
-
-# Post Installation Message
-Write-Host "Successful installation! Try $packageName using the command 'pythonrest version' in your terminal."
+Install-ChocolateyPackage @packageArgs
