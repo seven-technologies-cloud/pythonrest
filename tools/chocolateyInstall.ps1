@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $packageName = 'pythonrest'
-$url = 'https://github.com/daflongustavo/pythonrest/releases/download/0.1.0/pythonrest.exe'
-$checksum = 'zDPNsTLfRPZ7s1ZoD0qU3wB/WWmWXw1A5GY4LQjq6O8='
+$url = 'https://github.com/seven-technologies-cloud/pythonrest/releases/download/0.1.0/pythonrest.exe'
+$checksum = 'CC33CDB132DF44F67BB356680F4A94DF007F5969965F0D40E466382D08EAE8EF'
 $checksumType = 'sha256'
 $toolsDir = "$(Get-ToolsLocation)\$packageName"
 
