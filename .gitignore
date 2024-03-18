@@ -1,9 +1,15 @@
+# Mac Files
+__MACOSX
+*/__MACOSX
+*/.DS_Store
+
 # Generated API Folder
 PythonRestAPI
 
-#Generated Binaries Folders
+# Generated Binaries Folders
 windowsinstaller/PythonRestExecutables
 linuxinstaller/PythonRestExecutables
+macinstaller/PythonRestExecutables
 
 # exe files
 *.exe

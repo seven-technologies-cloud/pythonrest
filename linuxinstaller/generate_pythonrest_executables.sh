@@ -23,7 +23,7 @@ script_path=$(dirname "$(readlink -f "$0")")
 
 cd "$script_path" || exit 1
 
-run_command "pyinstaller --onefile --add-data '../pythonrest.py:.' --add-data '../databaseconnector:databaseconnector' --add-data '../domaingenerator:domaingenerator' --add-data '../apigenerator:apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql ../pythonrest.py"
+run_command "pyinstaller --onefile --add-data '../pythonrest.py:.' --add-data '../databaseconnector:databaseconnector' --add-data '../domaingenerator:domaingenerator' --add-data '../apigenerator:apigenerator' --collect-submodules typing --collect-submodules re --collect-submodules typer --collect-submodules yaml --collect-submodules parse --collect-submodules mergedeep --collect-submodules site --collect-submodules pymysql --collect-submodules psycopg2 --collect-submodules psycopg2-binary --collect-submodules pymssql ../pythonrest.py"
 
 run_command "mv '$script_path/dist/pythonrest' '$script_path' -f"
 

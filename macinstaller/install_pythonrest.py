@@ -1,12 +1,12 @@
+# -*- coding: utf-8 -*-
 import os
 import shutil
 import sys
 import subprocess
 import time
-import getpass
 
 
-def move_pythonrest_binary_to_usr_local_bin(executable_path, target_folder):
+def move_pythonrest_binary_to_system_bin(executable_path, target_folder):
     try:
         shutil.move(executable_path, os.path.join(target_folder, os.path.basename(executable_path)))
         print(f'Successfully added PythonREST to your system-level binaries and commands in "{target_folder}".')
@@ -35,7 +35,7 @@ def run_script_that_adds_pythonrest_to_path(script_path):
 if __name__ == "__main__":
     try:
         if os.geteuid() != 0:
-            print("This installer requires sudo privileges to run. Please type your sudo password")
+            # If not running as root, rerun the script with sudo
             os.system(f'sudo {sys.executable} {" ".join(sys.argv)}')
             sys.exit()
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
         executable_path = os.path.join(script_directory, 'pythonrest')
 
-        move_pythonrest_binary_to_usr_local_bin(executable_path, install_directory)
+        move_pythonrest_binary_to_system_bin(executable_path, install_directory)
 
         time.sleep(1)
 
