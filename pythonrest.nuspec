@@ -3,15 +3,15 @@
   <metadata>
     <id>pythonrest</id>
     <version>0.1.0</version>
-    <title>pythonrest</title>
-    <authors>seven-technologies-cloud</authors>
+    <title>pythonREST CLI</title>
+    <authors>seventechnologies</authors>
     <owners>seven-technologies-cloud</owners>
-    <projectUrl>https://github.com/daflongustavo/pythonrest</projectUrl>
-    <licenseUrl>https://github.com/daflongustavo/pythonrest/blob/main/LICENSE</licenseUrl>
-    <packageSourceUrl>https://github.com/daflongustavo/pythonrest</packageSourceUrl>
+    <projectUrl>https://github.com/seven-technologies-cloud/pythonrest</projectUrl>
+    <licenseUrl>https://github.com/seven-technologies-cloud/pythonrest/blob/main/LICENSE</licenseUrl>
+    <packageSourceUrl>https://github.com/seven-technologies-cloud/pythonrest</packageSourceUrl>
     <bugTrackerUrl>https://github.com/seven-technologies-cloud/pythonrest/issues</bugTrackerUrl>
-    <docsUrl>https://github.com/daflongustavo/pythonrest/blob/main/README.md</docsUrl>
-    <iconUrl>https://avatars.githubusercontent.com/u/106111090?v=4</iconUrl>
+    <docsUrl>https://github.com/seven-technologies-cloud/pythonrest/blob/main/README.md</docsUrl>
+    <iconUrl>https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYQaGLdP44igBcrFUpCFt2Fxa3E_fk1p8cmMDx2FmKCF9oWUKMxvgOZEYE7EOJD1mCRi8dFDhF-HpdY90PQQ5r6tXdqo=w1920-h922</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>First release for pythonrest, a Seven Technologies Cloud CLI tool.</summary>
     <description>pythonrest CLI tool was designed to generate an API from a database (mysql, postgres, mariaDB, sqlserver and aurora).</description>
@@ -20,8 +20,6 @@
     <tags>python cli db mysql postgres database sqlserver apirest lambda api mariadb</tags>
   </metadata>
   <files>
-    <file src="./dist/pythonrest.exe" target="tools" />
-    <file src="./tools/VERIFICATION.txt" target="tools" />
-    <file src="./tools/LICENSE.txt" target="tools" />
+    <file src="tools\**" target="tools" />
   </files>
 </package>
