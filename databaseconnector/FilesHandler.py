@@ -21,6 +21,9 @@ def normalize_path(path):
     # Ensure there are always two backslashes separating each folder
     path = re.sub(r'\\(?!\\)', r'\\', path)
 
+    # Remove trailing backslashes or slashes at the end of the string
+    path = re.sub(r'[\\/]+$', '', path)
+
     return path
 
 
@@ -35,7 +38,7 @@ def check_if_given_result_path_is_unsafe(path):
         "/System", "/Library", "/Applications", "/private/var", "/Users",
 
         # Windows sensitive paths
-        "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\Program Files", "C:\\Program Files (x86)"
+        "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)"
     ]
 
     # List of sensitive paths for different systems
@@ -47,7 +50,7 @@ def check_if_given_result_path_is_unsafe(path):
         "/System", "/Library", "/Applications", "/private/var", "/Users",
 
         # Windows sensitive paths
-        "C:\\", "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
+        "C:", "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
     ]
 
     path = path.lower()
@@ -75,6 +78,18 @@ def check_if_given_result_path_is_unsafe(path):
 
 def check_if_current_working_directory_is_unsafe(path):
     path = normalize_path(path)
+
+    sensitive_startswith_paths = [
+        # Linux sensitive paths
+        "/", "/etc", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/boot", "/proc", "/sys", "/dev",
+
+        # Mac sensitive paths
+        "/System", "/Library", "/Applications", "/private/var", "/Users",
+
+        # Windows sensitive paths
+        "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)"
+    ]
+
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
@@ -84,10 +99,20 @@ def check_if_current_working_directory_is_unsafe(path):
         "/System", "/Library", "/Applications", "/private/var", "/Users",
 
         # Windows sensitive paths
-        "C:\\", "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
+        "C:", "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
     ]
 
     path = path.lower()
+
+    # Check if the path is unsafe for creation
+    for sensitive_path in sensitive_startswith_paths:
+        sensitive_path = sensitive_path.lower()
+        if os.name == "nt" and os.path.splitdrive(os.path.abspath(path))[0].lower() == os.path.splitdrive(sensitive_path)[0].lower():
+            if path.startswith(sensitive_path) or path == sensitive_path:
+                return True
+        elif os.name != "nt":
+            if path.startswith(sensitive_path) or path == sensitive_path:
+                return True
 
     # Check if the path is unsafe for creation
     for sensitive_path in sensitive_paths:
@@ -111,7 +136,7 @@ def check_if_provided_directory_is_unsafe(path):
         "/System", "/Library", "/Applications", "/private/var", "/Users",
 
         # Windows sensitive paths
-        "C:\\", "C:\\Windows", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
+        "C:", "C:\\Windows", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
     ]
 
     path = path.lower()
