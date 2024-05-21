@@ -16,38 +16,34 @@ class SaRowAttribute:
 
 
 def get_sa_row_attr_object(row_attr, attr_params):
-    if list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in get_string_list():
-        # --------------------- OBJECT ATTR --------------------- #
-        attr_type = 'string'
-    elif list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in get_integer_list():
-        # --------------------- OBJECT ATTR --------------------- #
-        attr_type = 'integer'
-    elif list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in get_number_list():
-        # --------------------- OBJECT ATTR --------------------- #
-        attr_type = 'number'
-    elif list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in get_boolean_list():
-        # --------------------- OBJECT ATTR --------------------- #
-        attr_type = 'boolean'
-    elif list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in get_array_list():
-        # --------------------- OBJECT ATTR --------------------- #
-        attr_type = 'array'
+    # Determine attribute type based on the attribute parameters
+    attr_type = next((key for key, value_list in {
+        'string': get_string_list(),
+        'integer': get_integer_list(),
+        'number': get_number_list(),
+        'boolean': get_boolean_list(),
+        'array': get_array_list(),
+        'object': []  # default catch-all if no other type matches
+    }.items() if list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in value_list), 'object')
+
+    # Check attribute characteristics
+    is_primary_key = any('primary_key' in attr_param for attr_param in attr_params)
+    is_nullable = not any('nullable=False' in attr_param or is_primary_key for attr_param in attr_params)
+    is_foreign_key = any('ForeignKey' in attr_param for attr_param in attr_params)
+    has_default_value = any('default=' in attr_param for attr_param in attr_params)
+
+    # Extract default value if present
+    if has_default_value:
+        default_value_param = next(attr_param for attr_param in attr_params if 'default=' in attr_param)
+        parsed_value = list(parse('default={}', default_value_param.strip()))
+        if parsed_value:
+            default_value = parsed_value[0]
+        else:
+            default_value = None
     else:
-        # --------------------- OBJECT ATTR --------------------- #
-        attr_type = 'object'
+        default_value = None
 
-    is_primary_key = next((True for attr_param in attr_params if 'primary_key' in attr_param), False)
-
-    is_nullable = next((False for attr_param in attr_params if 'nullable=False' in attr_param or is_primary_key), True)
-
-    is_foreign_key = next((True for attr_param in attr_params if 'ForeignKey' in attr_param), False)
-
-    has_default_value = next((True for attr_param in attr_params if 'default=' in attr_param), False)
-
-    default_value = next((list(parse('default={}', attr_param.strip()))[0]
-                          for attr_param in attr_params if has_default_value and 'default=' in attr_param), None)
-
-    exec('default_value = {}'.format(default_value))
-
+    # Create the attribute object
     attr_object = SaRowAttribute(row_attr, attr_type, is_primary_key, is_nullable,
                                  is_foreign_key, has_default_value, default_value)
 

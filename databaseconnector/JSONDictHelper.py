@@ -2,13 +2,13 @@ import json
 from databaseconnector.RegexHandler import transform_table_name_to_pascal_case_class_name
 
 
-def retrieve_json_from_sql_query(sql_query, connected_schema):
-    connected_schema.execute(sql_query)
+def retrieve_json_from_sql_query(sql_query, connected_schema, params=None):
+    connected_schema.execute(sql_query, params if params else ())
     data = connected_schema.fetchall()
 
     field_names = [i[0] for i in connected_schema.description]
 
-    result_list = list()
+    result_list = []
 
     for _object in data:
         new_object = dict()

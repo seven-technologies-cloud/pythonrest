@@ -30,9 +30,9 @@ try {
     exit 1
 }
 
-Run-Command "pyinstaller --onefile --add-data 'pythonrest.exe;.' --add-data 'install_pythonrest.py;.' --add-data 'addpythonresttouserpath.ps1;.' --icon=../pythonrestlogo.ico --name PythonRESTInstaller --version-file=version_information.txt install_pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data 'pythonrest.exe;.' --add-data 'install_pythonrest.py;.' --add-data 'addpythonresttouserpath.ps1;.' --add-data 'script_hashs.json;.' --icon=../pythonrestlogo.ico --name PythonRESTInstaller --version-file=version_information.txt install_pythonrest.py"
 
-Run-Command "pyinstaller --onefile --add-data 'uninstall_pythonrest.py;.' --add-data 'removepythonrestfromuserpath.ps1;.' --icon=../pythonrestlogo.ico --name PythonRESTUninstaller --version-file=version_information.txt uninstall_pythonrest.py"
+Run-Command "pyinstaller --onefile --add-data 'uninstall_pythonrest.py;.' --add-data 'removepythonrestfromuserpath.ps1;.' --add-data 'script_hashs.json;.' --icon=../pythonrestlogo.ico --name PythonRESTUninstaller --version-file=version_information.txt uninstall_pythonrest.py"
 
 $executablesDir = "$scriptPath\PythonRestExecutables"
 if (-not (Test-Path -Path $executablesDir -PathType Container)) {

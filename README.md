@@ -11,7 +11,7 @@ Your new generated API will have full CRUD compatibility with your mapped databa
 
 This project is under active enhancement and we have several open GitHub issues so we can improve it even further, if you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! Get in touch via admin@seventechnologies if you have any doubts or suggestions and don't forget to star rate our repo! 
 
-### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologies)!
 <br>
 
 # How Is PythonREST good for Developers?
@@ -701,6 +701,6 @@ as retaining that folder can lead to the project being built using that folder a
 the project files.
 
 <br></br>
-## If you find our solution helpful, consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+## If you find our solution helpful, consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologies)!
 ## Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
 ## Don't forget to star rate this repo if you like our job!

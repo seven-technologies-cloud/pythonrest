@@ -74,10 +74,11 @@ def generate(
 
     if mysql_connection_parameters:
         try:
-            mysql_params = eval(mysql_connection_parameters)
+            mysql_params = json.loads(mysql_connection_parameters)
             generate_mysql_database_metadata('mysql', mysql_params, use_pascal_case, result_full_path)
         except Exception as e:
             typer.echo(f"Error parsing MySQL connection parameters: {e}")
+            return
 
     elif mysql_connection_string:
         try:
@@ -91,6 +92,7 @@ def generate(
             generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
+            return
 
     elif postgres_connection_parameters:
         try:
@@ -98,6 +100,7 @@ def generate(
             generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path)
         except Exception as e:
             typer.echo(f"Error parsing PostgreSQL connection parameters: {e}")
+            return
 
     elif postgres_connection_string:
         try:
@@ -111,13 +114,15 @@ def generate(
             generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
+            return
 
     elif sqlserver_connection_parameters:
         try:
-            sqlserver_params = eval(sqlserver_connection_parameters)
+            sqlserver_params = json.loads(sqlserver_connection_parameters)
             generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path)
         except Exception as e:
             typer.echo(f"Error parsing SQLServer connection parameters: {e}")
+            return
 
     elif sqlserver_connection_string:
         try:
@@ -131,13 +136,15 @@ def generate(
             generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
+            return
 
     elif mariadb_connection_parameters:
         try:
-            mariadb_params = eval(mariadb_connection_parameters)
+            mariadb_params = json.loads(mariadb_connection_parameters)
             generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path)
         except Exception as e:
             typer.echo(f"Error parsing MariaDB connection parameters: {e}")
+            return
 
     elif mariadb_connection_string:
         try:
@@ -151,8 +158,10 @@ def generate(
             generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params, base_project_exists)
         except Exception as e:
             typer.echo(e)
+            return
     else:
         typer.echo("Please provide either MySQL, PostgreSQL, SQLServer, or MariaDB connection parameters or a connection string.")
+        return
 
 
 @app.command()
