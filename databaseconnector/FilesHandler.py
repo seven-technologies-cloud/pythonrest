@@ -32,7 +32,8 @@ def check_if_given_result_path_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/", "/etc", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/boot", "/proc", "/sys", "/dev",
+        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt", "/opt",
+        "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
@@ -41,10 +42,12 @@ def check_if_given_result_path_is_unsafe(path):
         "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)"
     ]
 
+
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/etc", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/boot", "/proc", "/sys", "/dev",
+        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
+        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
@@ -81,7 +84,8 @@ def check_if_current_working_directory_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/", "/etc", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/boot", "/proc", "/sys", "/dev",
+        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt", "/opt",
+        "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
@@ -93,7 +97,8 @@ def check_if_current_working_directory_is_unsafe(path):
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/etc", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/boot", "/proc", "/sys", "/dev",
+        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
+        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
@@ -130,7 +135,8 @@ def check_if_provided_directory_is_unsafe(path):
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/etc", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/boot", "/proc", "/sys", "/dev",
+        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
+        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
