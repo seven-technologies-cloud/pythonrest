@@ -8,3 +8,8 @@ regex
 requests
 sqlalchemy
 ujson
+rsa
+cryptography
+cffi
+pycparser
+pyasn1

@@ -12,8 +12,8 @@ class SqlServerTableColumnConstraintsData:
         self.auto_increment = auto_increment
         self.python_type = get_python_type(
             column_metadata['DATA_TYPE'], 'SeSQL')
-        self.sa_type = handler_sa_value(get_sa_type(column_metadata['DATA_TYPE'], self.python_type) if ' ' not in column_metadata['DATA_TYPE'] else get_sa_type(
-            column_metadata['DATA_TYPE'][:column_metadata['DATA_TYPE'].index(' ')], self.python_type), column_metadata['CHARACTER_MAXIMUM_LENGTH'], column_metadata['NUMERIC_PRECISION'], column_metadata['NUMERIC_SCALE'])
+        self.sa_type = handler_sa_value(get_sa_type(column_metadata['DATA_TYPE'], self.python_type, 'SeSQL') if ' ' not in column_metadata['DATA_TYPE'] else get_sa_type(
+            column_metadata['DATA_TYPE'][:column_metadata['DATA_TYPE'].index(' ')], self.python_type, 'SeSQL'), column_metadata['CHARACTER_MAXIMUM_LENGTH'], column_metadata['NUMERIC_PRECISION'], column_metadata['NUMERIC_SCALE'])
         self.default_value = handle_default_value(
             column_metadata['COLUMN_DEFAULT'], self.python_type)
         self.referenced_table_name = foreign_key_reference['referenced_table']

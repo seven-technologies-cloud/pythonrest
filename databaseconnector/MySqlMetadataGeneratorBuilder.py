@@ -37,7 +37,10 @@ def retrieve_table_name_tuple_list_from_connected_schema(connected_schema):
 
 
 def retrieve_table_field_metadata(table_name, connected_schema):
-    return retrieve_json_from_sql_query(f'SHOW FIELDS FROM {table_name}', connected_schema)
+    try:
+        return retrieve_json_from_sql_query(f'SHOW FIELDS FROM {table_name}', connected_schema)
+    except:
+        return retrieve_json_from_sql_query(f'SHOW FIELDS FROM `{table_name}`', connected_schema)
 
 
 def retrieve_table_relative_column_constraints(column_name, table_name, schema, connected_schema):

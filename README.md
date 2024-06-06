@@ -148,7 +148,7 @@ path to your generated API please follow the example below:
 pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\<YOUR_DESIRED_PATH_HERE>
 ```
 
-The above will generate your API on the provided path, and if the folder does not exist the generator will create i.
+The above will generate your API on the provided path, and if the folder does not exist the generator will create it.
 The following folders/files will be modified(content deleted and recreated) if a PythonREST project is already in place:
 - src/c_Domain
 - src/a_Presentation/a_Domain
@@ -500,6 +500,11 @@ Already listed within ./requirements.txt
 - 'parse==1.20.0'
 - 'mergedeep==1.3.4'
 - 'pymysql==1.1.0'
+- 'rsa==4.9'
+- 'cryptography==42.0.7'
+- 'cffi==1.16.0'
+- 'pycparser==2.22'
+- 'pyasn1==0.6.0'
 - 'psycopg2==2.9.9'
 - 'psycopg2-binary==2.9.9'
 - 'pymssql==2.2.11'
@@ -538,6 +543,11 @@ pyinstaller --onefile ^
     --collect-submodules mergedeep ^
     --collect-submodules site ^
     --collect-submodules pymysql ^
+    --collect-submodules rsa ^
+    --collect-submodules cryptography ^
+    --collect-submodules cffi ^
+    --collect-submodules pycparser ^
+    --collect-submodules pyasn1 ^
     --collect-submodules psycopg2 ^
     --collect-submodules psycopg2-binary ^
     --collect-submodules pymssql ^
@@ -603,6 +613,11 @@ pyinstaller --onefile \
     --collect-submodules mergedeep \
     --collect-submodules site \
     --collect-submodules pymysql \
+    --collect-submodules rsa \
+    --collect-submodules cryptography \
+    --collect-submodules cffi \
+    --collect-submodules pycparser \
+    --collect-submodules pyasn1 \
     --collect-submodules psycopg2 \
     --collect-submodules psycopg2-binary \
     --collect-submodules pymssql \
