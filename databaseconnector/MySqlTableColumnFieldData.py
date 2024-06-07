@@ -18,3 +18,5 @@ class MySqlTableColumnFieldData:
 def handle_default_value(default_value, python_type):
     if python_type == 'bool' and default_value is not None:
         return False if default_value == '0' else True
+    if default_value is not None:
+        return default_value

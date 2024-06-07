@@ -524,6 +524,8 @@ sudo pip install -r requirements.txt
 <br></br>
 
 # For Contributors: How to Build Your Own Binaries and Installers
+It is very important that you have all of the libraries used by the project (listed on requirements.txt) installed on your
+machine or on venv, because pyinstaller uses the versions of the libraries installed on your machine to build the binaries.
 
 # Windows
 

@@ -71,7 +71,7 @@ def get_sa_MySQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Set', 'Interval', 'NCHAR', 'NVARCHAR', "YEAR", "year",
             'TEXT', 'Text', 'Unicode', 'UnicodeText', 'VARCHAR',
-            'BIT', 'GEOMETRY', 'GEOMETRYCOLLECTION', 'GEOMCOLLECTION', 'POLYGON', 'MULTIPOLYGON']  # On this line there are non-supported types that will be cast to string to avoid errors
+            'BIT', 'GEOMETRY', 'GEOMETRYCOLLECTION', 'GEOMCOLLECTION', 'POLYGON', 'MULTIPOLYGON', 'MULTILINESTRING']  # On this line there are non-supported types that will be cast to string to avoid errors
 
 
 def get_sa_MySQL_bytes_types_list():
