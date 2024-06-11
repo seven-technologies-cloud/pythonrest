@@ -110,9 +110,6 @@ def get_exceptional_sql_type(column_type, database):
     if database == "MYSQL":
         if "tinyint(1)" in column_type.lower():
             return "bool"
-    if database == 'PgSQL':
-        if "smallint" in column_type.lower():
-            return "bool"
 
 
 def get_python_type(column_type, database):

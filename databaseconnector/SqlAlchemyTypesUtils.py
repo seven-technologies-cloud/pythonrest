@@ -135,7 +135,9 @@ def get_sa_PgSQL_string_types_list():
     return ['character varying', 'char', 'BLOB', 'character', 'varchar', 'Binary',
             'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary',
             'text', 'Unicode', 'UnicodeText', 'VARBINARY', 'UUID', 'date', 'time without time zone',
-            'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET']
+            'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET'
+            'bit', 'BIT',
+            'USER-DEFINED']  # On this line there are non-supported types that will be cast to string to avoid errors
 
 
 def get_sa_PgSQL_bytes_types_list():
@@ -277,6 +279,8 @@ def handle_sql_to_sa_types_conversion(column_type):
         return "Float"
     if "year" in column_type.lower():  # TODO remove this when YEAR types are fully supported by PythonREST
         return "String"
+    if "jsonb" in column_type.lower():
+        return "JSON"
 
 def get_sa_type(column_type, python_type_value, database):
     base_column_type = column_type.split(" ")[0]

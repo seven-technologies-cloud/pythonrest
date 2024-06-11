@@ -30,7 +30,7 @@ def get_sa_row_attr_object(row_attr, attr_params):
     is_primary_key = any('primary_key' in attr_param for attr_param in attr_params)
     is_nullable = not any('nullable=False' in attr_param or is_primary_key for attr_param in attr_params)
     is_foreign_key = any('ForeignKey' in attr_param for attr_param in attr_params)
-    has_default_value = any('default=' in attr_param for attr_param in attr_params)
+    has_default_value = any('default=' in attr_param and 'server_default=' not in attr_param for attr_param in attr_params)
 
     # Extract default value if present
     if has_default_value:

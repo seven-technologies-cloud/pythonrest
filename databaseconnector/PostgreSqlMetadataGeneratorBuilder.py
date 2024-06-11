@@ -16,7 +16,8 @@ def convert_retrieved_table_name_tuple_list_from_connected_schema(tuple_name_lis
 
 def retrieve_table_name_tuple_list_from_connected_schema(connected_db, schema_name):
     connected_db.execute(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema = %s ORDER BY table_name", (schema_name,))
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = %s AND table_type = 'BASE TABLE' ORDER BY table_name",
+        (schema_name,))
     response = connected_db.fetchall()
     return response
 

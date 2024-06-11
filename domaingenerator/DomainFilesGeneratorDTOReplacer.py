@@ -45,11 +45,7 @@ def get_column_arguments_string(column):
     if column['auto_increment']:
         arguments_string = arguments_string + ', autoincrement=True'
     if column['default_value'] is not None:
-        if column['python_type'] == 'str':
-            arguments_string = arguments_string + ', default="' + str(column['default_value']) + '"'
-        else:
-            arguments_string = arguments_string + ', default=' + str(column['default_value'])
-
+        arguments_string = arguments_string + ', server_default=sa.FetchedValue()'
     return arguments_string
 
 
