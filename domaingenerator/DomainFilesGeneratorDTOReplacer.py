@@ -12,7 +12,10 @@ def get_domain_imports(domain_dict):
 def get_columns_names_str(domain_dict):
     columns_list = [column['name'] for column in domain_dict['Columns']] + [constraint['name'] for constraint in domain_dict['Constraints']]
     sub_string = '", "'.join(columns_list)
-    return f'"{sub_string}"'
+    if len(columns_list) == 1:
+        return f'"{sub_string}",'
+    else:
+        return f'"{sub_string}"'
 
 
 def get_sa_columns(domain_dict):

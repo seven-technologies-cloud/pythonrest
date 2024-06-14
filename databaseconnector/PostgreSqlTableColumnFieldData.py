@@ -33,9 +33,74 @@ class PostgreSqlTableColumnFieldData:
         if sa_type == 'NUMERIC' and numeric_precision is not None and numeric_scale is not None:
             return f'{sa_type}({numeric_precision}, {numeric_scale})'
         if sa_type == 'ARRAY':
-            print(f"Type of array: {column_metadata['udt_name']}")
-            array_type = input('Array type: ')
-            return f'ARRAY({array_type})'
+            try:
+                return self.handle_array_type(column_metadata['udt_name'])
+            except Exception as e:
+                print(f"Type of array: {column_metadata['udt_name']}")
+                array_type = input('Array type: ')
+                return f'ARRAY({array_type})'
         else:
             return sa_type
 
+    def handle_array_type(self, udt_name):
+        array_type_map = {
+            '_int2': 'Integer',
+            '_int4': 'Integer',
+            '_int8': 'Integer',
+            '_text': 'String',
+            '_varchar': 'String',
+            '_char': 'String',
+            '_float4': 'Float',
+            '_float8': 'Float',
+            '_bool': 'Boolean',
+            '_date': 'Date',
+            '_timestamp': 'DateTime',
+            '_uuid': 'UUID',  # UUIDs are stored as strings in SQLAlchemy by default
+            '_json': 'JSON',  # JSON arrays are stored as JSON in SQLAlchemy
+            '_jsonb': 'JSON',  # JSONB arrays are stored as JSONB in SQLAlchemy
+            '_int2[]': 'Integer',
+            '_int4[]': 'Integer',
+            '_int8[]': 'Integer',
+            '_text[]': 'String',
+            '_varchar[]': 'String',
+            '_char[]': 'String',
+            '_float4[]': 'Float',
+            '_float8[]': 'Float',
+            '_bool[]': 'Boolean',
+            '_date[]': 'Date',
+            '_timestamp[]': 'DateTime',
+            '_uuid[]': 'UUID',  # Array of UUIDs as strings
+            '_json[]': 'JSON',  # Array of JSON as JSON
+            '_jsonb[]': 'JSONB',  # Array of JSONB as JSONB
+            '_int2range': 'Integer',
+            '_int4range': 'Integer',
+            '_int8range': 'Integer',
+            '_numrange': 'Integer',  # Numeric ranges are stored as integers in SQLAlchemy
+            '_tsrange': 'DateTime',  # Timestamp ranges are stored as DateTime in SQLAlchemy
+            '_tstzrange': 'DateTime',  # Timestamp with time zone ranges are stored as DateTime in SQLAlchemy
+            '_daterange': 'Date',  # Date ranges are stored as Date in SQLAlchemy
+            '_int4range[]': 'Integer',
+            '_int8range[]': 'Integer',
+            '_numrange[]': 'Integer',
+            '_tsrange[]': 'DateTime',
+            '_tstzrange[]': 'DateTime',
+            '_daterange[]': 'Date',
+            '_box': 'String',
+            '_circle': 'String',
+            '_path': 'String',
+            '_polygon': 'String',
+            '_line': 'String',
+            '_lseg': 'String',
+            '_macaddr': 'String',
+            '_macaddr8': 'String',
+            '_inet': 'String',
+            '_cidr': 'String',
+            '_xml': 'String',
+            '_tsvector': 'String',
+            '_tsquery': 'String',
+            '_point': 'String',
+            '_varbit': 'String',
+            '_bit': 'String',
+        }
+
+        return f'ARRAY(sa.{array_type_map[udt_name]})'
