@@ -133,13 +133,14 @@ def get_sa_OcSQL_dict_types_list():
 ################################################ SaPgSQLTypes
 def get_sa_PgSQL_string_types_list():
     return ['character varying', 'char', 'bpchar', 'BLOB', 'character', 'varchar', 'Binary', 'interval', 'enum', 'ENUM',
-            'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'time', 'time with time zone', 'timetz',
+            'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'time', 'time with time zone',
             'text', 'Unicode', 'UnicodeText', 'VARBINARY', 'UUID', 'date', 'time without time zone', 'XML', 'xml',
-            'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET', 'money',
-            'bit', 'BIT', 'cidr', 'macaddr', 'macaddr8', 'json', 'JSON', 'timestamptz',
-            'USER-DEFINED', 'point', 'line', 'lseg', 'box', 'path', 'polygon', 'circle', 'tsvector', 'tsquery',  # On this line there are non-supported types that will be cast to string to avoid errors
-            'regclass', 'regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator',  # On this line there are non-supported types that will be cast to string to avoid errors
-            'regprocedure', 'regtype', 'regrole', 'regprocregproc', 'regproc',  'pg_lsn', 'pg_snapshot',   # On this line there are non-supported types that will be cast to string to avoid errors
+            'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET',
+            'bit', 'BIT', 'cidr', 'macaddr', 'macaddr8', 'json', 'JSON', 'timestamptz', 'timetz', 'money',
+            'point', 'line', 'lseg', 'box', 'path', 'polygon', 'circle', 'pg_lsn', 'pg_snapshot',
+            'regclass', 'regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator',
+            'regprocedure', 'regtype', 'regrole', 'regproc',
+            'regprocregproc', 'USER-DEFINED','tsvector', 'tsquery',  # On this line there are non-supported types that will be cast to string to avoid errors
             'int4range', 'int8range', 'numrange', 'tsrange', 'tstzrange', 'daterange']  # On this line there are types that support types that will be cast to string to avoid errors
 
 
