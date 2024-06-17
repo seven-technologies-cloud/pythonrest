@@ -13,8 +13,8 @@ class PostgreSqlTableColumnConstraintsData:
 
         self.python_type = get_python_type(
             column_metadata['data_type'], 'PgSQL')
-        self.sa_type = self.handler_sa_value(get_sa_type(column_metadata['data_type'], self.python_type) if ' ' not in column_metadata['data_type'] else get_sa_type(
-            column_metadata['data_type'][:column_metadata['data_type'].index(' ')], self.python_type), column_metadata['character_maximum_length'], column_metadata['numeric_precision'], column_metadata['numeric_scale'], column_metadata)
+        self.sa_type = self.handler_sa_value(get_sa_type(column_metadata['data_type'], self.python_type, 'PgSQL') if ' ' not in column_metadata['data_type'] else get_sa_type(
+            column_metadata['data_type'][:column_metadata['data_type'].index(' ')], self.python_type, 'PgSQL'), column_metadata['character_maximum_length'], column_metadata['numeric_precision'], column_metadata['numeric_scale'], column_metadata)
         self.default_value = self.handle_default_value(
             column_metadata['column_default'], self.python_type)
         self.referenced_table_name = column_fk['referenced_table']

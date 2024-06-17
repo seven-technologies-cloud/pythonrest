@@ -45,7 +45,10 @@ def get_column_arguments_string(column):
     if column['auto_increment']:
         arguments_string = arguments_string + ', autoincrement=True'
     if column['default_value'] is not None:
-        arguments_string = arguments_string + ', default=' + str(column['default_value'])
+        if column['python_type'] == 'str':
+            arguments_string = arguments_string + ', default="' + str(column['default_value']) + '"'
+        else:
+            arguments_string = arguments_string + ', default=' + str(column['default_value'])
 
     return arguments_string
 

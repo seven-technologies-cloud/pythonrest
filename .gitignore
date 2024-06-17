@@ -3,6 +3,9 @@ __MACOSX
 */__MACOSX
 */.DS_Store
 
+# JSON ignored files
+windowsinstaller/script_hashs.json
+
 # Generated API Folder
 PythonRestAPI
 

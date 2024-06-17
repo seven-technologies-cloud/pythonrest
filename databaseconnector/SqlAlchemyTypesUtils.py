@@ -69,8 +69,9 @@ def get_sa_MaSQL_dict_types_list():
 ################################################ SaMySQLTypes
 def get_sa_MySQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
-            'CHAR',  'DATE', 'DATETIME', 'Enum', 'Interval', 'NCHAR', 'NVARCHAR', "YEAR", "year",
-            'TEXT', 'Text', 'Unicode', 'UnicodeText', 'VARCHAR']
+            'CHAR',  'DATE', 'DATETIME', 'Enum', 'Set', 'Interval', 'NCHAR', 'NVARCHAR', "YEAR", "year",
+            'TEXT', 'Text', 'Unicode', 'UnicodeText', 'VARCHAR',
+            'BIT', 'GEOMETRY', 'GEOMETRYCOLLECTION', 'GEOMCOLLECTION', 'POLYGON', 'MULTIPOLYGON', 'MULTILINESTRING']  # On this line there are non-supported types that will be cast to string to avoid errors
 
 
 def get_sa_MySQL_bytes_types_list():
@@ -78,12 +79,12 @@ def get_sa_MySQL_bytes_types_list():
 
 
 def get_sa_MySQL_int_types_list():
-    return ['Integer', 'BIGINT', 'BigInteger',
+    return ['Integer', 'BIGINT', 'BigInteger', 'MEDIUMINT', 'TINYINT'
             'INTEGER', 'SMALLINT', 'SmallInteger', 'int']
 
 
 def get_sa_MySQL_float_types_list():
-    return ['Float', 'DECIMAL', 'FLOAT', 'NUMERIC', 'Numeric', 'REAL']
+    return ['Float', 'DECIMAL', 'FLOAT', 'NUMERIC', 'Numeric', 'REAL', 'DOUBLE', 'DOUBLE PRECISION']
 
 
 def get_sa_MySQL_bool_types_list():
@@ -193,12 +194,12 @@ def get_sa_SeSQL_dict_types_list():
 ########################################################################################################################
 def get_sa_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'jsonb', 'JSONB' 'DateTime',
-            'CHAR',  'DATE', 'DATETIME', 'Enum', 'Interval', 'NCHAR', 'NVARCHAR', 'UUID',
+            'CHAR',  'DATE', 'DATETIME', 'Enum', 'Set', 'Interval', 'NCHAR', 'NVARCHAR', 'UUID',
             'TEXT', 'Text', 'Unicode', 'UnicodeText', 'VARCHAR', "YEAR", "year"]
 
 
 def get_sa_bytes_types_list():
-    return ['Binary', 'BLOB', 'BINARY', 'CLOB', 'LargeBinary', 'VARBINARY']
+    return ['BLOB', 'BINARY', 'CLOB', 'LargeBinary', 'VARBINARY']
 
 
 def get_sa_int_types_list():
@@ -221,6 +222,7 @@ def get_sa_list_types_list():
 def get_sa_dict_types_list():
     return []
 
+################################################################################################################
 
 def type_with_size(column_type):
     return True if '(' in column_type and ')' in column_type else False
@@ -248,9 +250,38 @@ def get_sa_type_match(type_list, column_type_no_size, python_type_value, python_
         return third_result
 
 
-def get_sa_type(column_type, python_type_value):
+def convert_set_or_enum_to_Enum(input_string):
+    # Check if the input is in 'set(...)' format
+    if input_string.lower().startswith("set(") and input_string.lower().endswith(")"):
+        values_string = input_string[4:-1]  # Strip 'set(' from the start and ')' from the end
+    # Check if the input is in 'enum(...)' format
+    elif input_string.lower().startswith("enum(") and input_string.lower().endswith(")"):
+        values_string = input_string[5:-1]  # Strip 'enum(' from the start and ')' from the end
+    else:
+        raise ValueError("Input string is not in the expected format: 'set(...)' or 'enum(...)'")
 
-    column_type_no_size = column_type[:column_type.index('(')] if '(' in column_type else column_type
+    # Extract the values and split by comma, keeping the quotes
+    values = [value.strip().strip("'") for value in values_string.split(",")]
+
+    # Create the Enum declaration
+    enum_declaration = f"Enum({', '.join(repr(value) for value in values)})"
+
+    return enum_declaration
+
+
+def handle_sql_to_sa_types_conversion(column_type):
+    if "set" in column_type.lower() or "enum" in column_type.lower():  # TODO remove this when SET types are fully supported by PythonREST
+        converted_column_type = convert_set_or_enum_to_Enum(column_type)
+        return converted_column_type
+    if "decimal" in column_type.lower() or "numeric" in column_type.lower():  # TODO remove this when float type casting to Decimal or a way to send data of decimal type on requests is supported by PythonREST
+        return "Float"
+    if "year" in column_type.lower():  # TODO remove this when YEAR types are fully supported by PythonREST
+        return "String"
+
+def get_sa_type(column_type, python_type_value, database):
+    base_column_type = column_type.split(" ")[0]
+
+    column_type_no_size = base_column_type.split('(')[0] if '(' in base_column_type else base_column_type
 
     str_type_list = get_sa_string_types_list()
     bytes_type_list = get_sa_bytes_types_list()
@@ -263,13 +294,16 @@ def get_sa_type(column_type, python_type_value):
     types_list_object = {'str': str_type_list, 'bytes': bytes_type_list, 'int': int_type_list, 'float': float_type_list,
                         'bool': bool_type_list, 'list': list_type_list, 'dict': dict_type_list}
 
-    executed_script_name = os.path.basename(sys.argv[0])
+    converted_type = handle_sql_to_sa_types_conversion(column_type)
+
+    if converted_type is not None:
+        return converted_type
 
     for python_type, type_list in types_list_object.items():
         result = get_sa_type_match(type_list, column_type_no_size, python_type_value, python_type)
         if result:
             if type_with_size(column_type):
-                if column_type_no_size == "int" or column_type_no_size == "bigint" and executed_script_name == 'mysql_script.py':
+                if python_type == "int" or python_type == "float" and database == "MYSQL":
                     pass
                 else:
                     result = add_size_to_result(result, column_type)

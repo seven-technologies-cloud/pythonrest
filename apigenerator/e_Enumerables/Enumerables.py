@@ -10,7 +10,7 @@ def get_directory_data():
     data = dict()
     data['domain_test_path'] = os.environ.get('domain_folder')
     data['base_proj_path'] = "apigenerator/resources/1 - Project/1 - BaseProject/Project"
-    data['result_path'] = "./result"
+    data['result_path_suffix'] = "PythonRestAPI"
     data['class_generic_path'] = "apigenerator/resources/1 - Project/3 - ClassGeneric"
     data['resource_path'] = "apigenerator/resources"
     data['db_dependencies'] = "apigenerator/resources/1 - Project/2 - Database/database_dependencies/"

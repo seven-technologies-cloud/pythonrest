@@ -15,39 +15,104 @@ def convert_retrieved_table_name_tuple_list_from_connected_schema(tuple_name_lis
 
 
 def retrieve_table_name_tuple_list_from_connected_schema(connected_db, schema_name):
-
     connected_db.execute(
-        f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema_name}' ORDER BY table_name")
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = %s ORDER BY table_name", (schema_name,))
     response = connected_db.fetchall()
     return response
 
 
 def retrieve_table_field_metadata(table_name, schema_name, connected_db):
-
-    return retrieve_json_from_sql_query(f"SELECT column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_default, udt_name FROM information_schema.columns WHERE table_name='{table_name}' AND table_schema='{schema_name}'", connected_db)
-
+    sql_query = """
+        SELECT column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale, column_default, udt_name
+        FROM information_schema.columns
+        WHERE table_name = %s AND table_schema = %s
+        """
+    return retrieve_json_from_sql_query(sql_query, connected_db, (table_name, schema_name))
 
 def retrieve_auto_increment_from_column(column_name, table_name, connected_db):
-
-    all_table_constraints = retrieve_json_from_sql_query(f"SELECT count(*) FROM pg_class AS t JOIN pg_attribute AS a ON a.attrelid=t.oid JOIN pg_depend AS d ON d.refobjid=t.oid AND d.refobjsubid=a.attnum JOIN pg_class AS s ON s.oid=d.objid WHERE d.classid = 'pg_catalog.pg_class':: regclass AND d.refclassid = 'pg_catalog.pg_class':: regclass AND t.relkind IN('r', 'P') AND s.relkind='S' AND t.relname='{table_name}' AND a.attname='{column_name}'", connected_db)
-
-    return all_table_constraints if all_table_constraints != list() else dict()
+    sql_query = """
+    SELECT count(*) FROM pg_class AS t
+    JOIN pg_attribute AS a ON a.attrelid=t.oid
+    JOIN pg_depend AS d ON d.refobjid=t.oid AND d.refobjsubid=a.attnum
+    JOIN pg_class AS s ON s.oid=d.objid
+    WHERE d.classid = 'pg_catalog.pg_class'::regclass
+    AND d.refclassid = 'pg_catalog.pg_class'::regclass
+    AND t.relkind IN('r', 'P')
+    AND s.relkind='S'
+    AND t.relname=%s
+    AND a.attname=%s
+    """
+    result = retrieve_json_from_sql_query(sql_query, connected_db, (table_name, column_name))
+    return result if result != list() else {}
 
 
 def get_constraints_primary_keys(table_name, schema_name, connected_db):
-
-    return retrieve_json_from_sql_query(f"WITH unnested_confkey AS(SELECT oid, unnest(confkey) as confkey FROM pg_constraint), unnested_conkey AS(SELECT oid, unnest(conkey) as conkey FROM pg_constraint) select distinct c.conname AS constraint_name, c.contype AS constraint_type, tbl.relname AS constraint_table, col.attname AS constraint_column, referenced_tbl.relname AS referenced_table, referenced_field.attname AS referenced_column, pg_get_constraintdef(c.oid) AS definition FROM pg_constraint c LEFT JOIN unnested_conkey con ON c.oid=con.oid LEFT JOIN pg_class tbl ON tbl.oid=c.conrelid LEFT JOIN pg_attribute col ON(col.attrelid=tbl.oid AND col.attnum=con.conkey)LEFT JOIN pg_class referenced_tbl ON c.confrelid=referenced_tbl.oid LEFT JOIN unnested_confkey conf ON c.oid=conf.oid LEFT JOIN pg_attribute referenced_field ON(referenced_field.attrelid=c.confrelid AND referenced_field.attnum=conf.confkey) LEFT JOIN information_schema.constraint_column_usage ccu on c.conname=ccu.constraint_name WHERE ccu.table_schema= '{schema_name}' AND tbl.relname='{table_name}' AND c.contype = 'p'", connected_db)
-
-
+    sql_query = """
+      WITH unnested_confkey AS (
+          SELECT oid, unnest(confkey) as confkey FROM pg_constraint
+      ), unnested_conkey AS (
+          SELECT oid, unnest(conkey) as conkey FROM pg_constraint
+      )
+      SELECT distinct c.conname AS constraint_name, c.contype AS constraint_type, 
+      tbl.relname AS constraint_table, col.attname AS constraint_column,
+      referenced_tbl.relname AS referenced_table, referenced_field.attname AS referenced_column,
+      pg_get_constraintdef(c.oid) AS definition
+      FROM pg_constraint c
+      LEFT JOIN unnested_conkey con ON c.oid=con.oid
+      LEFT JOIN pg_class tbl ON tbl.oid=c.conrelid
+      LEFT JOIN pg_attribute col ON (col.attrelid=tbl.oid AND col.attnum=con.conkey)
+      LEFT JOIN pg_class referenced_tbl ON c.confrelid=referenced_tbl.oid
+      LEFT JOIN unnested_confkey conf ON c.oid=conf.oid
+      LEFT JOIN pg_attribute referenced_field ON (referenced_field.attrelid=c.confrelid AND referenced_field.attnum=conf.confkey)
+      LEFT JOIN information_schema.constraint_column_usage ccu on c.conname=ccu.constraint_name
+      WHERE ccu.table_schema= %s AND tbl.relname= %s AND c.contype = 'p'
+      """
+    return retrieve_json_from_sql_query(sql_query, connected_db, (schema_name, table_name))
 def get_constraints_foreign_key(table_name, schema_name, connected_db):
-
-    return retrieve_json_from_sql_query(f"WITH unnested_confkey AS(SELECT oid, unnest(confkey) as confkey FROM pg_constraint), unnested_conkey AS(SELECT oid, unnest(conkey) as conkey FROM pg_constraint) select distinct c.conname AS constraint_name, c.contype AS constraint_type, tbl.relname AS constraint_table, col.attname AS constraint_column, referenced_tbl.relname AS referenced_table, referenced_field.attname AS referenced_column, pg_get_constraintdef(c.oid) AS definition FROM pg_constraint c LEFT JOIN unnested_conkey con ON c.oid=con.oid LEFT JOIN pg_class tbl ON tbl.oid=c.conrelid LEFT JOIN pg_attribute col ON(col.attrelid=tbl.oid AND col.attnum=con.conkey)LEFT JOIN pg_class referenced_tbl ON c.confrelid=referenced_tbl.oid LEFT JOIN unnested_confkey conf ON c.oid=conf.oid LEFT JOIN pg_attribute referenced_field ON(referenced_field.attrelid=c.confrelid AND referenced_field.attnum=conf.confkey) LEFT JOIN information_schema.constraint_column_usage ccu on c.conname=ccu.constraint_name WHERE ccu.table_schema= '{schema_name}' AND tbl.relname='{table_name}' AND c.contype = 'f'", connected_db)
-
+    sql_query = """
+    WITH unnested_confkey AS (
+        SELECT oid, unnest(confkey) as confkey FROM pg_constraint
+    ), unnested_conkey AS (
+        SELECT oid, unnest(conkey) as conkey FROM pg_constraint
+    )
+    SELECT distinct c.conname AS constraint_name, c.contype AS constraint_type, 
+    tbl.relname AS constraint_table, col.attname AS constraint_column,
+    referenced_tbl.relname AS referenced_table, referenced_field.attname AS referenced_column,
+    pg_get_constraintdef(c.oid) AS definition
+    FROM pg_constraint c
+    LEFT JOIN unnested_conkey con ON c.oid=con.oid
+    LEFT JOIN pg_class tbl ON tbl.oid=c.conrelid
+    LEFT JOIN pg_attribute col ON (col.attrelid=tbl.oid AND col.attnum=con.conkey)
+    LEFT JOIN pg_class referenced_tbl ON c.confrelid=referenced_tbl.oid
+    LEFT JOIN unnested_confkey conf ON c.oid=conf.oid
+    LEFT JOIN pg_attribute referenced_field ON (referenced_field.attrelid=c.confrelid AND referenced_field.attnum=conf.confkey)
+    LEFT JOIN information_schema.constraint_column_usage ccu ON c.conname=ccu.constraint_name
+    WHERE ccu.table_schema= %s AND tbl.relname= %s AND c.contype = 'f'
+    """
+    return retrieve_json_from_sql_query(sql_query, connected_db, (schema_name, table_name))
 
 def get_constraints_unique(table_name, schema_name, connected_db):
-
-    return retrieve_json_from_sql_query(f"WITH unnested_confkey AS(SELECT oid, unnest(confkey) as confkey FROM pg_constraint), unnested_conkey AS(SELECT oid, unnest(conkey) as conkey FROM pg_constraint) select distinct c.conname AS constraint_name, c.contype AS constraint_type, tbl.relname AS constraint_table, col.attname AS constraint_column, referenced_tbl.relname AS referenced_table, referenced_field.attname AS referenced_column, pg_get_constraintdef(c.oid) AS definition FROM pg_constraint c LEFT JOIN unnested_conkey con ON c.oid=con.oid LEFT JOIN pg_class tbl ON tbl.oid=c.conrelid LEFT JOIN pg_attribute col ON(col.attrelid=tbl.oid AND col.attnum=con.conkey)LEFT JOIN pg_class referenced_tbl ON c.confrelid=referenced_tbl.oid LEFT JOIN unnested_confkey conf ON c.oid=conf.oid LEFT JOIN pg_attribute referenced_field ON(referenced_field.attrelid=c.confrelid AND referenced_field.attnum=conf.confkey) LEFT JOIN information_schema.constraint_column_usage ccu on c.conname=ccu.constraint_name WHERE ccu.table_schema= '{schema_name}' AND tbl.relname='{table_name}' AND c.contype = 'u'", connected_db)
-
+    sql_query = """
+    WITH unnested_confkey AS (
+        SELECT oid, unnest(confkey) as confkey FROM pg_constraint
+    ), unnested_conkey AS (
+        SELECT oid, unnest(conkey) as conkey FROM pg_constraint
+    )
+    SELECT distinct c.conname AS constraint_name, c.contype AS constraint_type, 
+    tbl.relname AS constraint_table, col.attname AS constraint_column,
+    referenced_tbl.relname AS referenced_table, referenced_field.attname AS referenced_column,
+    pg_get_constraintdef(c.oid) AS definition
+    FROM pg_constraint c
+    LEFT JOIN unnested_conkey con ON c.oid=con.oid
+    LEFT JOIN pg_class tbl ON tbl.oid=c.conrelid
+    LEFT JOIN pg_attribute col ON (col.attrelid=tbl.oid AND col.attnum=con.conkey)
+    LEFT JOIN pg_class referenced_tbl ON c.confrelid=referenced_tbl.oid
+    LEFT JOIN unnested_confkey conf ON c.oid=conf.oid
+    LEFT JOIN pg_attribute referenced_field ON (referenced_field.attrelid=c.confrelid AND referenced_field.attnum=conf.confkey)
+    LEFT JOIN information_schema.constraint_column_usage ccu ON c.conname=ccu.constraint_name
+    WHERE ccu.table_schema= %s AND tbl.relname= %s AND c.contype = 'u'
+    """
+    return retrieve_json_from_sql_query(sql_query, connected_db, (schema_name, table_name))
 
 # Verifies if column_metadata has a match on columns_constraint_primary_key
 # If match, return true, else return false

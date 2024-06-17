@@ -11,7 +11,7 @@ Your new generated API will have full CRUD compatibility with your mapped databa
 
 This project is under active enhancement and we have several open GitHub issues so we can improve it even further, if you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! Get in touch via admin@seventechnologies if you have any doubts or suggestions and don't forget to star rate our repo! 
 
-### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologies)!
 <br>
 
 # How Is PythonREST good for Developers?
@@ -148,7 +148,7 @@ path to your generated API please follow the example below:
 pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\<YOUR_DESIRED_PATH_HERE>
 ```
 
-The above will generate your API on the provided path, and if the folder does not exist the generator will create i.
+The above will generate your API on the provided path, and if the folder does not exist the generator will create it.
 The following folders/files will be modified(content deleted and recreated) if a PythonREST project is already in place:
 - src/c_Domain
 - src/a_Presentation/a_Domain
@@ -500,6 +500,11 @@ Already listed within ./requirements.txt
 - 'parse==1.20.0'
 - 'mergedeep==1.3.4'
 - 'pymysql==1.1.0'
+- 'rsa==4.9'
+- 'cryptography==42.0.7'
+- 'cffi==1.16.0'
+- 'pycparser==2.22'
+- 'pyasn1==0.6.0'
 - 'psycopg2==2.9.9'
 - 'psycopg2-binary==2.9.9'
 - 'pymssql==2.2.11'
@@ -519,6 +524,8 @@ sudo pip install -r requirements.txt
 <br></br>
 
 # For Contributors: How to Build Your Own Binaries and Installers
+It is very important that you have all of the libraries used by the project (listed on requirements.txt) installed on your
+machine or on venv, because pyinstaller uses the versions of the libraries installed on your machine to build the binaries.
 
 # Windows
 
@@ -538,6 +545,11 @@ pyinstaller --onefile ^
     --collect-submodules mergedeep ^
     --collect-submodules site ^
     --collect-submodules pymysql ^
+    --collect-submodules rsa ^
+    --collect-submodules cryptography ^
+    --collect-submodules cffi ^
+    --collect-submodules pycparser ^
+    --collect-submodules pyasn1 ^
     --collect-submodules psycopg2 ^
     --collect-submodules psycopg2-binary ^
     --collect-submodules pymssql ^
@@ -603,6 +615,11 @@ pyinstaller --onefile \
     --collect-submodules mergedeep \
     --collect-submodules site \
     --collect-submodules pymysql \
+    --collect-submodules rsa \
+    --collect-submodules cryptography \
+    --collect-submodules cffi \
+    --collect-submodules pycparser \
+    --collect-submodules pyasn1 \
     --collect-submodules psycopg2 \
     --collect-submodules psycopg2-binary \
     --collect-submodules pymssql \
@@ -701,6 +718,6 @@ as retaining that folder can lead to the project being built using that folder a
 the project files.
 
 <br></br>
-## If you find our solution helpful, consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologiescloud)!
+## If you find our solution helpful, consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologies)!
 ## Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
 ## Don't forget to star rate this repo if you like our job!
