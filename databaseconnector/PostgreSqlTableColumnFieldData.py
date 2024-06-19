@@ -53,11 +53,9 @@ class PostgreSqlTableColumnFieldData:
             '_float4': 'Float',
             '_float8': 'Float',
             '_bool': 'Boolean',
-            '_date': 'Date',
-            '_timestamp': 'DateTime',
-            '_uuid': 'UUID',  # UUIDs are stored as strings in SQLAlchemy by default
-            '_json': 'JSON',  # JSON arrays are stored as JSON in SQLAlchemy
-            '_jsonb': 'JSON',  # JSONB arrays are stored as JSONB in SQLAlchemy
+            '_uuid': 'UUID',
+            '_json': 'JSON',
+            '_jsonb': 'JSON',
             '_int2[]': 'Integer',
             '_int4[]': 'Integer',
             '_int8[]': 'Integer',
@@ -67,11 +65,19 @@ class PostgreSqlTableColumnFieldData:
             '_float4[]': 'Float',
             '_float8[]': 'Float',
             '_bool[]': 'Boolean',
+            '_uuid[]': 'UUID',
+            '_json[]': 'JSON',
+            '_jsonb[]': 'JSON',
+        }
+        if udt_name in array_type_map:
+            return f'ARRAY(sa.{array_type_map[udt_name]})'
+        else:
+            '''
+            Unsupported types will fall on this else, like:
+            '_date': 'Date',
+            '_timestamp': 'DateTime',
             '_date[]': 'Date',
             '_timestamp[]': 'DateTime',
-            '_uuid[]': 'UUID',  # Array of UUIDs as strings
-            '_json[]': 'JSON',  # Array of JSON as JSON
-            '_jsonb[]': 'JSONB',  # Array of JSONB as JSONB
             '_int2range': 'Integer',
             '_int4range': 'Integer',
             '_int8range': 'Integer',
@@ -101,6 +107,6 @@ class PostgreSqlTableColumnFieldData:
             '_point': 'String',
             '_varbit': 'String',
             '_bit': 'String',
-        }
+            '''
+            return 'String'
 
-        return f'ARRAY(sa.{array_type_map[udt_name]})'
