@@ -12,7 +12,10 @@ def get_domain_imports(domain_dict):
 def get_columns_names_str(domain_dict):
     columns_list = [column['name'] for column in domain_dict['Columns']] + [constraint['name'] for constraint in domain_dict['Constraints']]
     sub_string = '", "'.join(columns_list)
-    return f'"{sub_string}"'
+    if len(columns_list) == 1:
+        return f'"{sub_string}",'
+    else:
+        return f'"{sub_string}"'
 
 
 def get_sa_columns(domain_dict):
@@ -45,11 +48,7 @@ def get_column_arguments_string(column):
     if column['auto_increment']:
         arguments_string = arguments_string + ', autoincrement=True'
     if column['default_value'] is not None:
-        if column['python_type'] == 'str':
-            arguments_string = arguments_string + ', default="' + str(column['default_value']) + '"'
-        else:
-            arguments_string = arguments_string + ', default=' + str(column['default_value'])
-
+        arguments_string = arguments_string + ', server_default=sa.FetchedValue()'
     return arguments_string
 
 

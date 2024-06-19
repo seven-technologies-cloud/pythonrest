@@ -132,10 +132,16 @@ def get_sa_OcSQL_dict_types_list():
 
 ################################################ SaPgSQLTypes
 def get_sa_PgSQL_string_types_list():
-    return ['character varying', 'char', 'BLOB', 'character', 'varchar', 'Binary',
-            'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary',
-            'text', 'Unicode', 'UnicodeText', 'VARBINARY', 'UUID', 'date', 'time without time zone',
-            'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET']
+    return ['character varying', 'char', 'bpchar', 'BLOB', 'character', 'varchar', 'Binary', 'interval', 'enum', 'ENUM',
+            'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'time', 'time with time zone',
+            'text', 'Unicode', 'UnicodeText', 'VARBINARY', 'UUID', 'date', 'time without time zone', 'XML', 'xml',
+            'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET',
+            'bit', 'BIT', 'cidr', 'macaddr', 'macaddr8', 'json', 'JSON', 'timestamptz', 'timetz', 'money',
+            'point', 'line', 'lseg', 'box', 'path', 'polygon', 'circle', 'pg_lsn', 'pg_snapshot',
+            'regclass', 'regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator',
+            'regprocedure', 'regtype', 'regrole', 'regproc',
+            'regprocregproc', 'USER-DEFINED','tsvector', 'tsquery',  # On this line there are non-supported types that will be cast to string to avoid errors
+            'int4range', 'int8range', 'numrange', 'tsrange', 'tstzrange', 'daterange']  # On this line there are types that support types that will be cast to string to avoid errors
 
 
 def get_sa_PgSQL_bytes_types_list():
@@ -143,12 +149,11 @@ def get_sa_PgSQL_bytes_types_list():
 
 
 def get_sa_PgSQL_int_types_list():
-    return ['smallint', 'integer', 'bigint', 'serial', 'bigserial', 'oid', 'regprocregproc',
-            'regprocedure', 'regoper', 'regoperator', 'regclass', 'regtype']
+    return ['smallint', 'integer', 'bigint', 'smallserial', 'serial', 'bigserial', 'oid']
 
 
 def get_sa_PgSQL_float_types_list():
-    return ['decimal', 'numeric', 'real', 'double precision', 'money']
+    return ['decimal', 'numeric', 'real', 'double precision']
 
 
 def get_sa_PgSQL_bool_types_list():
@@ -277,6 +282,8 @@ def handle_sql_to_sa_types_conversion(column_type):
         return "Float"
     if "year" in column_type.lower():  # TODO remove this when YEAR types are fully supported by PythonREST
         return "String"
+    if "jsonb" in column_type.lower():
+        return "JSON"
 
 def get_sa_type(column_type, python_type_value, database):
     base_column_type = column_type.split(" ")[0]

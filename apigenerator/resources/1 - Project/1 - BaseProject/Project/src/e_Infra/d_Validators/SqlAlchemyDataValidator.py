@@ -1,7 +1,8 @@
 from src.e_Infra.b_Builders.DomainBuilder import *
 from sqlalchemy.inspection import inspect
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import request
+import re
 
 
 def validate_request_data_object(declarative_meta, request_data_object):
@@ -65,13 +66,30 @@ def validate_time(column, request_data):
     raise Exception(f'Invalid time value for {column.name} attribute')
 
 
+def validate_and_parse_interval(column, request_data):
+    # This function will convert a string like "2 days" into a timedelta object.
+    interval_pattern = re.compile(r'(?P<number>\d+)\s*(?P<unit>days?)')
+    match = interval_pattern.match(request_data.get(column.name))
+    if match:
+        number = int(match.group('number'))
+        unit = match.group('unit')
+
+        if 'day' in unit:
+            request_data[column.name] = timedelta(days=number)
+            return
+    raise ValueError(f"Cannot parse interval: {request_data.get(column.name)}")
+
+
 def validate_datetime_masks(declarative_meta, request_data_object):
     if request.method != 'GET':
         declarative_meta_column_list = inspect(declarative_meta).columns
         for request_object in request_data_object:
             declarative_meta_item = get_declarative_meta_attribute_definitions(request_object, declarative_meta_column_list)
             if str(declarative_meta_item.type).lower() == 'timestamp' or str(declarative_meta_item.type).lower() == 'datetime':
-                validate_datetime(declarative_meta_item, request_data_object)
+                if isinstance(declarative_meta_item, timedelta) or str(declarative_meta_item.type.python_type).lower() == "<class 'datetime.timedelta'>":
+                    validate_and_parse_interval(declarative_meta_item, request_data_object)
+                else:
+                    validate_datetime(declarative_meta_item, request_data_object)
             if str(declarative_meta_item.type).lower() == 'date':
                 validate_date(declarative_meta_item, request_data_object)
             if str(declarative_meta_item.type).lower() == 'time':
