@@ -9,11 +9,10 @@ def get_domain_result_files(domain_result_folder):
 
 
 def normalize_path(path):
-    if os.name == "nt":
-        # Replace forward slashes and double forward slashes with double backslashes
-        path = re.sub(r'[/]+', r'\\', path)
-        path = re.sub(r'//', r'\\', path)
-
+    # if os.name == "nt":
+    # Replace forward slashes and double forward slashes with double backslashes
+    path = re.sub(r'[/]+', r'\\', path)
+    path = re.sub(r'//', r'\\', path)
 
     # Replace multiple consecutive backslashes with a single backslash
     path = re.sub(r'\\+', r'\\', path)
@@ -32,7 +31,7 @@ def check_if_given_result_path_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt", "/opt",
+        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
         "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
@@ -84,7 +83,7 @@ def check_if_current_working_directory_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt", "/opt",
+        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
         "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths

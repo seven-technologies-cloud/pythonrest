@@ -9,9 +9,9 @@ import time
 def move_pythonrest_binary_to_system_bin(executable_path, target_folder):
     try:
         shutil.move(executable_path, os.path.join(target_folder, os.path.basename(executable_path)))
-        print(f'Successfully added PythonREST to your system-level binaries and commands in "{target_folder}".')
+        print(f'Successfully added PythonREST to your user-level binaries and commands in "{target_folder}".')
     except Exception as e:
-        print(f'Error: Unable to add PythonREST to system-level binaries and commands. {e}')
+        print(f'Error: Unable to add PythonREST to user-level binaries and commands. {e}')
         input('Press Enter to exit...')
         sys.exit(1)
 

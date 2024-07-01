@@ -20,6 +20,9 @@ macinstaller/PythonRestExecutables
 # PyCharm Files
 .idea
 
+# VSCode Files
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

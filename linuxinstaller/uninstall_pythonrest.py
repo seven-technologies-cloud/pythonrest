@@ -30,6 +30,11 @@ def run_script_that_removes_pythonrest_from_path(script_path):
 
 if __name__ == "__main__":
     try:
+        if os.geteuid() != 0:
+            print("This installer requires sudo privileges to run. Please type your sudo password")
+            os.system(f'sudo {sys.executable} {" ".join(sys.argv)}')
+            sys.exit()
+
         script_directory = os.path.dirname(os.path.abspath(__file__))
         install_path = '/usr/local/bin/pythonrest'
 

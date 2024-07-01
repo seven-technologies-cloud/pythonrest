@@ -41,7 +41,7 @@ def generate(
             typer.echo(f"Error: Given result path {result_path} is unsafe to generate API on, please provide another result path, API generation aborted!")
             return
         if not result_path.endswith('\\'):
-            result_path = result_path + "\\" + get_directory_data()['result_path_suffix']
+            result_path = os.path.join(result_path, get_directory_data()['result_path_suffix'])
         else:
             result_path = result_path + get_directory_data()['result_path_suffix']
     else:
