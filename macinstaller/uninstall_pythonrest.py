@@ -5,10 +5,10 @@ import sys
 import time
 
 
-def remove_pythonrest_from_system_bin(install_path):
+def remove_pythonrest_from_usr_local_bin(install_path):
     try:
         os.remove(install_path)
-        print(f'Successfully removed the PythonREST binary: {install_path}')
+        print(f'Successfully removed the PythonREST binary from {install_path}')
     except Exception as e:
         print(f'Error: Unable to remove PythonREST binary. {e}')
         input('Press Enter to exit...')
@@ -32,14 +32,14 @@ def run_script_that_removes_pythonrest_from_path(script_path):
 if __name__ == "__main__":
     try:
         if os.geteuid() != 0:
-            print("This installer requires sudo privileges to run. Please type your sudo password")
+            print("This installer requires sudo privileges to run. Please type your sudo password if prompted")
             os.system(f'sudo {sys.executable} {" ".join(sys.argv)}')
             sys.exit()
 
         script_directory = os.path.dirname(os.path.abspath(__file__))
         install_path = '/usr/local/bin/pythonrest'
 
-        remove_pythonrest_from_system_bin(install_path)
+        remove_pythonrest_from_usr_local_bin(install_path)
 
         time.sleep(1)
 

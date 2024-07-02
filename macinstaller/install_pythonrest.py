@@ -35,7 +35,7 @@ def run_script_that_adds_pythonrest_to_path(script_path):
 if __name__ == "__main__":
     try:
         if os.geteuid() != 0:
-            # If not running as root, rerun the script with sudo
+            print("This installer requires sudo privileges to run. Please type your sudo password if prompted")
             os.system(f'sudo {sys.executable} {" ".join(sys.argv)}')
             sys.exit()
 
