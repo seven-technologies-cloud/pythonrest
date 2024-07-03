@@ -9,11 +9,9 @@ def get_domain_result_files(domain_result_folder):
 
 
 def normalize_path(path):
-    if os.name == "nt":
-        # Replace forward slashes and double forward slashes with double backslashes
-        path = re.sub(r'[/]+', r'\\', path)
-        path = re.sub(r'//', r'\\', path)
-
+    # Replace forward slashes and double forward slashes with double backslashes
+    path = re.sub(r'[/]+', r'\\', path)
+    path = re.sub(r'//', r'\\', path)
 
     # Replace multiple consecutive backslashes with a single backslash
     path = re.sub(r'\\+', r'\\', path)
@@ -22,7 +20,8 @@ def normalize_path(path):
     path = re.sub(r'\\(?!\\)', r'\\', path)
 
     # Remove trailing backslashes or slashes at the end of the string
-    path = re.sub(r'[\\/]+$', '', path)
+    if path != '\\':
+        path = re.sub(r'[\\/]+$', '', path)
 
     return path
 
@@ -32,7 +31,7 @@ def check_if_given_result_path_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt", "/opt",
+        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
         "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
@@ -46,8 +45,9 @@ def check_if_given_result_path_is_unsafe(path):
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
-        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\", "\\bin", "\\boot", "\\dev", "\\etc", "\\home", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32",
+        "\\media", "\\mnt", "\\opt", "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr",
+        "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
@@ -84,7 +84,7 @@ def check_if_current_working_directory_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media", "/mnt", "/opt",
+        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
         "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
 
         # Mac sensitive paths
@@ -97,8 +97,9 @@ def check_if_current_working_directory_is_unsafe(path):
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
-        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\", "\\bin", "\\boot", "\\dev", "\\etc", "\\home", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32",
+        "\\media", "\\mnt", "\\opt", "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr",
+        "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
         "/System", "/Library", "/Applications", "/private/var", "/Users",
