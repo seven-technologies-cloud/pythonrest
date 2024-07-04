@@ -31,11 +31,11 @@ def check_if_given_result_path_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
-        "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\bin", "\\boot",  "\\dev", "\\etc", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32", "\\opt",
+        "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr", "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\home", "\\tmp", "\\cores", "\\opt", 
+        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\tmp", "\\cores", "\\opt", 
         "\\private\\var", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\usr",
 
         # Windows sensitive paths
@@ -86,11 +86,11 @@ def check_if_current_working_directory_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
-        "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\bin", "\\boot", "\\dev", "\\etc", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32", "\\opt",
+        "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr", "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\home", "\\tmp", "\\cores", "\\opt", 
+        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\tmp", "\\cores", "\\opt", 
         "\\private\\var", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\usr",
 
         # Windows sensitive paths
@@ -140,8 +140,8 @@ def check_if_provided_directory_is_unsafe(path):
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
-        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\", "\\bin", "\\boot", "\\dev", "\\etc", "\\home", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32", "\\media",
+        "\\mnt", "\\opt", "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr", "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
         "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\home", "\\tmp", "\\cores", "\\opt", 
