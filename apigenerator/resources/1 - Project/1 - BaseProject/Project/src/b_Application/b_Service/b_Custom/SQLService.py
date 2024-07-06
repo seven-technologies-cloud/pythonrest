@@ -56,10 +56,7 @@ def validate_query_method(reduced_query, method):
 # Method that executes a SQL query on database
 def execute_query(request_args, method):
     # Extracting SQL Query #
-    if method == 'GET':
-        query = request_args.get('HTTP_QUERY')
-    else:
-        query = request_args.get('Query')
+    query = request_args.get('HTTP_QUERY')
     # Validating if Query String Parameters is properly built #
     if query is None:
         # Returning API built response #
@@ -72,7 +69,7 @@ def execute_query(request_args, method):
     # Extracting reduced query for method validation #
     reduced_query = reduce_query_statement(query)
 
-    if method == 'PATCH' or method =='DELETE':
+    if method == 'PATCH' or method == 'DELETE':
         if 'where' not in reduced_query:
             return build_proxy_response_insert_dumps(
                 400, {
@@ -115,12 +112,12 @@ def execute_query(request_args, method):
         except Exception as e:
             if build_sql_error_table_does_not_exist(e.args[0]):
                 return build_proxy_response_insert_dumps(404, {get_system_message('error_message'):
-                                                                               get_system_message(
-                                                                                   'table_does_not_exist')})
+                                                               get_system_message(
+                    'table_does_not_exist')})
             elif build_sql_error_invalid_syntax(e.args[0]):
                 return build_proxy_response_insert_dumps(400, {get_system_message('error_message'):
-                                                                               get_system_message(
-                                                                                   'invalid_syntax')})
+                                                               get_system_message(
+                    'invalid_syntax')})
             return handle_custom_exception(get_system_message('invalid_sql'))
 
         # Retrieving JSON if method is GET #
