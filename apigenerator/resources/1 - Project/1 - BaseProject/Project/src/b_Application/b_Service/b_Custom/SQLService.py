@@ -110,14 +110,28 @@ def execute_query(request_args, method):
             else:
                 con.commit()
         except Exception as e:
-            if build_sql_error_table_does_not_exist(e.args[0]):
+            error_kind_check = build_sql_error_table_does_not_exist(e.args[0])
+            if error_kind_check:
                 return build_proxy_response_insert_dumps(404, {get_system_message('error_message'):
                                                                get_system_message(
                     'table_does_not_exist')})
-            elif build_sql_error_invalid_syntax(e.args[0]):
+            error_kind_check = build_sql_error_invalid_syntax(e.args[0])
+            if error_kind_check:
                 return build_proxy_response_insert_dumps(400, {get_system_message('error_message'):
                                                                get_system_message(
                     'invalid_syntax')})
+            error_kind_check = build_sql_error_duplicate_entry(e.args[0])
+            if error_kind_check is not None:
+                return build_proxy_response_insert_dumps(409, {get_system_message('error_message'):
+                                                               error_kind_check})
+            error_kind_check = build_sql_error_missing_foreign_key(e.args[0])
+            if error_kind_check is not None:
+                return build_proxy_response_insert_dumps(409, {get_system_message('error_message'):
+                                                               error_kind_check})
+            error_kind_check = build_sql_error_no_default_value(e.args[0])
+            if error_kind_check is not None:
+                return build_proxy_response_insert_dumps(400, {get_system_message('error_message'):
+                                                               error_kind_check})
             return handle_custom_exception(get_system_message('invalid_sql'))
 
         # Retrieving JSON if method is GET #
