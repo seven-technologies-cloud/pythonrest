@@ -51,15 +51,23 @@ def get_all(declarative_meta, request_args, header_args):
     except Exception as e:
         return handle_custom_exception(get_system_message('invalid_connection_parameters'))
 
+    try:
         # Retrieving results #
-    result_set = select_all_objects(
-        declarative_meta, request_args, main_connection_session, header_args
-    )
-
-    # Returning API built response #
-    return build_proxy_response(
-        200, result_set
-    )
+        result_set = select_all_objects(
+            declarative_meta, request_args, main_connection_session, header_args
+        )
+        if result_set == '[]':
+            # Return items not found when list is empty #
+            return build_proxy_response_insert_dumps(
+                404, {get_system_message('error_message'): get_system_message('get_no_items_found')}
+            )
+        else:
+            # Otherwise, return API built response with items #
+            return build_proxy_response(
+                200, result_set
+            )
+    except Exception as e:
+        return handle_custom_exception(e)
 
 
 # Method retrieves a given entity by its given 'id' and 'request_args' parameters #
