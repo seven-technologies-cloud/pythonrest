@@ -13,7 +13,7 @@ Chocolatey
 
 .. code-block::
 
-   choco install pythonrest --version=0.1.0
+   choco install pythonrest
 
 Pip
 ~~~~~~~~~~

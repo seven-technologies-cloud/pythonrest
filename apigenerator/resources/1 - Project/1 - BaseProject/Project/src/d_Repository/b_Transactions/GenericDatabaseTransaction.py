@@ -23,7 +23,7 @@ def select_all_objects(declarative_meta, request_args, session, header_args):
 def select_object_by_id(declarative_meta, id_value_list, id_name_list, request_args, session, header_args):
     try:
         # Executing query according to existence of request_args parameter #
-        if request_args != get_system_empty_dict():
+        if request_args != get_system_empty_dict() or header_args != get_system_empty_dict():
             query = build_query_from_api_request(
                 declarative_meta, request_args, session, header_args
             )

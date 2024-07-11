@@ -7,7 +7,7 @@ copyright = '2024, SevenTechnologies'
 author = 'SevenTechnologies'
 
 release = '0.1'
-version = '0.1.0'
+version = '0.1.4'
 
 # -- General configuration
 
