@@ -16,7 +16,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -27,18 +27,18 @@ paths:
                       name: string
               schema:
                 type: array
-                description: ''
+                description: ""
                 minItems: 1
                 uniqueItems: true
                 items:
                   type: object
-                  properties: ''
-        '400':
+                  properties: ""
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -62,12 +62,12 @@ paths:
                 Invalid SQL method:
                   value:
                     ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -85,31 +85,19 @@ paths:
         - SQL
       summary: Insert SQL Query
       operationId: insertSQLQuery
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              description: ''
-              properties:
-                Query:
-                  type: string
-                  minLength: 1
-              required:
-                - Query
-            examples:
-              SQL Query:
-                value:
-                  Query: INSERT INTO client (id_client) VALUES ('value_1')
-        required: true
-        description: Body to send post sql data
+      parameters:
+        - name: query
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   Message:
@@ -121,12 +109,12 @@ paths:
                 Query successfully persisted:
                   value:
                     Message: Query successfully persisted
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -147,12 +135,12 @@ paths:
                 Invalid SQL method:
                   value:
                     ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -164,12 +152,12 @@ paths:
                 Table does not exist:
                   value:
                     ErrorMessage: Table does not exist
-        '406':
+        "406":
           description: Not Acceptable
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -187,31 +175,19 @@ paths:
         - SQL
       summary: Update SQL Query
       operationId: updateSQLQuery
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              description: ''
-              properties:
-                Query:
-                  type: string
-                  minLength: 1
-              required:
-                - Query
-            examples:
-              SQL Query:
-                value:
-                  Query: UPDATE client SET name = 'name_2' WHERE id_client = 'value_1'
-        required: true
-        description: Body to send patch sql data
+      parameters:
+        - name: query
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   Message:
@@ -223,12 +199,12 @@ paths:
                 Query successfully persisted:
                   value:
                     Message: Query successfully persisted
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -252,12 +228,12 @@ paths:
                 Where clause required:
                   value:
                     ErrorMessage: Missing WHERE clause
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -269,12 +245,12 @@ paths:
                 Table does not exist:
                   value:
                     ErrorMessage: Table does not exist
-        '406':
+        "406":
           description: Not Acceptable
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -292,31 +268,19 @@ paths:
         - SQL
       summary: Delete SQL Query by Full Match Object
       operationId: deleteSQLQueryByFullMatch
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              description: ''
-              properties:
-                Query:
-                  type: string
-                  minLength: 1
-              required:
-                - Query
-            examples:
-              SQL Query:
-                value:
-                  Query: DELETE FROM client WHERE id_client='value_1'
-        required: true
-        description: Body to send delete sql data
+      parameters:
+        - name: query
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   Message:
@@ -328,12 +292,12 @@ paths:
                 Query successfully persisted:
                   value:
                     Message: Query successfully persisted
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -357,12 +321,12 @@ paths:
                 Where clause required:
                   value:
                     ErrorMessage: Missing WHERE clause
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -374,12 +338,12 @@ paths:
                 Table does not exist:
                   value:
                     ErrorMessage: Table does not exist
-        '406':
+        "406":
           description: Not Acceptable
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -409,11 +373,11 @@ paths:
           application/json:
             schema:
               type: object
-              description: ''
+              description: ""
               properties:
                 out:
                   type: object
-                  description: ''
+                  description: ""
                 in:
                   type: array
                   minItems: 1
@@ -424,17 +388,17 @@ paths:
             examples:
               Stored Procedure in and out parameters:
                 value:
-                  out: {"client_count_output": 0}
+                  out: { "client_count_output": 0 }
                   in: ["client_id", "user_id"]
         required: true
         description: Body to send post sql stored procedure data
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   Message:
@@ -446,12 +410,12 @@ paths:
                 Query successfully persisted:
                   value:
                     Message: Query successfully persisted
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -472,12 +436,12 @@ paths:
                 Invalid SQL method:
                   value:
                     ErrorMessage: SQL query blocked, invalid SQL verb for HTTP method
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
@@ -489,12 +453,12 @@ paths:
                 Table does not exist:
                   value:
                     ErrorMessage: Table does not exist
-        '406':
+        "406":
           description: Not Acceptable
           content:
             application/json:
               schema:
-                description: ''
+                description: ""
                 type: object
                 properties:
                   ErrorMessage:
