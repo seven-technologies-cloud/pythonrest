@@ -523,6 +523,35 @@ sudo pip install -r requirements.txt
 ```
 <br></br>
 
+# For Contributors: How to run this project on terminal and VSCode
+To run using the command line, you need to open this project root folder on the terminal and run the project startup file
+(pythonrest.py) with Python, that way you can test any modifications you made to the project without needing to build the
+binary everytime, just run the command below, remembering to replace the test database properties on it:
+```bash
+python pythonrest.py generate --mysql-connection-string mysql://<user_name>:<password>@<endpoint>:<port>/<schema>
+```
+
+Also, if you wish to debug this project, and you usually use VSCode with Microsoft's Python extension, you can create a 
+launch configuration and put a structure similar to the below, only replacing the test database properties:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "pythonrest.py",
+            "args": ["generate", "--mysql-connection-string", "mysql://<user_name>:<password>@<endpoint>:<port>/<schema>"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
+```
+
+<br></br>
 # For Contributors: How to Build Your Own Binaries and Installers
 It is very important that you have all of the libraries used by the project (listed on requirements.txt) installed on your
 machine or on venv, because pyinstaller uses the versions of the libraries installed on your machine to build the binaries.

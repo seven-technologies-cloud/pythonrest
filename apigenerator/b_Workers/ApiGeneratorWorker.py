@@ -4,6 +4,7 @@ from apigenerator.b_Workers.DomainMigrationHandler import *
 from apigenerator.b_Workers.ProjectFinalizer import *
 from apigenerator.b_Workers.EnvironmentVariablesWorker import *
 from apigenerator.b_Workers.DirectoryManager import copy_domain_files
+from apigenerator.f_Builders.FlaskAdminBuilder import build_flask_admin_files
 
 
 def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists):
@@ -36,6 +37,9 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
         # ----------------------------- Environment Variables ----------------------------- #
 
         install_environment_variables(result_full_path, us_datetime, db, db_params, script_absolute_path)
+
+        # ---------------------------------- Flask-Admin ---------------------------------- #
+        build_flask_admin_files(result_full_path, proj_domain_folder)
     except Exception as e:
         print(e)
         return
