@@ -84,12 +84,16 @@ export LDFLAGS="-L$(brew --prefix openssl)/lib -L/usr/local/opt/openssl/lib"
 export CPPFLAGS="-I$(brew --prefix openssl)/include"
 pip install --pre --no-binary :all: pymssql --no-cache
 ```
-After a successful installation of pymssql, you can then proceed with the installation of pythonrest using pip or the download on the website
+After a successful installation of pymssql, you can then proceed with the installation of pythonrest using pip or the 
+download on the website
 <br></br>
 
 ## Prerequisites
 To use PythonREST, you must have Python 3.11 installed on your machine.
-You'll also need credentials that can connect to your desired database so that the generator can access it and create your API. If you're not familiar with creating and connecting to relational databases, you can check these [articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies on how to create local databases (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
+You'll also need credentials that can connect to your desired database so that the generator can access it and create 
+your API. If you're not familiar with creating and connecting to relational databases, you can check these 
+[articles](https://medium.com/@seventechnologiescloud/) written by us at Seven Technologies on how to create local 
+databases (MySQL, PostgreSQL, SQLServer and MariaDB) using Docker and connect to it.
 <br></br>
 
 ## Usage

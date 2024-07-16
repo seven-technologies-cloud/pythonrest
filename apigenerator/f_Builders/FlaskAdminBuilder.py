@@ -2,6 +2,29 @@ import os
 import re
 
 
+# This function will check for column types that can't use flask admin filters, to then remove them on the build of column_filters
+def extract_columns_to_exclude_from_column_filters(file_path):
+    types_to_exclude_from_column_filters = [r"^.*\bsa\.JSON\b.*$"]
+
+    columns = []
+
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    for type_pattern in types_to_exclude_from_column_filters:
+        # Find all matches in the file content
+        matches = re.findall(type_pattern, content, re.M)
+
+        for match in matches:
+            # Regular expression to capture the column name
+            column_pattern = r"^\s*(\w+)\s*:\s*"
+            column_match = re.match(column_pattern, match)
+            if column_match:
+                columns.append(column_match.group(1))
+
+    return columns
+
+
 def parse_model_attributes(file_path):
     with open(file_path, 'r') as file:
         content = file.read()
@@ -20,7 +43,12 @@ def parse_model_attributes(file_path):
     return fields, pk_autoincrement
 
 
-def create_model_view(model_name, fields, pk_autoincrement):
+def create_model_view(model_name, fields, pk_autoincrement, file_path):
+    fields_to_remove = extract_columns_to_exclude_from_column_filters(file_path)
+    if fields_to_remove:
+        column_filters = [field for field in fields if field not in fields_to_remove]
+    else:
+        column_filters = fields
     form_columns = fields if not pk_autoincrement else fields[1:]
 
     return f"""
@@ -28,7 +56,7 @@ def create_model_view(model_name, fields, pk_autoincrement):
 class {model_name}ModelView(ModelView):
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
-    column_filters = {tuple(fields)}
+    column_filters = {tuple(column_filters)}
     form_columns = {tuple(form_columns)}
 """
 
@@ -40,8 +68,8 @@ def generate_flask_admin_files(result, project_domain_folder, domain_files):
 
     for domain_file in domain_files:
         model_name = domain_file[:-3]  # Remove .py extension
-        fields, pk_autoincrement = parse_model_attributes(f'{project_domain_folder}/{domain_file}')
-        views_code += create_model_view(model_name, fields, pk_autoincrement)
+        fields, pk_autoincrement = parse_model_attributes(os.path.join(project_domain_folder, domain_file))
+        views_code += create_model_view(model_name, fields, pk_autoincrement, os.path.join(project_domain_folder, domain_file))
         model_imports += f"from src.c_Domain.{model_name} import {model_name}\n"
         admin_views += f"admin.add_view({model_name}ModelView({model_name}, get_mysql_connection_session()))\n"
 
