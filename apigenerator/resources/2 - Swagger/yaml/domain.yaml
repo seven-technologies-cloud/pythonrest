@@ -25,25 +25,35 @@
         schema:
           type: string
         description: Used to define the page to retrieve
+      - name: startdate
+        in: header
+        schema:
+          type: string
+        description: Used to filter by start date
+      - name: enddate
+        in: header
+        schema:
+          type: string
+        description: Used to filter by end date
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
               type: array
-              description: ''
+              description: ""
               minItems: 1
               uniqueItems: true
               items:
                 type: object
-                properties: ''
-      '400':
+                properties: ""
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorMessage:
@@ -60,10 +70,10 @@
                   ErrorMessage: orderby got an unexpected keyword argument 'unexpected_attribute'
               Unexpected orderby header order:
                 value:
-                  ErrorMessage: '''unexpected_order'' not a valid argument. Must be either ''asc'' or ''desc'''
+                  ErrorMessage: "'unexpected_order' not a valid argument. Must be either 'asc' or 'desc'"
               Limit header not integer:
                 value:
-                  ErrorMessage: '''string'' is not an integer'
+                  ErrorMessage: "'string' is not an integer"
               Unexpected query key:
                 value:
                   ErrorMessage: meta_string got an unexpected keyword argument 'unexpected_argument'
@@ -81,22 +91,22 @@
         application/json:
           schema:
             type: array
-            description: ''
+            description: ""
             minItems: 1
             uniqueItems: true
             items:
               type: object
-              properties: ''
+              properties: ""
               required: post_required
       required: true
       description: Body to send post meta_string data
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 Message:
@@ -104,12 +114,12 @@
                   minLength: 1
               required:
                 - Message
-      '400':
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -122,18 +132,18 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
               required:
                 - ErrorList
-      '406':
+      "406":
         description: Not Acceptable
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -146,7 +156,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -167,13 +177,13 @@
                   ErrorMessage: Malformed input data
               Invalid attribute value type:
                 value:
-                  ErrorMessage: 'Expected type ''str'' for attribute ''id_string'' but received type ''int'''
-      '409':
+                  ErrorMessage: "Expected type 'str' for attribute 'id_string' but received type 'int'"
+      "409":
         description: Conflict
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -186,7 +196,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -211,22 +221,22 @@
         application/json:
           schema:
             type: array
-            description: ''
+            description: ""
             minItems: 1
             uniqueItems: true
             items:
               type: object
-              properties: ''
+              properties: ""
               required: patch_required
       required: true
       description: Body to send patch meta_string data
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 Message:
@@ -234,12 +244,12 @@
                   minLength: 1
               required:
                 - Message
-      '400':
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -252,18 +262,18 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
               required:
                 - ErrorList
-      '404':
+      "404":
         description: Not Found
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -276,7 +286,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -296,12 +306,12 @@
                     - body:
                         client_name: value_1
                       error: Primary key missing
-      '406':
+      "406":
         description: Not Acceptable
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -314,7 +324,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -341,7 +351,7 @@
                   ErrorMessage: Malformed input data
               Invalid attribute value type:
                 value:
-                  ErrorMessage: 'Expected type ''str'' for attribute ''id_string'' but received type ''int'''
+                  ErrorMessage: "Expected type 'str' for attribute 'id_string' but received type 'int'"
     description: Route responsible for updating a meta_string set
   put:
     tags:
@@ -349,12 +359,12 @@
     summary: Insert and/or Update DeclarativeMeta Set
     operationId: putDeclarativeMetaSet
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorMessage:
@@ -362,12 +372,12 @@
                   minLength: 1
               required:
                 - ErrorMessage
-      '400':
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -380,18 +390,18 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
               required:
                 - ErrorList
-      '406':
+      "406":
         description: Not Acceptable
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -404,7 +414,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -425,18 +435,18 @@
                   ErrorMessage: Malformed input data
               Invalid attribute value type:
                 value:
-                  ErrorMessage: 'Expected type ''str'' for attribute ''id_string'' but received type ''int'''
+                  ErrorMessage: "Expected type 'str' for attribute 'id_string' but received type 'int'"
     requestBody:
       content:
         application/json:
           schema:
             type: array
-            description: ''
+            description: ""
             minItems: 1
             uniqueItems: true
             items:
               type: object
-              properties: ''
+              properties: ""
       required: true
       description: Body to send put meta_string data
     description: Route responsible for inserting or updating a meta_string set
@@ -450,21 +460,21 @@
         application/json:
           schema:
             type: array
-            description: ''
+            description: ""
             minItems: 1
             uniqueItems: true
             items:
               type: object
-              properties: ''
+              properties: ""
       required: true
       description: Body to send delete meta_string data
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 Message:
@@ -472,12 +482,12 @@
                   minLength: 1
               required:
                 - Message
-      '400':
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -490,18 +500,18 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
               required:
                 - ErrorList
-      '404':
+      "404":
         description: Not Found
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -514,7 +524,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -528,12 +538,12 @@
                         id_client: id_not_registered_in_table
                         client_name: name_not_registered_in_table
                       error: No match found to delete
-      '406':
+      "406":
         description: Not Acceptable
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorList:
@@ -546,7 +556,7 @@
                     properties:
                       Body:
                         type: object
-                        properties: ''
+                        properties: ""
                       ErrorMessage:
                         type: string
                         minLength: 1
@@ -561,9 +571,9 @@
                   ErrorMessage: Malformed input data
               Invalid attribute value type:
                 value:
-                  ErrorMessage: 'Expected type ''str'' for attribute ''id_string'' but received type ''int'''
+                  ErrorMessage: "Expected type 'str' for attribute 'id_string' but received type 'int'"
     description: Route responsible for deleting a meta_string set
-'/meta_string/{id_string}':
+"/meta_string/{id_string}":
   get:
     tags:
       - DeclarativeMeta
@@ -581,24 +591,24 @@
         schema:
           type: string
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
               type: array
-              description: ''
+              description: ""
               minItems: 1
               uniqueItems: true
               items:
                 type: object
-                properties: ''
-      '400':
+                properties: ""
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorMessage:
@@ -610,12 +620,12 @@
               Unexpected select header attribute:
                 value:
                   ErrorMessage: meta_string select got an unexpected keyword argument 'unexpected_attribute'
-      '404':
+      "404":
         description: Not Found
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorMessage:
@@ -624,7 +634,7 @@
               required:
                 - ErrorMessage
             examples:
-             id not found:
+              id not found:
                 value:
                   ErrorMessage: "Object with given parameter '{id_not_registered_in_table}' not found."
     description: Route responsible for retrieving a meta_string by primary key
@@ -640,12 +650,12 @@
         schema:
           type: string
     responses:
-      '200':
+      "200":
         description: OK
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 Message:
@@ -653,12 +663,12 @@
                   minLength: 1
               required:
                 - Message
-      '400':
+      "400":
         description: Bad Request
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorMessage:
@@ -666,12 +676,12 @@
                   minLength: 1
               required:
                 - ErrorMessage
-      '404':
+      "404":
         description: Not Found
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 ErrorMessage:
@@ -680,7 +690,7 @@
               required:
                 - ErrorMessage
             examples:
-             id not found:
+              id not found:
                 value:
                   ErrorMessage: "Object with given parameter '{id_not_registered_in_table}' not found."
     description: Route responsible for deleting a meta_string by primary key
