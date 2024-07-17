@@ -102,6 +102,7 @@ def apply_query_filter_datetime(query, header_args, declarative_meta):
     header_args = dict() if header_args is None else header_args
     start_date = header_args.get('HTTP_STARTDATE')
     end_date = header_args.get('HTTP_ENDDATE')
+    columnname = header_args.get('HTTP_COLUMNNAME')
 
     # Get all column attributes from the declarative_meta
     column_attributes = [getattr(declarative_meta, col.name)
@@ -109,11 +110,12 @@ def apply_query_filter_datetime(query, header_args, declarative_meta):
 
     # Filter columns based on data type (assuming date/datetime)
     for field in column_attributes:
-        if field.type.python_type == datetime.date or field.type.python_type == datetime.datetime:
-            if start_date is not None or end_date is not None:
-                query = query.filter(field <= str(end_date)).\
-                    filter(field >= str(start_date))
-                return query
+        if field.name == columnname:
+            if field.type.python_type == datetime.date or field.type.python_type == datetime.datetime:
+                if start_date is not None or end_date is not None:
+                    query = query.filter(field <= str(end_date)).\
+                        filter(field >= str(start_date))
+                    return query
     return query
 
 

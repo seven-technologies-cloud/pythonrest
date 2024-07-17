@@ -19,7 +19,8 @@ def control_route_get():
                                      'HTTP_ORDERBY': request.environ.get('HTTP_ORDERBY'),
                                      'HTTP_PAGE': request.environ.get('HTTP_PAGE'),
                                      'HTTP_STARTDATE': request.environ.get('HTTP_STARTDATE'),
-                                     'HTTP_ENDDATE': request.environ.get('HTTP_ENDDATE')}
+                                     'HTTP_ENDDATE': request.environ.get('HTTP_ENDDATE'),
+                                     'HTTP_COLUMNNAME': request.environ.get('HTTP_COLUMNNAME')}
         )
         return result
 
