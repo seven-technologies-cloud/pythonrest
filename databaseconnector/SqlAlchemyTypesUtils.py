@@ -136,7 +136,7 @@ def get_sa_PgSQL_string_types_list():
             'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'time', 'time with time zone',
             'text', 'Unicode', 'UnicodeText', 'VARBINARY', 'UUID', 'date', 'time without time zone', 'XML', 'xml',
             'timestamp with time zone', 'timestamp without time zone', 'timestamp', 'jsonb', 'JSONB', 'inet', 'INET',
-            'bit', 'BIT', 'cidr', 'macaddr', 'macaddr8', 'json', 'JSON', 'timestamptz', 'timetz', 'money',
+            'bit', 'BIT', 'cidr', 'macaddr', 'macaddr8', 'json', 'JSON', 'timestamptz', 'timetz',
             'point', 'line', 'lseg', 'box', 'path', 'polygon', 'circle', 'pg_lsn', 'pg_snapshot',
             'regclass', 'regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator',
             'regprocedure', 'regtype', 'regrole', 'regproc',
@@ -153,7 +153,7 @@ def get_sa_PgSQL_int_types_list():
 
 
 def get_sa_PgSQL_float_types_list():
-    return ['decimal', 'numeric', 'real', 'double precision']
+    return ['decimal', 'numeric', 'real', 'double precision', 'MONEY']
 
 
 def get_sa_PgSQL_bool_types_list():
@@ -299,7 +299,7 @@ def get_sa_type(column_type, python_type_value, database):
     dict_type_list = get_sa_dict_types_list()
 
     types_list_object = {'str': str_type_list, 'bytes': bytes_type_list, 'int': int_type_list, 'float': float_type_list,
-                        'bool': bool_type_list, 'list': list_type_list, 'dict': dict_type_list}
+                         'bool': bool_type_list, 'list': list_type_list, 'dict': dict_type_list}
 
     converted_type = handle_sql_to_sa_types_conversion(column_type)
 
@@ -315,3 +315,6 @@ def get_sa_type(column_type, python_type_value, database):
                 else:
                     result = add_size_to_result(result, column_type)
             return result
+
+    # Caso o tipo de dado não seja encontrado, sair com mensagem de erro
+    sys.exit(f'Tipo de coluna não suportado: {column_type}')

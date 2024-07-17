@@ -23,6 +23,8 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ------------------------------------ Domain ------------------------------------ #
 
+        analyze_domain_files(db, proj_domain_folder, result_full_path)
+
         handle_domain_migration_multiple_swagger_files(result_full_path, proj_domain_folder, script_absolute_path)
 
         modify_swagger_related_files(result_full_path, proj_domain_folder, script_absolute_path)
