@@ -17,7 +17,9 @@ def control_route_get():
             request.args.to_dict(), {'HTTP_SELECT': request.environ.get('HTTP_SELECT'),
                                      'HTTP_LIMIT': request.environ.get('HTTP_LIMIT'),
                                      'HTTP_ORDERBY': request.environ.get('HTTP_ORDERBY'),
-                                     'HTTP_PAGE': request.environ.get('HTTP_PAGE')}
+                                     'HTTP_PAGE': request.environ.get('HTTP_PAGE'),
+                                     'HTTP_COLUMNNAME': request.environ.get('HTTP_COLUMNNAME'),
+                                     'HTTP_MULTIPLEVALUES': request.environ.get('HTTP_MULTIPLEVALUES')}
         )
         return result
 
@@ -38,4 +40,3 @@ def control_route_delete_by_full_match():
     if request.method == 'DELETE':
         result = delete_control_by_full_match(request.json)
         return result
-

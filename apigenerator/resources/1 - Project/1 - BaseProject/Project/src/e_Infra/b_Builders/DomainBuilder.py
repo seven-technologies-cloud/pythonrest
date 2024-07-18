@@ -26,7 +26,8 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     # Initializing query session by declarative_meta param #
     query = session.query(*query_args)
     # Building class object from given param request_args #
-    class_object = build_domain_object_from_dict(declarative_meta, request_args)
+    class_object = build_domain_object_from_dict(
+        declarative_meta, request_args)
     # Iterating over instantiated class object to resolve filter #
     for attr in class_object.__dict__:
         # Removing SqlAlchemy's _sa_instance_state attribute from validation  #
@@ -35,20 +36,25 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                 value = getattr(class_object, attr)
                 # Check if the value is NULL or null (case-insensitive)
                 if str(value).lower() in ('null', 'null'):
-                    query = query.filter(getattr(declarative_meta, attr) == None)
+                    query = query.filter(
+                        getattr(declarative_meta, attr) == None)
                 else:
                     # Checking if in global list for left-sided like filter #
                     if str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_left').replace(' ', '').split(','):
-                        query = resolve_string_filter(declarative_meta, class_object, attr, query, 'left_like')
+                        query = resolve_string_filter(
+                            declarative_meta, class_object, attr, query, 'left_like')
                     # Checking if in global list for right-sided like filter #
                     elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_right').replace(' ', '').split(','):
-                        query = resolve_string_filter(declarative_meta, class_object, attr, query, 'right_like')
+                        query = resolve_string_filter(
+                            declarative_meta, class_object, attr, query, 'right_like')
                     # Checking if in global list for full like filter #
                     elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_full').replace(' ', '').split(','):
-                        query = resolve_string_filter(declarative_meta, class_object, attr, query, 'full_like')
+                        query = resolve_string_filter(
+                            declarative_meta, class_object, attr, query, 'full_like')
                     # Not in any global list for like filter #
                     else:
-                        query = resolve_string_filter(declarative_meta, class_object, attr, query, 'regular')
+                        query = resolve_string_filter(
+                            declarative_meta, class_object, attr, query, 'regular')
 
     # Apply order by to query #
     query = query_order_by(query, header_args, declarative_meta)
@@ -56,6 +62,9 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     query = apply_query_offset(query, header_args)
     # Apply limit to query #
     query = apply_query_limit(query, header_args, limit)
+    # Apply selecting multiple values #
+    query = apply_query_selecting_multiple_values(
+        query, header_args, declarative_meta)
     # Returning filtered query #
     return query
 
@@ -65,11 +74,14 @@ def query_order_by(query, header_args, declarative_meta):
     if header_args.get('HTTP_ORDERBY') is not None and header_args.get('HTTP_ORDERBY')[0] != '':
         if len(header_args.get('HTTP_ORDERBY')) == 2:
             if header_args['HTTP_ORDERBY'][1] == 'asc':
-                query = query.order_by(getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]))
+                query = query.order_by(
+                    getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]))
             else:
-                query = query.order_by(getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]).desc())
+                query = query.order_by(
+                    getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]).desc())
         else:
-            query = query.order_by(getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]))
+            query = query.order_by(
+                getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]))
     return query
 
 
@@ -77,7 +89,8 @@ def apply_query_limit(query, header_args, limit):
     if limit:
         header_args = dict() if header_args is None else header_args
         limit_value = header_args.get('HTTP_LIMIT')
-        limit_value = limit_value if limit_value is not None else get_global_variable('query_limit')
+        limit_value = limit_value if limit_value is not None else get_global_variable(
+            'query_limit')
         if limit_value == '*':
             return query
         else:
@@ -98,6 +111,26 @@ def apply_query_offset(query, header_args):
             raise Exception(
                 f"page header can't be defined without limit header"
             )
+    return query
+
+
+def apply_query_selecting_multiple_values(query, header_args, declarative_meta):
+    header_args = dict() if header_args is None else header_args
+    multiple_values = header_args.get('HTTP_MULTIPLEVALUES')
+    columnname = header_args.get('HTTP_COLUMNNAME')
+
+    # Get all column attributes from the declarative_meta
+    column_attributes = [getattr(declarative_meta, col.name)
+                         for col in declarative_meta.__table__.columns]
+
+    # Filter columns based on data type (assuming date/datetime)
+    for field in column_attributes:
+        if field.name == columnname:
+            if multiple_values is not None:
+                multiple_values = multiple_values.split(",")
+                query = query.where(
+                    field.in_(tuple(multiple_values)))
+                return query
     return query
 
 
@@ -123,7 +156,8 @@ def remove_keys_with_null_values(dictionary):
 
 
 def fill_missing_keys_with_null_values(declarative_meta, dictionary):
-    dictionary = build_domain_object_from_dict(declarative_meta, dictionary).__dict__
+    dictionary = build_domain_object_from_dict(
+        declarative_meta, dictionary).__dict__
     del dictionary['_sa_instance_state']
 
 
@@ -178,10 +212,12 @@ def apply_custom_cast(cast, key, value):
 
 def cast_headers_args(header_args):
     if header_args.get('HTTP_SELECT') is not None:
-        header_args['HTTP_SELECT'] = header_args['HTTP_SELECT'].replace(' ', '').split(',')
+        header_args['HTTP_SELECT'] = header_args['HTTP_SELECT'].replace(
+            ' ', '').split(',')
 
     if header_args.get('HTTP_ORDERBY') is not None:
-        header_args['HTTP_ORDERBY'] = header_args['HTTP_ORDERBY'].replace(' ', '').split(',')
+        header_args['HTTP_ORDERBY'] = header_args['HTTP_ORDERBY'].replace(
+            ' ', '').split(',')
 
     if header_args.get('HTTP_LIMIT') is not None:
         if header_args['HTTP_LIMIT'] == '*':
