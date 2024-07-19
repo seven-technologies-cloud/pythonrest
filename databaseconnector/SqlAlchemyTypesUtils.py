@@ -153,7 +153,7 @@ def get_sa_PgSQL_int_types_list():
 
 
 def get_sa_PgSQL_float_types_list():
-    return ['decimal', 'numeric', 'real', 'double precision', 'MONEY']
+    return ['Float', 'DECIMAL', 'FLOAT', 'NUMERIC', 'Numeric', 'REAL', 'MONEY']
 
 
 def get_sa_PgSQL_bool_types_list():
@@ -284,6 +284,9 @@ def handle_sql_to_sa_types_conversion(column_type):
         return "String"
     if "jsonb" in column_type.lower():
         return "JSON"
+    if "money" in column_type.lower():
+        return "MONEY"
+
 
 def get_sa_type(column_type, python_type_value, database):
     base_column_type = column_type.split(" ")[0]

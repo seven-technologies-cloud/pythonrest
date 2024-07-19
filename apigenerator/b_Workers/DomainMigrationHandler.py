@@ -7,22 +7,29 @@ from apigenerator.e_Enumerables.Enumerables import *
 import os
 import re
 
+
 def check_domain_files(proj_domain_folder):
     domain_files_content = []
     for root, _, files in os.walk(proj_domain_folder):
         for file in files:
             if file.endswith(".py"):
-                with open(os.path.join(root, file), 'r', encoding='utf-8') as f:
+                with open(os.path.join(root, file), 'r') as f:
                     domain_files_content.append(f.read())
     return domain_files_content
 
-def replace_money(file_content):
+
+def replace_money(domain_files_content):
     money_found = False
-    money_pattern = re.compile(r'\bsa\.MONEY\b')
-    new_content, num_replacements = money_pattern.subn('MONEY', file_content)
-    if num_replacements > 0:
-        money_found = True
-    return new_content, money_found
+    for content in domain_files_content:
+        money_pattern = re.compile(r'\bsa\.MONEY\b')
+
+        new_content, num_replacements = money_pattern.subn('MONEY', content)
+
+        if num_replacements > 0:
+            money_found = True
+
+    return money_found
+
 
 def add_import_money(file_content):
     import_statement = "from sqlalchemy.dialects.postgresql.types import MONEY\n"
@@ -31,15 +38,13 @@ def add_import_money(file_content):
         file_content = parts[0] + "import sqlalchemy as sa\n" + import_statement + parts[1]
     return file_content
 
+
 def analyze_domain_files(db, proj_domain_folder, result_full_path):
     if db == 'pgsql':
         domain_files_content = check_domain_files(proj_domain_folder)
-        for content in domain_files_content:
-            new_content, money_found = replace_money(content)
+        money_found = replace_money(domain_files_content)
         if money_found:
-            with open(result_full_path, 'w', encoding='utf-8') as f:
-                f.write(new_content)
-            with open(result_full_path, 'r+', encoding='utf-8') as f:
+            with open(os.path.join(result_full_path, 'src/e_Infra/b_Builders/SqlAlchemyBuilder.py'), 'r+') as f:
                 existing_content = f.read()
                 f.seek(0)
                 f.write(add_import_money(existing_content))
