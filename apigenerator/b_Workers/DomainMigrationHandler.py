@@ -9,46 +9,55 @@ import re
 
 
 def check_domain_files(proj_domain_folder):
-    domain_files_content = []
+    python_file_paths = []
     for root, _, files in os.walk(proj_domain_folder):
         for file in files:
             if file.endswith(".py"):
-                with open(os.path.join(root, file), 'r') as f:
-                    domain_files_content.append(f.read())
-    return domain_files_content
+                python_file_paths.append(os.path.join(root, file))
+    return python_file_paths
 
 
-def replace_money(domain_files_content):
+def replace_money(domain_files_paths):
     money_found = False
-    for content in domain_files_content:
+    for file_path in domain_files_paths:
         money_pattern = re.compile(r'\bsa\.MONEY\b')
+        with open(file_path, "r") as domain_file_read:
+            file_content = domain_file_read.read()
+            new_content, num_replacements = money_pattern.subn('MONEY', file_content)
 
-        new_content, num_replacements = money_pattern.subn('MONEY', content)
-
-        if num_replacements > 0:
-            money_found = True
-
+            if num_replacements > 0:
+                with open(file_path, "w") as domain_file_write:
+                    domain_file_write.write(new_content)
+                money_found = True
     return money_found
 
 
 def add_import_money(file_content):
-    import_statement = "from sqlalchemy.dialects.postgresql.types import MONEY\n"
-    if "import sqlalchemy as sa" in file_content and import_statement not in file_content:
-        parts = file_content.split("import sqlalchemy as sa")
-        file_content = parts[0] + "import sqlalchemy as sa\n" + import_statement + parts[1]
-    return file_content
+    try:
+        import_statement = "from sqlalchemy.dialects.postgresql.types import MONEY\n"
+        if "import sqlalchemy as sa" in file_content and import_statement not in file_content:
+            parts = file_content.split("import sqlalchemy as sa")
+            file_content = parts[0] + "import sqlalchemy as sa\n" + import_statement + parts[1]
+        return file_content
+    except Exception as e:
+        raise e
 
 
-def analyze_domain_files(db, proj_domain_folder, result_full_path):
-    if db == 'pgsql':
-        domain_files_content = check_domain_files(proj_domain_folder)
-        money_found = replace_money(domain_files_content)
-        if money_found:
-            with open(os.path.join(result_full_path, 'src/e_Infra/b_Builders/SqlAlchemyBuilder.py'), 'r+') as f:
-                existing_content = f.read()
-                f.seek(0)
-                f.write(add_import_money(existing_content))
-                f.truncate()
+def modify_exceptional_types_in_domain_files(db, proj_domain_folder, result_full_path):
+    try:
+        if db == 'pgsql':
+            domain_files_paths = check_domain_files(proj_domain_folder)
+            money_found = replace_money(domain_files_paths)
+            if money_found:
+                with open(os.path.join(result_full_path, 'src/e_Infra/b_Builders/SqlAlchemyBuilder.py'), 'r+') as f:
+                    existing_content = f.read()
+                    f.seek(0)
+                    new_content = add_import_money(existing_content)
+                    f.write(new_content)
+                    f.truncate()
+    except Exception as e:
+        print(e)
+        raise e
 
 
 def handle_domain_migration_multiple_swagger_files(result, proj_domain_folder, script_absolute_path):

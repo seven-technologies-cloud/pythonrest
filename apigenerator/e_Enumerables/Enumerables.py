@@ -32,7 +32,7 @@ def get_integer_list():
 
 
 def get_number_list():
-    number_list = ['DECIMAL', 'FLOAT', 'Float', 'NUMERIC', 'Numeric', 'REAL']
+    number_list = ['DECIMAL', 'FLOAT', 'Float', 'NUMERIC', 'Numeric', 'REAL', 'MONEY']
     return number_list
 
 
