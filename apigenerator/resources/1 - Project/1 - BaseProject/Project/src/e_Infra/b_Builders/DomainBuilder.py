@@ -53,8 +53,15 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                             declarative_meta, class_object, attr, query, 'full_like')
                     # Not in any global list for like filter #
                     else:
-                        query = resolve_string_filter(
-                            declarative_meta, class_object, attr, query, 'regular')
+                        if request_args:
+                            for key, query_param in request_args.items():
+                                if '[or]' in query_param:
+                                    # Apply selecting multiple values #
+                                    query = apply_query_selecting_multiple_values(
+                                        query, query_param, key, declarative_meta)
+                                else:
+                                    query = resolve_string_filter(
+                                        declarative_meta, class_object, attr, query, 'regular')
 
     # Apply order by to query #
     query = query_order_by(query, header_args, declarative_meta)
@@ -62,9 +69,6 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     query = apply_query_offset(query, header_args)
     # Apply limit to query #
     query = apply_query_limit(query, header_args, limit)
-    # Apply selecting multiple values #
-    query = apply_query_selecting_multiple_values(
-        query, header_args, declarative_meta)
     # Returning filtered query #
     return query
 
@@ -114,23 +118,14 @@ def apply_query_offset(query, header_args):
     return query
 
 
-def apply_query_selecting_multiple_values(query, header_args, declarative_meta):
-    header_args = dict() if header_args is None else header_args
-    multiple_values = header_args.get('HTTP_MULTIPLEVALUES')
-    columnname = header_args.get('HTTP_COLUMNNAME')
-
-    # Get all column attributes from the declarative_meta
+def apply_query_selecting_multiple_values(query, query_param, key, declarative_meta):
     column_attributes = [getattr(declarative_meta, col.name)
                          for col in declarative_meta.__table__.columns]
-
-    # Filter columns based on data type (assuming date/datetime)
+    query_param = query_param.split(" [or] ")
     for field in column_attributes:
-        if field.name == columnname:
-            if multiple_values is not None:
-                multiple_values = multiple_values.split(",")
-                query = query.where(
-                    field.in_(tuple(multiple_values)))
-                return query
+        if field.name == key:
+            query = query.where(field.in_(query_param))
+            print(query)
     return query
 
 
