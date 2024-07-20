@@ -117,7 +117,7 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                     return query
                 else:
                     raise Exception(
-                        f"datetime filter invalid, can only contain one [to]"
+                        f"column name is invalid for this execution"
                     )
     else:
         raise Exception(
