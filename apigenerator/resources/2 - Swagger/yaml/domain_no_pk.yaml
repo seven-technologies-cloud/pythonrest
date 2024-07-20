@@ -25,21 +25,6 @@
         schema:
           type: string
         description: Used to define the page to retrieve
-      - name: startdate
-        in: header
-        schema:
-          type: string
-        description: Used to filter by start date
-      - name: enddate
-        in: header
-        schema:
-          type: string
-        description: Used to filter by end date
-      - name: columnname
-        in: header
-        schema:
-          type: string
-        description: Used to help filter by start and end date and multiples values
     responses:
       "200":
         description: OK
