@@ -60,7 +60,7 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                                 if '[to]' in query_param.lower():
                                     # Apply selecting multiple values #
                                     query = apply_query_filter_datetime(
-                                        query, query_param.lower(), key, declarative_meta)
+                                        query, query_param, key, declarative_meta)
                                 else:
                                     validate_datetime_or_date(query_param)
                                     query = resolve_string_filter(
@@ -109,8 +109,8 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
     column_attributes = [getattr(declarative_meta, col.name)
                          for col in declarative_meta.__table__.columns]
     if query_param.count("[to]") == 1:
-        start_and_end_dates = query_param.replace(" ", "")
-        start_and_end_dates = start_and_end_dates.split("[to]")
+        start_and_end_dates = re.sub(
+            r'\s+\[to\]\s+', '[to]', query_param).split('[to]')
         for field in column_attributes:
             if field.name == key:
                 start_datetime, end_datetime = start_and_end_dates
@@ -130,8 +130,8 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                         query = query.filter(func.cast(field, func.Integer()).between(
                             start_datetime, end_datetime))
                     else:
-                        query = query.filter(field <= str(start_and_end_dates[1])).\
-                            filter(field >= str(start_and_end_dates[0]))
+                        query = query.filter(
+                            field >= str(start_datetime), field <= str(end_datetime))
                         return query
                 else:
                     raise Exception(
