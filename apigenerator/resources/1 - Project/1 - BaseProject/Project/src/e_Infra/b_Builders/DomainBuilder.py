@@ -7,6 +7,7 @@ from src.e_Infra.c_Resolvers.SqlAlchemyStringFilterResolver import *
 # Variables Imports #
 from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
+import re
 
 
 # Method builds a domain object from a dictionary #
@@ -122,8 +123,8 @@ def apply_query_selecting_multiple_values(query, query_param, key, declarative_m
     column_attributes = [getattr(declarative_meta, col.name)
                          for col in declarative_meta.__table__.columns]
 
-    query_param = query_param.replace(" ", "")
-    query_param = query_param.split("[or]")
+    query_param = re.sub(
+            r'\s+\[or\]\s+', '[or]', query_param).split('[or]')
     for field in column_attributes:
         if field.name == key:
             query = query.where(field.in_(query_param))
