@@ -121,11 +121,12 @@ def apply_query_offset(query, header_args):
 def apply_query_selecting_multiple_values(query, query_param, key, declarative_meta):
     column_attributes = [getattr(declarative_meta, col.name)
                          for col in declarative_meta.__table__.columns]
-    query_param = query_param.split(" [or] ")
+
+    query_param = query_param.replace(" ", "")
+    query_param = query_param.split("[or]")
     for field in column_attributes:
         if field.name == key:
             query = query.where(field.in_(query_param))
-            print(query)
     return query
 
 
