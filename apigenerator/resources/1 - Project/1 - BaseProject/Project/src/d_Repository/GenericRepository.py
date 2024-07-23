@@ -2,7 +2,7 @@
 from src.d_Repository.b_Transactions.GenericDatabaseTransaction import *
 
 # Validator Imports #
-from src.e_Infra.d_Validators.SqlAlchemyDataValidator import *
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_request_data_object, validate_header_args
 from src.e_Infra.d_Validators.RequestJSONValidator import *
 
 # Handler Imports #
@@ -10,6 +10,7 @@ from src.e_Infra.a_Handlers.SystemMessagesHandler import *
 from src.e_Infra.a_Handlers.ExceptionsHandler import *
 
 # Builder Imports #
+from src.e_Infra.b_Builders.DomainObjectBuilder import build_domain_object_from_dict, build_object_error_message
 from src.e_Infra.b_Builders.ProxyResponseBuilder import *
 
 # Resolver Imports #
@@ -51,23 +52,15 @@ def get_all(declarative_meta, request_args, header_args):
     except Exception as e:
         return handle_custom_exception(get_system_message('invalid_connection_parameters'))
 
-    try:
         # Retrieving results #
-        result_set = select_all_objects(
-            declarative_meta, request_args, main_connection_session, header_args
-        )
-        if result_set == '[]':
-            # Return items not found when list is empty #
-            return build_proxy_response_insert_dumps(
-                404, {get_system_message('error_message'): get_system_message('get_no_items_found')}
-            )
-        else:
-            # Otherwise, return API built response with items #
-            return build_proxy_response(
-                200, result_set
-            )
-    except Exception as e:
-        return handle_custom_exception(e)
+    result_set = select_all_objects(
+        declarative_meta, request_args, main_connection_session, header_args
+    )
+
+    # Returning API built response #
+    return build_proxy_response(
+        200, result_set
+    )
 
 
 # Method retrieves a given entity by its given 'id' and 'request_args' parameters #
