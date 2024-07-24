@@ -10,10 +10,16 @@ from src.e_Infra.b_Builders.DomainObjectBuilder import build_domain_object_from_
 # Variables Imports #
 from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
-
-# System Imports #
-import datetime
 import re
+
+# Method builds a domain object from a dictionary #
+def build_domain_object_from_dict(declarative_meta, dictionary):
+    # Remove keys with null values #
+    remove_keys_with_null_values(dictionary)
+    # Assigning dictionary to __init__ class method #
+    class_object = declarative_meta(**dictionary)
+    # Returning construct object #
+    return class_object
 
 
 # Method builds a domain query filter object from standard or custom definitions #
@@ -52,12 +58,11 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                     else:
                         if request_args:
                             for key, query_param in request_args.items():
-                                if '[to]' in query_param.lower():
+                                if '[or]' in query_param:
                                     # Apply selecting multiple values #
-                                    query = apply_query_filter_datetime(
+                                    query = apply_query_selecting_multiple_values(
                                         query, query_param, key, declarative_meta)
                                 else:
-                                    validate_datetime_or_date(query_param)
                                     query = resolve_string_filter(
                                         declarative_meta, class_object, attr, query, 'regular')
 
@@ -187,6 +192,45 @@ def apply_query_offset(query, header_args):
                 f"page header can't be defined without limit header"
             )
     return query
+
+
+def apply_query_selecting_multiple_values(query, query_param, key, declarative_meta):
+    column_attributes = [getattr(declarative_meta, col.name)
+                         for col in declarative_meta.__table__.columns]
+
+    query_param = re.sub(
+            r'\s+\[or\]\s+', '[or]', query_param).split('[or]')
+    for field in column_attributes:
+        if field.name == key:
+            query = query.where(field.in_(query_param))
+    return query
+
+
+# Method builds an error message from an object and an exception error cause #
+def build_object_error_message(object_from_body, validation_error):
+    # Constructing empty dictionary object #
+    error_dict = dict()
+    # Populating body #
+    error_dict['body'] = object_from_body
+    # Populating error #
+    error_dict['error'] = validation_error
+    # Returning error object #
+    return error_dict
+
+
+def remove_keys_with_null_values(dictionary):
+    keys_to_delete = list()
+    for key in dictionary:
+        if dictionary[key] is None:
+            keys_to_delete.append(key)
+    for key_to_delete in keys_to_delete:
+        del dictionary[key_to_delete]
+
+
+def fill_missing_keys_with_null_values(declarative_meta, dictionary):
+    dictionary = build_domain_object_from_dict(
+        declarative_meta, dictionary).__dict__
+    del dictionary['_sa_instance_state']
 
 
 def auto_fill_guid_in_request_body(declarative_meta, dictionary):
