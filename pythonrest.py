@@ -166,7 +166,7 @@ def generate(
 
 @app.command()
 def version():
-    typer.echo("pythonrest v0.1.0")
+    typer.echo("pythonrest v0.1.4")
 
 
 if __name__ == "__main__":

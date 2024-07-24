@@ -4,11 +4,15 @@ from sqlalchemy import inspect, func, Time
 # Resolver Imports #
 from src.e_Infra.c_Resolvers.SqlAlchemyStringFilterResolver import *
 
+# Builder Imports #
+from src.e_Infra.b_Builders.DomainObjectBuilder import build_domain_object_from_dict
+
 # Variables Imports #
 from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
 import datetime
 import re
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_date, validate_datetime, validate_time, validate_year
 
 
 # Method builds a domain object from a dictionary #
@@ -58,11 +62,10 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                         if request_args:
                             for key, query_param in request_args.items():
                                 if '[to]' in query_param.lower():
-                                    # Apply selecting multiple values #
+                                    # Apply filter by interval datetime #
                                     query = apply_query_filter_datetime(
                                         query, query_param, key, declarative_meta)
                                 else:
-                                    validate_datetime_or_date(query_param)
                                     query = resolve_string_filter(
                                         declarative_meta, class_object, attr, query, 'regular')
 
@@ -117,8 +120,8 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                 if field.type.python_type in (
                     datetime.date, datetime.datetime, datetime.time, datetime.datetime.timestamp, datetime.date.year
                 ):
-                    date_type = filter_by_inferred_date_range(
-                        start_and_end_dates)
+                    date_type = validate_all_datetime_types(field,
+                                                            start_and_end_dates)
                     print(date_type)
                     if date_type == datetime.time:
                         query = query.filter(func.cast(field, Time).between(
@@ -126,9 +129,6 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                     elif date_type == datetime.date.year:
                         query = query.filter(func.year(field).between(
                             int(start_datetime), int(end_datetime)))
-                    elif date_type == datetime.datetime.timestamp:
-                        query = query.filter(func.cast(field, func.Integer()).between(
-                            start_datetime, end_datetime))
                     else:
                         query = query.filter(
                             field >= str(start_datetime), field <= str(end_datetime))
@@ -144,38 +144,23 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
     return query
 
 
-def validate_datetime_or_date(query_param):
-    try:
-        # Attempt to convert the string to a datetime object
-        datetime.datetime.fromisoformat(query_param)
-    except ValueError:
-        # Handle invalid input and raise your custom error
-        raise Exception(
-            f"Invalid date or datetime format. Please provide a valid YYYY-MM-DD or YYYY-MM-DD HH:MM:SS string."
-        )
-
-
-def filter_by_inferred_date_range(start_and_end_strings):
-    format_patterns = {
-        # Date format: YYYY-MM-DD
-        r"^\d{4}-\d{1,2}-\d{1,2}$": datetime.date,
-
-        # Datetime format: YYYY-MM-DD HH:MM:SS[.mmm]
-        r"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{1,3})?$": datetime.datetime,
-
-        # Time format: HH:MM:SS[.mmm]
-        r"\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{1,3})?$": datetime.time,
-
-        # Year format: YYYY
-        r"^\d{4}$": datetime.date.year,
-
-        # Timestamp format: Unix timestamp
-        r"\d+$": datetime.datetime.fromtimestamp,
+def validate_all_datetime_types(column, start_and_end_strings):
+    functions_validate_date = {
+        validate_date(column, data): datetime.date,
+        validate_datetime(column, data): datetime.datetime,
+        validate_time(column, data): datetime.time,
+        validate_year(column, data): datetime.datetime.year
     }
-
-    for pattern, date_type in format_patterns.items():
-        if re.match(pattern, start_and_end_strings[0]) and re.match(pattern, start_and_end_strings[1]):
-            return date_type
+    for data in start_and_end_strings:
+        data = {column: data}
+        for function_validate, date_type in functions_validate_date.items():
+            try:
+                if function_validate is None:
+                    return date_type
+            except Exception as e:
+                pass
+    raise Exception(
+        f'Failed to validate {column.name} as datetime, date, or time')
 
 
 def apply_query_offset(query, header_args):

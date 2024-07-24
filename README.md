@@ -47,7 +47,7 @@ familiar with package managers, we have options for that below.
 ### Chocolatey
 
 ```ps
-choco install pythonrest --version=0.1.0
+choco install pythonrest
 ```
 
 ### Pip
