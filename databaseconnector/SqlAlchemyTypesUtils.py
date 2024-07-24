@@ -139,7 +139,7 @@ def get_sa_PgSQL_string_types_list():
             'bit', 'BIT', 'cidr', 'macaddr', 'macaddr8', 'json', 'JSON', 'timestamptz', 'timetz',
             'point', 'line', 'lseg', 'box', 'path', 'polygon', 'circle', 'pg_lsn', 'pg_snapshot',
             'regclass', 'regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator',
-            'regprocedure', 'regtype', 'regrole', 'regproc',
+            'regprocedure', 'regtype', 'regrole', 'regproc', 'MONEY',
             'regprocregproc', 'USER-DEFINED','tsvector', 'tsquery',  # On this line there are non-supported types that will be cast to string to avoid errors
             'int4range', 'int8range', 'numrange', 'tsrange', 'tstzrange', 'daterange']  # On this line there are types that support types that will be cast to string to avoid errors
 
@@ -153,7 +153,7 @@ def get_sa_PgSQL_int_types_list():
 
 
 def get_sa_PgSQL_float_types_list():
-    return ['Float', 'DECIMAL', 'FLOAT', 'NUMERIC', 'Numeric', 'REAL', 'MONEY']
+    return ['Float', 'DECIMAL', 'FLOAT', 'NUMERIC', 'Numeric', 'REAL']
 
 
 def get_sa_PgSQL_bool_types_list():
@@ -178,7 +178,7 @@ def get_sa_SeSQL_bytes_types_list():
 
 
 def get_sa_SeSQL_int_types_list():
-    return ['bigint', 'numeric', 'bit', 'smallint', 'decimal', 'smallmoney', 'int', 'tinyint', 'money']
+    return ['bigint', 'numeric', 'bit', 'smallint', 'decimal', 'smallmoney', 'int', 'tinyint']
 
 
 def get_sa_SeSQL_float_types_list():
