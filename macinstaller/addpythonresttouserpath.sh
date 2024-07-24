@@ -1,4 +1,4 @@
-desired_entry='/usr/bin/python-rest'
+desired_entry='/usr/local/bin/pythonrest'
 bash_profile="$HOME/.bash_profile"
 zshrc="$HOME/.zshrc"
 

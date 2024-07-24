@@ -27,12 +27,12 @@ VSVersionInfo(
           '040904B0',  # Language and character set identifier
           [StringStruct('CompanyName', 'Seven Technologies'),
            StringStruct('FileDescription', 'Installable version of PythonREST, the next level REST API Generator for Python projects! Create a full application with a single CLI command and experience months of project development in a few seconds'),
-           StringStruct('FileVersion', '0.0.1.0'),
+           StringStruct('FileVersion', '0.0.1.4'),
            StringStruct('InternalName', 'PythonRest'),
            StringStruct('LegalCopyright', 'Copyright © 2024 Seven Technologies'),
            StringStruct('OriginalFilename', 'pythonrest.exe'),
            StringStruct('ProductName', 'PythonREST'),
-           StringStruct('ProductVersion', '0.0.1.0')]
+           StringStruct('ProductVersion', '0.0.1.4')]
         )
       ]
     ),

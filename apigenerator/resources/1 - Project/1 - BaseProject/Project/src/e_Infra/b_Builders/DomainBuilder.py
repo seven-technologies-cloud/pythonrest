@@ -1,14 +1,16 @@
 # SqlAlchemy Imports
-from sqlalchemy import inspect
+from sqlalchemy import inspect, func, Time
 
 # Resolver Imports #
 from src.e_Infra.c_Resolvers.SqlAlchemyStringFilterResolver import *
+
+# Builder Imports #
+from src.e_Infra.b_Builders.DomainObjectBuilder import build_domain_object_from_dict
 
 # Variables Imports #
 from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
 import re
-
 
 # Method builds a domain object from a dictionary #
 def build_domain_object_from_dict(declarative_meta, dictionary):
@@ -101,6 +103,79 @@ def apply_query_limit(query, header_args, limit):
         else:
             query = query.limit(int(limit_value))
     return query
+
+
+def apply_query_filter_datetime(query, query_param, key, declarative_meta):
+    column_attributes = [getattr(declarative_meta, col.name)
+                         for col in declarative_meta.__table__.columns]
+    if query_param.count("[to]") == 1:
+        start_and_end_dates = re.sub(
+            r'\s+\[to\]\s+', '[to]', query_param).split('[to]')
+        for field in column_attributes:
+            if field.name == key:
+                start_datetime, end_datetime = start_and_end_dates
+                if field.type.python_type in (
+                    datetime.date, datetime.datetime, datetime.time, datetime.datetime.timestamp, datetime.date.year
+                ):
+                    date_type = filter_by_inferred_date_range(
+                        start_and_end_dates)
+                    print(date_type)
+                    if date_type == datetime.time:
+                        query = query.filter(func.cast(field, Time).between(
+                            start_datetime, end_datetime))
+                    elif date_type == datetime.date.year:
+                        query = query.filter(func.year(field).between(
+                            int(start_datetime), int(end_datetime)))
+                    elif date_type == datetime.datetime.timestamp:
+                        query = query.filter(func.cast(field, func.Integer()).between(
+                            start_datetime, end_datetime))
+                    else:
+                        query = query.filter(
+                            field >= str(start_datetime), field <= str(end_datetime))
+                        return query
+                else:
+                    raise Exception(
+                        f"[to] is not supported on given query param"
+                    )
+    else:
+        raise Exception(
+            f"datetime filter invalid, can only contain one [to]"
+        )
+    return query
+
+
+def validate_datetime_or_date(query_param):
+    try:
+        # Attempt to convert the string to a datetime object
+        datetime.datetime.fromisoformat(query_param)
+    except ValueError:
+        # Handle invalid input and raise your custom error
+        raise Exception(
+            f"Invalid date or datetime format. Please provide a valid YYYY-MM-DD or YYYY-MM-DD HH:MM:SS string."
+        )
+
+
+def filter_by_inferred_date_range(start_and_end_strings):
+    format_patterns = {
+        # Date format: YYYY-MM-DD
+        r"^\d{4}-\d{1,2}-\d{1,2}$": datetime.date,
+
+        # Datetime format: YYYY-MM-DD HH:MM:SS[.mmm]
+        r"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{1,3})?$": datetime.datetime,
+
+        # Time format: HH:MM:SS[.mmm]
+        r"\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{1,3})?$": datetime.time,
+
+        # Year format: YYYY
+        r"^\d{4}$": datetime.date.year,
+
+        # Timestamp format: Unix timestamp
+        r"\d+$": datetime.datetime.fromtimestamp,
+    }
+
+    for pattern, date_type in format_patterns.items():
+        if re.match(pattern, start_and_end_strings[0]) and re.match(pattern, start_and_end_strings[1]):
+            return date_type
 
 
 def apply_query_offset(query, header_args):

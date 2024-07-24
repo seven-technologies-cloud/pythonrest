@@ -1,4 +1,4 @@
-desired_entry='/usr/bin/python-rest'
+desired_entry='/usr/local/bin/pythonrest'
 
 if [ -n "$BASH_VERSION" ]; then
     profile_file="$HOME/.bash_profile"
