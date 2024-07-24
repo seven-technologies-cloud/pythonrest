@@ -38,4 +38,3 @@ def control_route_delete_by_full_match():
     if request.method == 'DELETE':
         result = delete_control_by_full_match(request.json)
         return result
-
