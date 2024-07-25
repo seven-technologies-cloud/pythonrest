@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sql-server-database-mapper
+    environment:
+      SA_PASSWORD: 24ad0a77-c59b-4479-b508-72b83615f8ed
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - "./database_mapper_sqlserver.sql:/docker-entrypoint-initdb.d/1.sql"
