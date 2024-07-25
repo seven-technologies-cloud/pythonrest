@@ -12,8 +12,7 @@ from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
 import datetime
 import re
-from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_date, validate_datetime, validate_time, validate_year
-from dateutil.parser import parse
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_date, validate_datetime, validate_time, validate_year, validate_year_month
 
 
 # Method builds a domain object from a dictionary #
@@ -133,10 +132,10 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                         start_year, start_month = start_datetime.split('-')
                         end_year, end_month = end_datetime.split('-')
                         query = query.filter(extract('year', field).between(
-                            start_year, end_year), extract('month', field).between(start_month, end_month))
+                            int(start_year), int(end_year)), extract('month', field).between(int(start_month), int(end_month)))
                     else:
                         query = query.filter(
-                            field >= str(start_datetime), field <= str(end_datetime))
+                            field.between(str(start_datetime), str(end_datetime)))
                         return query
                 else:
                     date_type = validate_all_datetime_types(field,
@@ -157,23 +156,39 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
 
 
 def validate_all_datetime_types(column, start_and_end_strings):
-    for value in start_and_end_strings:
+    for data in start_and_end_strings:
+        data = {column.name: data}
         try:
-            datetime_obj = parse(value)
+            validate_datetime(column, data)
+            return 'datetime'
+        except Exception:
+            pass
 
-            if str(datetime_obj.time()) == value:
-                return 'time'
-            elif str(datetime_obj.date()) == value:
-                return 'date'
-            elif str(datetime_obj.year) == value:
-                return 'year'
-            elif str(datetime_obj) == value:
-                return 'datetime'
-            else:
-                return 'year-month'
-        except ValueError:
-            raise Exception(
-                f'Failed to validate {column.name} as datetime, date, or time')
+        try:
+            validate_date(column, data)
+            return 'date'
+        except Exception:
+            pass
+
+        try:
+            validate_time(column, data)
+            return 'time'
+        except Exception:
+            pass
+
+        try:
+            validate_year_month(column, data)
+            return 'year-month'
+        except Exception:
+            pass
+
+        try:
+            validate_year(column, data)
+            return 'year'
+        except Exception:
+            pass
+    raise Exception(
+        f'Failed to validate {column.name} as datetime, date, or time')
 
 
 def apply_query_offset(query, header_args):

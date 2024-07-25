@@ -82,15 +82,40 @@ def validate_time(column, request_data):
 
 
 def validate_year(column, start_and_end_strings):
-    for year in start_and_end_strings:
+    for key, year in start_and_end_strings.items():
         try:
-            re.match(r"^\d{4}$", year)
-            date_type = datetime.year
-            return
+            if re.match(r"^\d{4}$", year) and '-' not in year and '/' not in year:
+                year_integer = int(year)
+                date_obj = datetime.date(year_integer, 1, 1)
+
+                if date_obj.year == year_integer:
+                    continue
         except Exception as e:
-            del e
+            print(f"Error processing year {year}: {e}")
             continue
+        else:
+            # If all validations pass, return here
+            return
+
+    # If we reach here, it means no valid year was found
     raise Exception(f'Invalid year value for {column.name} attribute')
+
+
+def validate_year_month(column, start_and_end_strings):
+    for key, date_str in start_and_end_strings.items():
+        try:
+            print(date_str)
+            year_month = datetime.datetime.strptime('2023-03', "%Y-%m")
+            print(year_month)
+        except Exception as e:
+            print(f"Error processing year and month {year_month}: {e}")
+            continue
+        else:
+            # If all validations pass, return here
+            return
+
+    # If we reach here, it means no valid year was found
+    raise Exception(f'Invalid year-month value for {column.name} attribute')
 
 
 def validate_and_parse_interval(column, request_data):
