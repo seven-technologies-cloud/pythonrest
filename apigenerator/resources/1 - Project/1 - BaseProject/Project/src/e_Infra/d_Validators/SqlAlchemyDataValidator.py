@@ -82,9 +82,9 @@ def validate_time(column, request_data):
 
 
 def validate_year(column, start_and_end_strings):
-    for key, year in start_and_end_strings.items():
+    for year in start_and_end_strings:
         try:
-            if re.match(r"^\d{4}$", year) and '-' not in year and '/' not in year:
+            if re.match(r"^\d{4}$", year):
                 year_integer = int(year)
                 date_obj = datetime.date(year_integer, 1, 1)
 

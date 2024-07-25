@@ -177,14 +177,14 @@ def validate_all_datetime_types(column, start_and_end_strings):
             pass
 
         try:
-            validate_year_month(column, data)
-            return 'year-month'
+            validate_year(column, data)
+            return 'year'
         except Exception:
             pass
 
         try:
-            validate_year(column, data)
-            return 'year'
+            validate_year_month(column, data)
+            return 'year-month'
         except Exception:
             pass
     raise Exception(
