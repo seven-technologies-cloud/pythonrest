@@ -84,12 +84,13 @@ def validate_time(column, request_data):
 def validate_year(column, start_and_end_strings):
     for year in start_and_end_strings:
         try:
-            if re.match(r"^\d{4}$", year):
-                year_integer = int(year)
-                date_obj = datetime.date(year_integer, 1, 1)
+            if '-' not in year and '/' not in year:
+                if re.match(r"^\d{4}$", year):
+                    year_integer = int(year)
+                    date_obj = datetime.date(year_integer, 1, 1)
 
-                if date_obj.year == year_integer:
-                    continue
+                    if date_obj.year == year_integer:
+                        continue
         except Exception as e:
             print(f"Error processing year {year}: {e}")
             continue
@@ -104,11 +105,27 @@ def validate_year(column, start_and_end_strings):
 def validate_year_month(column, start_and_end_strings):
     for key, date_str in start_and_end_strings.items():
         try:
-            print(date_str)
-            year_month = datetime.datetime.strptime('2023-03', "%Y-%m")
-            print(year_month)
+            if '-' in date_str:
+                year_month = date_str.split('-')
+                if len(year_month[0]) == 4:
+                    date_str = f'{date_str}-01'
+                    validate_date(column, {column.name: date_str})
+                else:
+                    date_str = f'01-{date_str}'
+                    validate_date(column, {column.name: date_str})
+            elif '/' in date_str:
+                year_month = date_str.split('/')
+                if len(year_month[0]) == 4:
+                    date_str = f'{date_str}/01'
+                    validate_date(column, {column.name: date_str})
+                else:
+                    date_str = f'01/{date_str}'
+                    validate_date(column, {column.name: date_str})
+            else:
+                raise Exception(
+                    f'Invalid year-month value for {column.name} attribute')
         except Exception as e:
-            print(f"Error processing year and month {year_month}: {e}")
+            print(f"Error processing year and month {date_str}: {e}")
             continue
         else:
             # If all validations pass, return here

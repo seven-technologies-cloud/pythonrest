@@ -122,6 +122,7 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                 ):
                     date_type = validate_all_datetime_types(field,
                                                             start_and_end_dates)
+                    print(date_type)
                     if date_type == 'time':
                         query = query.filter(func.cast(field, Time).between(
                             start_datetime, end_datetime))
@@ -129,10 +130,24 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                         query = query.filter(func.year(field).between(
                             int(start_datetime), int(end_datetime)))
                     elif date_type == 'year-month':
-                        start_year, start_month = start_datetime.split('-')
-                        end_year, end_month = end_datetime.split('-')
-                        query = query.filter(extract('year', field).between(
-                            int(start_year), int(end_year)), extract('month', field).between(int(start_month), int(end_month)))
+                        if '-' in start_datetime and '-' in end_datetime:
+                            start_year_month = start_datetime.split('-')
+                            end_year_month = end_datetime.split('-')
+                            if len(start_year_month[0]) == 4 and len(end_year_month[0]) == 4:
+                                query = query.filter(func.date_format(
+                                    field, '%Y-%m').between(start_datetime, end_datetime))
+                            else:
+                                query = query.filter(func.date_format(
+                                    field, '%m-%Y').between(start_datetime, end_datetime))
+                        else:
+                            start_year_month = start_datetime.split('/')
+                            end_year_month = end_datetime.split('/')
+                            if len(start_year_month[0]) == 4 and len(end_year_month[0]) == 4:
+                                query = query.filter(func.date_format(
+                                    field, '%Y/%m').between(start_datetime, end_datetime))
+                            else:
+                                query = query.filter(func.date_format(
+                                    field, '%m/%Y').between(start_datetime, end_datetime))
                     else:
                         query = query.filter(
                             field.between(str(start_datetime), str(end_datetime)))
