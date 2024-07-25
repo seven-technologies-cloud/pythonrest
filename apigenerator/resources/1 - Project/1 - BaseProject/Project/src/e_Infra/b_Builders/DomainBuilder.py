@@ -1,5 +1,5 @@
 # SqlAlchemy Imports
-from sqlalchemy import inspect, func, Time
+from sqlalchemy import inspect, func, Time, extract
 
 # Resolver Imports #
 from src.e_Infra.c_Resolvers.SqlAlchemyStringFilterResolver import *
@@ -123,21 +123,32 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                 ):
                     date_type = validate_all_datetime_types(field,
                                                             start_and_end_dates)
-                    print(date_type)
                     if date_type == 'time':
                         query = query.filter(func.cast(field, Time).between(
                             start_datetime, end_datetime))
                     elif date_type == 'year':
                         query = query.filter(func.year(field).between(
                             int(start_datetime), int(end_datetime)))
+                    elif date_type == 'year-month':
+                        start_year, start_month = start_datetime.split('-')
+                        end_year, end_month = end_datetime.split('-')
+                        query = query.filter(extract('year', field).between(
+                            start_year, end_year), extract('month', field).between(start_month, end_month))
                     else:
                         query = query.filter(
                             field >= str(start_datetime), field <= str(end_datetime))
                         return query
                 else:
-                    raise Exception(
-                        f"[to] is not supported on given query param"
-                    )
+                    date_type = validate_all_datetime_types(field,
+                                                            start_and_end_dates)
+                    if date_type == 'year':
+                        query = query.filter(
+                            field >= str(start_datetime), field <= str(end_datetime))
+                        return query
+                    else:
+                        raise Exception(
+                            f"[to] is not supported on given query param"
+                        )
     else:
         raise Exception(
             f"datetime filter invalid, can only contain one [to]"
@@ -156,10 +167,13 @@ def validate_all_datetime_types(column, start_and_end_strings):
                 return 'date'
             elif str(datetime_obj.year) == value:
                 return 'year'
-            else:
+            elif str(datetime_obj) == value:
                 return 'datetime'
+            else:
+                return 'year-month'
         except ValueError:
-            raise Exception(f'Failed to validate {column.name} as datetime, date, or time')
+            raise Exception(
+                f'Failed to validate {column.name} as datetime, date, or time')
 
 
 def apply_query_offset(query, header_args):
