@@ -1,5 +1,5 @@
 # SqlAlchemy Imports
-from sqlalchemy import inspect, func, Time
+from sqlalchemy import inspect, func, Time, extract
 
 # Resolver Imports #
 from src.e_Infra.c_Resolvers.SqlAlchemyStringFilterResolver import *
@@ -10,7 +10,19 @@ from src.e_Infra.b_Builders.DomainObjectBuilder import build_domain_object_from_
 # Variables Imports #
 from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
+import datetime
 import re
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_date, validate_datetime, validate_time, validate_year, validate_year_month
+
+
+# Method builds a domain object from a dictionary #
+def build_domain_object_from_dict(declarative_meta, dictionary):
+    # Remove keys with null values #
+    remove_keys_with_null_values(dictionary)
+    # Assigning dictionary to __init__ class method #
+    class_object = declarative_meta(**dictionary)
+    # Returning construct object #
+    return class_object
 
 # Method builds a domain object from a dictionary #
 def build_domain_object_from_dict(declarative_meta, dictionary):
@@ -58,7 +70,12 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                     else:
                         if request_args:
                             for key, query_param in request_args.items():
-                                if '[or]' in query_param:
+
+                                if '[to]' in query_param.lower():
+                                    # Apply filter by interval datetime #
+                                    query = apply_query_filter_datetime(
+                                      query, query_param, key, declarative_meta)
+                                elif '[or]' in query_param.lower():
                                     # Apply selecting multiple values #
                                     query = apply_query_selecting_multiple_values(
                                         query, query_param, key, declarative_meta)
@@ -117,26 +134,49 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                 if field.type.python_type in (
                     datetime.date, datetime.datetime, datetime.time, datetime.datetime.timestamp, datetime.date.year
                 ):
-                    date_type = filter_by_inferred_date_range(
-                        start_and_end_dates)
+                    date_type = validate_all_datetime_types(field,
+                                                            start_and_end_dates)
                     print(date_type)
-                    if date_type == datetime.time:
+                    if date_type == 'time':
                         query = query.filter(func.cast(field, Time).between(
                             start_datetime, end_datetime))
-                    elif date_type == datetime.date.year:
+                    elif date_type == 'year':
                         query = query.filter(func.year(field).between(
                             int(start_datetime), int(end_datetime)))
-                    elif date_type == datetime.datetime.timestamp:
-                        query = query.filter(func.cast(field, func.Integer()).between(
-                            start_datetime, end_datetime))
+                    elif date_type == 'year-month':
+                        if '-' in start_datetime and '-' in end_datetime:
+                            start_year_month = start_datetime.split('-')
+                            end_year_month = end_datetime.split('-')
+                            if len(start_year_month[0]) == 4 and len(end_year_month[0]) == 4:
+                                query = query.filter(func.date_format(
+                                    field, '%Y-%m').between(start_datetime, end_datetime))
+                            else:
+                                query = query.filter(func.date_format(
+                                    field, '%m-%Y').between(start_datetime, end_datetime))
+                        else:
+                            start_year_month = start_datetime.split('/')
+                            end_year_month = end_datetime.split('/')
+                            if len(start_year_month[0]) == 4 and len(end_year_month[0]) == 4:
+                                query = query.filter(func.date_format(
+                                    field, '%Y/%m').between(start_datetime, end_datetime))
+                            else:
+                                query = query.filter(func.date_format(
+                                    field, '%m/%Y').between(start_datetime, end_datetime))
                     else:
+                        query = query.filter(
+                            field.between(str(start_datetime), str(end_datetime)))
+                        return query
+                else:
+                    date_type = validate_all_datetime_types(field,
+                                                            start_and_end_dates)
+                    if date_type == 'year':
                         query = query.filter(
                             field >= str(start_datetime), field <= str(end_datetime))
                         return query
-                else:
-                    raise Exception(
-                        f"[to] is not supported on given query param"
-                    )
+                    else:
+                        raise Exception(
+                            f"[to] is not supported on given query param"
+                        )
     else:
         raise Exception(
             f"datetime filter invalid, can only contain one [to]"
@@ -144,38 +184,40 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
     return query
 
 
-def validate_datetime_or_date(query_param):
-    try:
-        # Attempt to convert the string to a datetime object
-        datetime.datetime.fromisoformat(query_param)
-    except ValueError:
-        # Handle invalid input and raise your custom error
-        raise Exception(
-            f"Invalid date or datetime format. Please provide a valid YYYY-MM-DD or YYYY-MM-DD HH:MM:SS string."
-        )
+def validate_all_datetime_types(column, start_and_end_strings):
+    for data in start_and_end_strings:
+        data = {column.name: data}
+        try:
+            validate_datetime(column, data)
+            return 'datetime'
+        except Exception:
+            pass
 
+        try:
+            validate_date(column, data)
+            return 'date'
+        except Exception:
+            pass
 
-def filter_by_inferred_date_range(start_and_end_strings):
-    format_patterns = {
-        # Date format: YYYY-MM-DD
-        r"^\d{4}-\d{1,2}-\d{1,2}$": datetime.date,
+        try:
+            validate_time(column, data)
+            return 'time'
+        except Exception:
+            pass
 
-        # Datetime format: YYYY-MM-DD HH:MM:SS[.mmm]
-        r"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{1,3})?$": datetime.datetime,
+        try:
+            validate_year(column, data)
+            return 'year'
+        except Exception:
+            pass
 
-        # Time format: HH:MM:SS[.mmm]
-        r"\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{1,3})?$": datetime.time,
-
-        # Year format: YYYY
-        r"^\d{4}$": datetime.date.year,
-
-        # Timestamp format: Unix timestamp
-        r"\d+$": datetime.datetime.fromtimestamp,
-    }
-
-    for pattern, date_type in format_patterns.items():
-        if re.match(pattern, start_and_end_strings[0]) and re.match(pattern, start_and_end_strings[1]):
-            return date_type
+        try:
+            validate_year_month(column, data)
+            return 'year-month'
+        except Exception:
+            pass
+    raise Exception(
+        f'Failed to validate {column.name} as datetime, date, or time')
 
 
 def apply_query_offset(query, header_args):
@@ -193,7 +235,6 @@ def apply_query_offset(query, header_args):
             )
     return query
 
-
 def apply_query_selecting_multiple_values(query, query_param, key, declarative_meta):
     column_attributes = [getattr(declarative_meta, col.name)
                          for col in declarative_meta.__table__.columns]
@@ -204,7 +245,6 @@ def apply_query_selecting_multiple_values(query, query_param, key, declarative_m
         if field.name == key:
             query = query.where(field.in_(query_param))
     return query
-
 
 # Method builds an error message from an object and an exception error cause #
 def build_object_error_message(object_from_body, validation_error):
