@@ -4,7 +4,7 @@ import re
 
 # This function will check for column types that can't use flask admin filters, to then remove them on the build of column_filters
 def extract_columns_to_exclude_from_column_filters(file_path):
-    types_to_exclude_from_column_filters = [r"^.*\bsa\.JSON\b.*$"]
+    types_to_exclude_from_column_filters = [r"^.*\bsa\.JSON\b.*$"] # TODO add a reference to the MySQL SET data type
 
     columns = []
 
@@ -74,13 +74,16 @@ def generate_flask_admin_files(result, project_domain_folder, domain_files):
         admin_views += f"admin.add_view({model_name}ModelView({model_name}, get_mysql_connection_session()))\n"
 
     # Write FlaskAdminModelViews.py
-    with open(os.path.join(project_domain_folder, 'FlaskAdminModelViews.py'), 'w') as file:
+    if not os.path.exists(os.path.join(project_domain_folder, 'a_FlaskAdminPanel')):
+        os.makedirs(os.path.join(project_domain_folder, 'a_FlaskAdminPanel'))
+
+    with open(os.path.join(project_domain_folder, 'a_FlaskAdminPanel', 'FlaskAdminModelViews.py'), 'w') as file:
         file.write(views_code)
 
     # Write FlaskAdminPanelBuilder.py
     builder_code = f"""from src.e_Infra.b_Builders.FlaskBuilder import app_handler
 from flask_admin import Admin
-from src.c_Domain.FlaskAdminModelViews import *
+from src.c_Domain.a_FlaskAdminPanel.FlaskAdminModelViews import *
 from src.e_Infra.c_Resolvers.MySqlConnectionResolver import get_mysql_connection_session
 {model_imports}
 

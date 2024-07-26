@@ -5,6 +5,7 @@ from apigenerator.b_Workers.ProjectFinalizer import *
 from apigenerator.b_Workers.EnvironmentVariablesWorker import *
 from apigenerator.b_Workers.DirectoryManager import copy_domain_files
 from apigenerator.f_Builders.FlaskAdminBuilder import build_flask_admin_files
+from apigenerator.f_Builders.RedocBuilder import modify_redoc_related_files
 
 
 def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists):
@@ -40,6 +41,9 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ---------------------------------- Flask-Admin ---------------------------------- #
         build_flask_admin_files(result_full_path, proj_domain_folder)
+
+        # ------------------------------------ Redoc -------------------------------------- #
+        modify_redoc_related_files(result_full_path, proj_domain_folder, script_absolute_path)
     except Exception as e:
         print(e)
         return
