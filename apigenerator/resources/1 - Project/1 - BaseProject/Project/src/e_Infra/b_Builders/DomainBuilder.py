@@ -24,6 +24,15 @@ def build_domain_object_from_dict(declarative_meta, dictionary):
     # Returning construct object #
     return class_object
 
+# Method builds a domain object from a dictionary #
+def build_domain_object_from_dict(declarative_meta, dictionary):
+    # Remove keys with null values #
+    remove_keys_with_null_values(dictionary)
+    # Assigning dictionary to __init__ class method #
+    class_object = declarative_meta(**dictionary)
+    # Returning construct object #
+    return class_object
+
 
 # Method builds a domain query filter object from standard or custom definitions #
 def build_query_from_api_request(declarative_meta, request_args, session, header_args=None, limit=False):
@@ -61,9 +70,14 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                     else:
                         if request_args:
                             for key, query_param in request_args.items():
+
                                 if '[to]' in query_param.lower():
                                     # Apply filter by interval datetime #
                                     query = apply_query_filter_datetime(
+                                      query, query_param, key, declarative_meta)
+                                elif '[or]' in query_param.lower():
+                                    # Apply selecting multiple values #
+                                    query = apply_query_selecting_multiple_values(
                                         query, query_param, key, declarative_meta)
                                 else:
                                     query = resolve_string_filter(
@@ -221,6 +235,16 @@ def apply_query_offset(query, header_args):
             )
     return query
 
+def apply_query_selecting_multiple_values(query, query_param, key, declarative_meta):
+    column_attributes = [getattr(declarative_meta, col.name)
+                         for col in declarative_meta.__table__.columns]
+
+    query_param = re.sub(
+            r'\s+\[or\]\s+', '[or]', query_param).split('[or]')
+    for field in column_attributes:
+        if field.name == key:
+            query = query.where(field.in_(query_param))
+    return query
 
 # Method builds an error message from an object and an exception error cause #
 def build_object_error_message(object_from_body, validation_error):
