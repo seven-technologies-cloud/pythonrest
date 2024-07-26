@@ -12,26 +12,7 @@ from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
 import datetime
 import re
-from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_date, validate_datetime, validate_time, validate_year, validate_year_month
-
-
-# Method builds a domain object from a dictionary #
-def build_domain_object_from_dict(declarative_meta, dictionary):
-    # Remove keys with null values #
-    remove_keys_with_null_values(dictionary)
-    # Assigning dictionary to __init__ class method #
-    class_object = declarative_meta(**dictionary)
-    # Returning construct object #
-    return class_object
-
-# Method builds a domain object from a dictionary #
-def build_domain_object_from_dict(declarative_meta, dictionary):
-    # Remove keys with null values #
-    remove_keys_with_null_values(dictionary)
-    # Assigning dictionary to __init__ class method #
-    class_object = declarative_meta(**dictionary)
-    # Returning construct object #
-    return class_object
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_all_datetime_types
 
 
 # Method builds a domain query filter object from standard or custom definitions #
@@ -184,42 +165,6 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
     return query
 
 
-def validate_all_datetime_types(column, start_and_end_strings):
-    for data in start_and_end_strings:
-        data = {column.name: data}
-        try:
-            validate_datetime(column, data)
-            return 'datetime'
-        except Exception:
-            pass
-
-        try:
-            validate_date(column, data)
-            return 'date'
-        except Exception:
-            pass
-
-        try:
-            validate_time(column, data)
-            return 'time'
-        except Exception:
-            pass
-
-        try:
-            validate_year(column, data)
-            return 'year'
-        except Exception:
-            pass
-
-        try:
-            validate_year_month(column, data)
-            return 'year-month'
-        except Exception:
-            pass
-    raise Exception(
-        f'Failed to validate {column.name} as datetime, date, or time')
-
-
 def apply_query_offset(query, header_args):
     header_args = dict() if header_args is None else header_args
     if header_args.get('HTTP_PAGE') is not None:
@@ -235,6 +180,7 @@ def apply_query_offset(query, header_args):
             )
     return query
 
+
 def apply_query_selecting_multiple_values(query, query_param, key, declarative_meta):
     column_attributes = [getattr(declarative_meta, col.name)
                          for col in declarative_meta.__table__.columns]
@@ -245,32 +191,6 @@ def apply_query_selecting_multiple_values(query, query_param, key, declarative_m
         if field.name == key:
             query = query.where(field.in_(query_param))
     return query
-
-# Method builds an error message from an object and an exception error cause #
-def build_object_error_message(object_from_body, validation_error):
-    # Constructing empty dictionary object #
-    error_dict = dict()
-    # Populating body #
-    error_dict['body'] = object_from_body
-    # Populating error #
-    error_dict['error'] = validation_error
-    # Returning error object #
-    return error_dict
-
-
-def remove_keys_with_null_values(dictionary):
-    keys_to_delete = list()
-    for key in dictionary:
-        if dictionary[key] is None:
-            keys_to_delete.append(key)
-    for key_to_delete in keys_to_delete:
-        del dictionary[key_to_delete]
-
-
-def fill_missing_keys_with_null_values(declarative_meta, dictionary):
-    dictionary = build_domain_object_from_dict(
-        declarative_meta, dictionary).__dict__
-    del dictionary['_sa_instance_state']
 
 
 def auto_fill_guid_in_request_body(declarative_meta, dictionary):

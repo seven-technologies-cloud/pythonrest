@@ -8,7 +8,7 @@ from src.e_Infra.GlobalVariablesManager import *
 from sqlalchemy.inspection import inspect
 
 # System Imports #
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import re
 
 # Flask Imports #
@@ -81,22 +81,18 @@ def validate_time(column, request_data):
     raise Exception(f'Invalid time value for {column.name} attribute')
 
 
-def validate_year(column, start_and_end_strings):
-    for year in start_and_end_strings:
-        try:
-            if '-' not in year and '/' not in year:
-                if re.match(r"^\d{4}$", year):
-                    year_integer = int(year)
-                    date_obj = datetime.date(year_integer, 1, 1)
+def validate_year(column, year):
+    year_value = year[column.name]
+    try:
+        if '-' not in year_value and '/' not in year_value and year_value.isdigit():
+            if re.match(r"^\d{4}$", year_value):
+                year_integer = int(year_value)
+                date_obj = date(year_integer, 1, 1)
 
-                    if date_obj.year == year_integer:
-                        continue
-        except Exception as e:
-            print(f"Error processing year {year}: {e}")
-            continue
-        else:
-            # If all validations pass, return here
-            return
+                if date_obj.year == year_integer:
+                    return 'year'
+    except Exception as e:
+        raise Exception(f"Error processing year {year_value}: {e}")
 
     # If we reach here, it means no valid year was found
     raise Exception(f'Invalid year value for {column.name} attribute')
@@ -133,6 +129,42 @@ def validate_year_month(column, start_and_end_strings):
 
     # If we reach here, it means no valid year was found
     raise Exception(f'Invalid year-month value for {column.name} attribute')
+
+
+def validate_all_datetime_types(column, start_and_end_strings):
+    for data in start_and_end_strings:
+        data = {column.name: data}
+        try:
+            validate_datetime(column, data)
+            return 'datetime'
+        except Exception:
+            pass
+
+        try:
+            validate_date(column, data)
+            return 'date'
+        except Exception:
+            pass
+
+        try:
+            validate_time(column, data)
+            return 'time'
+        except Exception:
+            pass
+
+        try:
+            year = validate_year(column, data)
+            return year
+        except Exception:
+            pass
+
+        try:
+            validate_year_month(column, data)
+            return 'year-month'
+        except Exception:
+            pass
+    raise Exception(
+        f'Failed to validate {column.name} as datetime, date, or time')
 
 
 def validate_and_parse_interval(column, request_data):
