@@ -31,11 +31,12 @@ def check_if_given_result_path_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
-        "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\bin", "\\boot",  "\\dev", "\\etc", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32", "\\opt",
+        "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr", "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "/System", "/Library", "/Applications", "/private/var", "/Users",
+        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\tmp", "\\cores", "\\opt", 
+        "\\private\\var", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\usr",
 
         # Windows sensitive paths
         "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)"
@@ -50,11 +51,12 @@ def check_if_given_result_path_is_unsafe(path):
         "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "/System", "/Library", "/Applications", "/private/var", "/Users",
+        "\\", "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\home", "\\tmp", "\\cores", "\\opt", 
+        "\\private\\var", "\\Users", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\usr",
 
         # Windows sensitive paths
         "C:", "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
-    ]
+    ]				
 
     path = path.lower()
 
@@ -84,11 +86,12 @@ def check_if_current_working_directory_is_unsafe(path):
 
     sensitive_startswith_paths = [
         # Linux sensitive paths
-        "/bin", "/boot",  "/dev", "/etc", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/opt",
-        "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\bin", "\\boot", "\\dev", "\\etc", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32", "\\opt",
+        "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr", "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "/System", "/Library", "/Applications", "/private/var", "/Users",
+        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\tmp", "\\cores", "\\opt", 
+        "\\private\\var", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\usr",
 
         # Windows sensitive paths
         "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)"
@@ -102,7 +105,8 @@ def check_if_current_working_directory_is_unsafe(path):
         "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "/System", "/Library", "/Applications", "/private/var", "/Users",
+        "\\", "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\home", "\\tmp", "\\cores", "\\opt", 
+        "\\private\\var", "\\Users", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\usr",
 
         # Windows sensitive paths
         "C:", "C:\\ProgramData", "C:\\WINDOWS", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"
@@ -136,11 +140,12 @@ def check_if_provided_directory_is_unsafe(path):
     # List of sensitive paths for different systems
     sensitive_paths = [
         # Linux sensitive paths
-        "/", "/bin", "/boot",  "/dev", "/etc", "/home", "/init", "/lib", "/lib32", "/lib64", "/libx32", "/media",
-        "/mnt", "/opt", "/proc", "root", "run", "/sbin", "snap", "/srv", "/sys", "tmp", "usr", "/usr/bin", "/usr/sbin",
+        "\\", "\\bin", "\\boot", "\\dev", "\\etc", "\\home", "\\init", "\\lib", "\\lib32", "\\lib64", "\\libx32", "\\media",
+        "\\mnt", "\\opt", "\\proc", "root", "run", "\\sbin", "snap", "\\srv", "\\sys", "tmp", "usr", "\\usr\\bin", "\\usr\\sbin"
 
         # Mac sensitive paths
-        "/System", "/Library", "/Applications", "/private/var", "/Users",
+        "\\System", "\\Library", "\\Applications", "\\Volumes", "\\bin", "\\home", "\\tmp", "\\cores", "\\opt", 
+        "\\private\\var", "\\etc", "\\sbin", "\\dev", "\\private", "\\var", "\\Users", "\\usr",
 
         # Windows sensitive paths
         "C:", "C:\\Windows", "C:\\WINDOWS\\system32", "C:\\WINDOWS\\SysWOW64", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Users"

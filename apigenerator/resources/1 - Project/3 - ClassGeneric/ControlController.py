@@ -53,7 +53,8 @@ def control_route_get_by_id(id_args):
     # Routing request to /control/{id} GET method #
     if request.method == 'GET':
         result = get_control_by_id(
-            id_list, request.args.to_dict(), {'HTTP_SELECT': request.environ.get('HTTP_SELECT')}
+            id_list, request.args.to_dict(
+            ), {'HTTP_SELECT': request.environ.get('HTTP_SELECT')}
         )
         return result
 

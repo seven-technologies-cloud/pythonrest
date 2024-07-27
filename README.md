@@ -1,6 +1,6 @@
 # PythonREST CLI
 <div align="center" style="padding:0px 100px 0px 0px">
-  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AEYmBYQaGLdP44igBcrFUpCFt2Fxa3E_fk1p8cmMDx2FmKCF9oWUKMxvgOZEYE7EOJD1mCRi8dFDhF-HpdY90PQQ5r6tXdqo=w1920-h922" alt="Logo" width="350"/>
+  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihYRUsjJDrLIsbUPrdDPzxBb6EC_HU4EGsQa4juabWc6g1yoP0Vcnh7R9vX93HxAwYiWloxEdGKrf7FVAP22BnduRPjFKg5aJ0Y=w1366-h641-rw-v1" alt="Logo" width="350"/>
 </div>
 
 PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds based on your relational database on a single CLI command. This allows you to create your APIs from scratch and update your current API previously created with our tool to always match your latest database definitions.
@@ -47,7 +47,7 @@ familiar with package managers, we have options for that below.
 ### Chocolatey
 
 ```ps
-choco install pythonrest --version=0.1.0
+choco install pythonrest
 ```
 
 ### Pip
@@ -287,7 +287,7 @@ Starting with a basic use, you go to your swagger/<table_name>, the first route 
 <br>
 
 <div align="center">
-  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRxL8hUgfencMlNjW35HP7fx_ZvlheJUuPjefCisGhDu6VxE2HUt9aOFSiBMOSpYXe8J5KKZZGN50VNt8VoleEz_GFw=w2880-h1404" alt="Swagger Select all Users"/>
+  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihbQK1U9v54G2lToTwVSHhjxIi_5vHX4K2DYolaqNlddxBe6EDQGCvNMnHfIxN8a_9fDcUjvSYBke6IfJUwxJl3m_d769XFMDA=w1920-h922-rw-v1" alt="Swagger Select all Users"/>
 </div>
 
 ### Insert Table Entry
@@ -297,7 +297,7 @@ From the same swagger page we were in, the next route is the post /<table_name>,
 <br>
 
 <div align="center">
-  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYSKKVmPS5CH_OCAbonoV_DJbjXq2IS5wGx6Q-CPAn4dI7Jo2W-2kx193E5lOg3VSrPmFRtz_1G8sYld8hUjT6JuagQjkQ=w2880-h1404" alt="Swagger Insert User"/>
+  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihaavUYFGCNkfS22MbYfhqOdA8rJFTrGKKVb0xiGOb7JkcD5GNZUHba70ChHKh2mLOpcnOjmA-EEIwbGWWcVQwa-CFIDk3YKcfk=w1920-h922-rw-v1" alt="Swagger Insert User"/>
 </div>
 
 <br>
@@ -330,7 +330,7 @@ Now we're talking about the delete /user route, if you hit "try it out" it will 
 <br>
 
 <div align="center">
-  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYTi11erJfknIMgb0R2auyanxd_g34kkoVcNYXfS5Kct20SRB-dsqOi7pMRG9UGXV_hAaiGOGvLf6CM8LQOxVMDedqGFXw=w2880-h1404" alt="Swagger Delete User"/>
+  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihZfYl9MfsivfZV5uoP1v0yIqjCp4Bul9Lr4hrGouIIIdIesfKLjrUSAeybCKnVxB38hKRGpuM6Nzx5kUDNXlM4wFRAUnDTr4cI=w1920-h922-rw-v1" alt="Swagger Delete User"/>
 </div>
 
 <br>
@@ -355,14 +355,14 @@ When running the API, it will provide you with a localhost url, then you have th
 <hr>
 That's the base route for viewing swagger, it contains the documentation of the SQL routes present on the application
 <div align="center">
-  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYR_dUffHUELqs1yay5iiqu0ltnAtbLqtPgjwjpsHv5IRhCRfZuhv0B5qVvPG5ZHm0ThT08xu99zsZuCRMblvjuFSasp=w2880-h1508" alt="Swagger Main Screen"/>
+  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihZsD73oX2ZxfkoyN3tcLzilSRJ5p2GfbSWklJ5TuWhngXa0VgIBVbq5uX1jT5QXGaqGT1WKL5zgE7sLsjjtpLB9rRcsQUcohUE=w1920-h922-rw-v1" alt="Swagger Main Screen"/>
 </div>
 
 ### /swagger/tablename
 <hr>
 For each table on your database, PythonREST creates an openapi page documentation for it, in which you can make your database queries targetting each table. To access them, simply append to the swagger endpoint url your table name in *flatcase* (**ALL WORDS TOGETHER IN LOWER CASE WITH NO SEPARATORS**).
 <div align="center">
-  <img src="https://lh3.googleusercontent.com/u/1/drive-viewer/AEYmBYRfUGgCAiU0KSLZJjLGttaIuBCf5vRNWa8ioShBm7KQtm_EkwwLSHiW-G2hZbi-25SH-x_HtkLKjizLfxafbYMnJ-D0uA=w2880-h1508" alt="Swagger User Screen"/>
+  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihZsD73oX2ZxfkoyN3tcLzilSRJ5p2GfbSWklJ5TuWhngXa0VgIBVbq5uX1jT5QXGaqGT1WKL5zgE7sLsjjtpLB9rRcsQUcohUE=w1920-h922-rw-v1" alt="Swagger User Screen"/>
 </div> 
 <br>
 
