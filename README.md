@@ -166,8 +166,6 @@ The following folders/files will be modified(content deleted and recreated) if a
 - config
 - app.py
 This allows you to make customizations or enhancements on your generated API and new upgrades will only affect CRUD API feature folders
-## ⚠️ Disclaimer
-Keep in mind that the provided folder will have all of its files deleted before generating the API, except when a PythonREST project is already in place
 
 #### --use-pascal-case:
 This option creates the Python Domain Classes with PascalCase pattern for their names, if this option is provided as
@@ -189,6 +187,14 @@ This behavior can be modified on the project's environment variables file(src/e_
 - "%Y-%m-%d, %d-%m-%Y, %Y/%m/%d, %d/%m/%Y" -> This value accepts dates on YYYY-MM-DD, DD-MM-YYYY, YYYY/MM/DD and DD/MM/YYYY formats
 - "%Y-%m-%d, %m-%d-%Y, %Y/%m/%d, %m/%d/%Y" -> This value accepts dates on YYYY-DD-MM, MM-DD-YYYY, YYYY/DD/MM and MM/DD/YYYY formats
 <br></br>
+
+#### --project-name:
+This options allows the user to define a custom name for his project, which will be displayed on the Swagger and Redoc 
+pages. If not defined, the default value for this parameter is PythonREST:
+
+```bash
+pythonrest generate --postgres-connection-string <POSTGRES_CONNECTION_STRING> --project-name MarketPlaceAPI
+```
 
 ## How to Run Generated API
 After generating your API, you may open it on your preferred IDE(VSCode, PyCharm, etc) or even the bash/cmd if you wish to, from there you may build your venv like below to run the project.

@@ -13,7 +13,22 @@ app_handler.register_blueprint(redoc_blueprint)'
         py_file_out.write(f'{blueprint_register_lines}\n')
 
 
-def modify_redoc_related_files(result, domain_path, script_absolute_path):
+def change_redoc_html_files_title(redoc_files_path, project_name):
+    for filename in os.listdir(redoc_files_path):
+        if filename.endswith('.html'):
+            file_path = os.path.join(redoc_files_path, filename)
+
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+
+            new_content = content.replace('PythonREST', project_name)
+
+            # Write the modified content back to the file
+            with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(new_content)
+
+
+def modify_redoc_related_files(result, domain_path, script_absolute_path, project_name):
     print('Creating Redoc docs for API')
     domain_list = get_domain_files_list(domain_path)
 
@@ -39,3 +54,4 @@ def modify_redoc_related_files(result, domain_path, script_absolute_path):
                                     os.path.join(result, 'config', f'{domain_name}.html'))
 
     add_redoc_blueprint_register_function_to_redoc_controller(os.path.join(result, 'src', 'a_Presentation', 'c_Redoc', 'RedocController.py'))
+    change_redoc_html_files_title(os.path.join(result, 'config'), project_name)

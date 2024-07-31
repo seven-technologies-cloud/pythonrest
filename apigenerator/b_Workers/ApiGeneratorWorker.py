@@ -8,7 +8,8 @@ from apigenerator.f_Builders.FlaskAdminBuilder import build_flask_admin_files
 from apigenerator.f_Builders.RedocBuilder import modify_redoc_related_files
 
 
-def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists):
+def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists,
+                             project_name):
     try:
         print('Preparing to generate API...')
         proj_domain_folder = os.path.join(result_full_path, 'src', 'c_Domain')
@@ -25,7 +26,8 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ------------------------------------ Domain ------------------------------------ #
 
-        handle_domain_migration_multiple_swagger_files(result_full_path, proj_domain_folder, script_absolute_path)
+        handle_domain_migration_multiple_swagger_files(result_full_path, proj_domain_folder, script_absolute_path,
+                                                       project_name)
 
         modify_swagger_related_files(result_full_path, proj_domain_folder, script_absolute_path)
 
@@ -43,7 +45,7 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
         build_flask_admin_files(result_full_path, proj_domain_folder)
 
         # ------------------------------------ Redoc -------------------------------------- #
-        modify_redoc_related_files(result_full_path, proj_domain_folder, script_absolute_path)
+        modify_redoc_related_files(result_full_path, proj_domain_folder, script_absolute_path, project_name)
     except Exception as e:
         print(e)
         return
