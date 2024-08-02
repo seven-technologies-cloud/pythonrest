@@ -167,6 +167,28 @@ def validate_all_datetime_types(column, start_and_end_strings):
         f'Failed to validate {column.name} as datetime, date, or time')
 
 
+def validate_non_serializable_types(query, declarative_meta):
+    try:
+        result = []
+        column_attributes = [getattr(declarative_meta, col.name)
+                             for col in declarative_meta.__table__.columns]
+        for item in query:
+            item_dict = {}
+            for field in column_attributes:
+                value = getattr(item, field.name, None)
+                if value is not None:
+                    if f'{field.type}' == 'SET' and value is not None:
+                        item_dict[field.name] = list(value)
+                    else:
+                        value = getattr(item, field.name)
+                        item_dict[field.name] = value
+            result.append(item_dict)
+        return result
+    except Exception as e:
+        raise Exception(
+            f'Failed to validate non serializable types:  {e}')
+
+
 def validate_and_parse_interval(column, request_data):
     # This function will convert a string like "2 days" into a timedelta object.
     interval_pattern = re.compile(r'(?P<number>\d+)\s*(?P<unit>days?)')

@@ -274,13 +274,36 @@ def convert_enum_to_Enum(input_string):
 
     # Create the Enum declaration
     enum_declaration = f"Enum({', '.join(repr(value) for value in values)})"
+    print(enum_declaration)
 
     return enum_declaration
+
+
+def convert_set_to_SET(input_string):
+    # Check if the input is in 'SET(...)' format
+    if input_string.lower().startswith("set(") and input_string.lower().endswith(")"):
+        # Strip 'set(' from the start and ')' from the end
+        values_string = input_string[4:-1]
+    else:
+        raise ValueError(
+            "Input string is not in the expected format: 'set(...)'")
+
+    # Extract the values and split by comma, keeping the quotes
+    values = [value.strip().strip("'") for value in values_string.split(",")]
+
+    # Create the Set declaration
+    set_declaration = f"Set({', '.join(repr(value) for value in values)})"
+    print(set_declaration)
+
+    return set_declaration
 
 
 def handle_sql_to_sa_types_conversion(column_type):
     if "enum" in column_type.lower():
         converted_column_type = convert_enum_to_Enum(column_type)
+        return converted_column_type
+    if "set" in column_type.lower():
+        converted_column_type = convert_set_to_SET(column_type)
         return converted_column_type
     # TODO remove this when float type casting to Decimal or a way to send data of decimal type on requests is supported by PythonREST
     if "decimal" in column_type.lower() or "numeric" in column_type.lower():

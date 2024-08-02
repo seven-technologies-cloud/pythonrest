@@ -12,7 +12,7 @@ from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
 import datetime
 import re
-from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_all_datetime_types
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_all_datetime_types, validate_non_serializable_types
 
 
 # Method builds a domain query filter object from standard or custom definitions #
@@ -70,6 +70,8 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     query = apply_query_offset(query, header_args)
     # Apply limit to query #
     query = apply_query_limit(query, header_args, limit)
+    # Validate column type non serialiable
+    query = validate_non_serializable_types(query, declarative_meta)
     # Returning filtered query #
     return query
 
