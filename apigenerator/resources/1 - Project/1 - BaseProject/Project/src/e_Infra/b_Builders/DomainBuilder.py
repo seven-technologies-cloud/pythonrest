@@ -119,7 +119,6 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                 ):
                     date_type = validate_all_datetime_types(field,
                                                             start_and_end_dates)
-                    print(date_type)
                     if date_type == 'time':
                         query = query.filter(func.cast(field, Time).between(
                             start_datetime, end_datetime))

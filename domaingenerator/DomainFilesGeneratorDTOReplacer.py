@@ -31,7 +31,6 @@ def get_sa_columns(domain_dict):
         try:
             if 'Set' in column['sa_type']:
                 column['sa_type'] = column['sa_type'].replace('Set', 'SET')
-                print(column['sa_type'])
                 result_string = result_string + tab + column['name'] + ": " + column['python_type'].replace(
                     'bytes', 'str') + ' = sa.Column(' + column['sa_type'] + get_column_arguments_string(column) + ')\n'
             else:

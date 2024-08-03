@@ -274,7 +274,6 @@ def convert_enum_to_Enum(input_string):
 
     # Create the Enum declaration
     enum_declaration = f"Enum({', '.join(repr(value) for value in values)})"
-    print(enum_declaration)
 
     return enum_declaration
 
@@ -293,7 +292,6 @@ def convert_set_to_SET(input_string):
 
     # Create the Set declaration
     set_declaration = f"Set({', '.join(repr(value) for value in values)})"
-    print(set_declaration)
 
     return set_declaration
 
