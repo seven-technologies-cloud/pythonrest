@@ -178,7 +178,8 @@ def validate_non_serializable_types(query, declarative_meta):
                 value = getattr(item, field.name, None)
                 if value is not None:
                     if f'{field.type}' == 'SET' and value is not None:
-                        item_dict[field.name] = list(value)
+                        set_to_string = ", ".join(map(str, value))
+                        item_dict[field.name] = set_to_string
                     else:
                         value = getattr(item, field.name)
                         item_dict[field.name] = value
@@ -194,12 +195,13 @@ def validate_types_enum_and_set(declarative_meta, request_data, message_error):
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
         for field in column_attributes:
-            if field.name in message_error[0]:
-                if request_data[f'{field.name}'] is None:
-                    message_error[0] = f'{field.name} cannot be empty.'
-                    return message_error
-                else:
+            if message_error is not None:
+                if field.name in message_error[0] and f'{field.type}' == 'SET' or f'{field.type}' == 'Enum':
                     message_error[0] = f'The value of field {field.name} not found.'
+                    return message_error
+            else:
+                if request_data[f'{field.name}'] == '' and field.nullable == False:
+                    message_error = [f'{field.name} cannot be empty.']
                     return message_error
         return None
     except Exception as e:

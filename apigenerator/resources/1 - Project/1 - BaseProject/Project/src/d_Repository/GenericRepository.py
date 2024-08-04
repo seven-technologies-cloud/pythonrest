@@ -190,26 +190,29 @@ def put_object_set(request_data, declarative_meta, id_name_list):
                 )
 
                 # Validating insert results #
-                if insert_result != get_system_null():
-                    message_error = validate_types_enum_and_set(
-                        declarative_meta, request_data_object, insert_result)
-                    if message_error is not None:
-                        error_message_list.append(
-                            build_object_error_message(
-                                request_data_object, message_error
+                for key, item in request_data_object.items():
+                    if insert_result != get_system_null() or request_data_object[key] == '':
+                        message_error = validate_types_enum_and_set(
+                            declarative_meta, request_data_object, insert_result)
+                        if message_error is not None:
+                            error_message_list.append(
+                                build_object_error_message(
+                                    request_data_object, message_error
+                                )
                             )
-                        )
-                    error_message_list.append(
-                        build_object_error_message(
-                            request_data_object, insert_result
-                        )
-                    )
-                    for error in insert_result:
-                        if 'Duplicate entry' in error:
-                            error_status_code = 409
-                        if 'cannot be null' in error:
-                            error_status_code = 406
-                continue
+                        else:
+                            error_message_list.append(
+                                build_object_error_message(
+                                    request_data_object, insert_result
+                                )
+                            )
+
+                            for error in insert_result:
+                                if 'Duplicate entry' in error:
+                                    error_status_code = 409
+                                if 'cannot be null' in error:
+                                    error_status_code = 406
+                    continue
 
             if request.method == 'PATCH':
                 missing_pk = next(
