@@ -2,7 +2,7 @@ import sys
 import os
 
 
-# SaAuSQLTypes
+######################################################################################################################## SaAuSQLTypes
 def get_sa_AuSQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Interval', 'NCHAR', 'NVARCHAR',
@@ -34,7 +34,7 @@ def get_sa_AuSQL_dict_types_list():
     return []
 
 
-# SaMaSQLTypes
+######################################################################################################################## SaMaSQLTypes
 def get_sa_MaSQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Interval', 'NCHAR', 'NVARCHAR',
@@ -66,7 +66,7 @@ def get_sa_MaSQL_dict_types_list():
     return []
 
 
-# SaMySQLTypes
+######################################################################################################################## SaMySQLTypes
 def get_sa_MySQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Set', 'Interval', 'NCHAR', 'NVARCHAR', "YEAR", "year",
@@ -99,7 +99,7 @@ def get_sa_MySQL_dict_types_list():
     return []
 
 
-# SaOcSQLTypes
+######################################################################################################################## SaOcSQLTypes
 def get_sa_OcSQL_string_types_list():
     return ['CHAR', 'VARCHAR2', 'VARCHAR', ]
 
@@ -130,7 +130,7 @@ def get_sa_OcSQL_dict_types_list():
     return []
 
 
-# SaPgSQLTypes
+######################################################################################################################## SaPgSQLTypes
 def get_sa_PgSQL_string_types_list():
     return ['character varying', 'char', 'bpchar', 'BLOB', 'character', 'varchar', 'Binary', 'interval', 'enum', 'ENUM',
             'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'time', 'time with time zone',
@@ -169,7 +169,7 @@ def get_sa_PgSQL_dict_types_list():
     return []
 
 
-# SaSeSQLTypes
+######################################################################################################################## SaSeSQLTypes
 def get_sa_SeSQL_string_types_list():
     return ['char', 'varchar', 'text', 'nchar', 'nvarchar', 'ntext', 'date', 'smalldatetime', 'datetime', 'datetime2', 'datetimeoffset', 'time']
 
