@@ -15,6 +15,7 @@ from apigenerator.b_Workers.ApiGeneratorWorker import generate_python_rest_api
 from apigenerator.e_Enumerables.Enumerables import get_directory_data
 
 app = typer.Typer()
+pythonrest_version = "0.1.7"
 
 
 @app.command()
@@ -22,6 +23,7 @@ def generate(
     result_path: Optional[str] = None,
     use_pascal_case: Optional[bool] = True,
     us_datetime: Optional[bool] = False,
+    project_name: Optional[str] = "PythonREST",
     mysql_connection_parameters: Optional[str] = None,
     mysql_connection_string: Optional[str] = None,
     postgres_connection_parameters: Optional[str] = None,
@@ -89,7 +91,8 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params, base_project_exists)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params,
+                                     base_project_exists, project_name)
         except Exception as e:
             typer.echo(e)
             return
@@ -166,7 +169,7 @@ def generate(
 
 @app.command()
 def version():
-    typer.echo("pythonrest v0.1.4")
+    typer.echo(f"pythonrest v{pythonrest_version}")
 
 
 if __name__ == "__main__":

@@ -4,9 +4,12 @@ from apigenerator.b_Workers.DomainMigrationHandler import *
 from apigenerator.b_Workers.ProjectFinalizer import *
 from apigenerator.b_Workers.EnvironmentVariablesWorker import *
 from apigenerator.b_Workers.DirectoryManager import copy_domain_files
+from apigenerator.f_Builders.FlaskAdminBuilder import build_flask_admin_files
+from apigenerator.f_Builders.RedocBuilder import modify_redoc_related_files
 
 
-def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists):
+def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists,
+                             project_name):
     try:
         print('Preparing to generate API...')
         proj_domain_folder = os.path.join(result_full_path, 'src', 'c_Domain')
@@ -23,7 +26,8 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ------------------------------------ Domain ------------------------------------ #
 
-        handle_domain_migration_multiple_swagger_files(result_full_path, proj_domain_folder, script_absolute_path)
+        handle_domain_migration_multiple_swagger_files(result_full_path, proj_domain_folder, script_absolute_path,
+                                                       project_name)
 
         modify_swagger_related_files(result_full_path, proj_domain_folder, script_absolute_path)
 
@@ -36,6 +40,12 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
         # ----------------------------- Environment Variables ----------------------------- #
 
         install_environment_variables(result_full_path, us_datetime, db, db_params, script_absolute_path)
+
+        # ---------------------------------- Flask-Admin ---------------------------------- #
+        build_flask_admin_files(result_full_path, proj_domain_folder)
+
+        # ------------------------------------ Redoc -------------------------------------- #
+        modify_redoc_related_files(result_full_path, proj_domain_folder, script_absolute_path, project_name)
     except Exception as e:
         print(e)
         return

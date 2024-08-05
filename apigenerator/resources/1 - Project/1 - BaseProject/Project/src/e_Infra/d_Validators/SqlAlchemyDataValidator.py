@@ -259,15 +259,32 @@ def validate_build(declarative_meta, request_data_object):
             '__init__()', declarative_meta.__tablename__))
 
 
+def cast_types_that_match(request_value, domain_value_type):
+    match_types = {"float": "int"}
+    if domain_value_type.__name__ in match_types:
+        expected_type = match_types[domain_value_type.__name__]
+        if type(request_value).__name__ == expected_type:
+            casted_value = domain_value_type(request_value)
+            return casted_value
+        else:
+            return None
+    else:
+        return None
+
+
 def validate_python_type(declarative_meta, request_data_object):
     annotations = declarative_meta.__annotations__
     for key in request_data_object:
         if type(request_data_object[key]) != annotations[key]:
-            raise Exception(
-                f"Expected type '{annotations[key]}' for attribute '{key}' "
-                f"but received type '{type(request_data_object[key])}'".replace(
-                    "<class '", "").replace("'>", "")
-            )
+            casted_value = cast_types_that_match(request_data_object[key], annotations[key])
+            if casted_value is not None:
+                request_data_object[key] = casted_value
+            else:
+                raise Exception(
+                    f"Expected type '{annotations[key]}' for attribute '{key}' "
+                    f"but received type '{type(request_data_object[key])}'".replace(
+                        "<class '", "").replace("'>", "")
+                )
 
 
 def validate_header_args(declarative_meta, header_args):

@@ -5,9 +5,8 @@ from apigenerator.b_Workers.MigrationHandler import *
 from apigenerator.b_Workers.ModifierHandler import *
 from apigenerator.e_Enumerables.Enumerables import *
 
-
-def handle_domain_migration_multiple_swagger_files(result, proj_domain_folder, script_absolute_path):
-    # Migrates generated domain python files to correct project folder and extracts data from it to configure Controllers, Services, Validators and Repositories. Finally, it also configures the Swagger files.
+def handle_domain_migration_multiple_swagger_files(result, proj_domain_folder, script_absolute_path, project_name):
+# Migrates generated domain python files to correct project folder and extracts data from it to configure Controllers, Services, Validators and Repositories. Finally, it also configures the Swagger files.
     try:
         class_generic_path = os.path.join(
             script_absolute_path, get_directory_data()['class_generic_path'])
@@ -29,8 +28,7 @@ def handle_domain_migration_multiple_swagger_files(result, proj_domain_folder, s
 
             print(f"Generating files for: {domain_name}")
 
-            domain_swagger_data = load_swagger_definitions_for_domain_target(
-                result, "PythonREST", domain_name)
+            domain_swagger_data = load_swagger_definitions_for_domain_target(result, project_name, domain_name)
 
             domain_obj = get_sa_meta_class_attributes_object(
                 proj_domain_folder, domain)
@@ -59,7 +57,7 @@ def handle_domain_migration_multiple_swagger_files(result, proj_domain_folder, s
 
         modify_domain_files_no_pk(result)
 
-        change_main_swagger_title(result, "PythonREST")
+        change_main_swagger_title(result, project_name)
 
     except Exception as e:
         raise e

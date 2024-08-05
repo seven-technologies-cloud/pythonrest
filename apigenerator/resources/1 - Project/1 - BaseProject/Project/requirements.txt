@@ -13,3 +13,4 @@ cryptography
 cffi
 pycparser
 pyasn1
+flask-admin
