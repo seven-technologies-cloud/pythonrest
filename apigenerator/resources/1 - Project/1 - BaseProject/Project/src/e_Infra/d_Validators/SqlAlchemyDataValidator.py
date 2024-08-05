@@ -197,16 +197,17 @@ def validate_types_enum_and_set(declarative_meta, request_data, message_error):
         for field in column_attributes:
             if message_error is not None:
                 if field.name in message_error[0] and f'{field.type}' == 'SET' or f'{field.type}' == 'Enum':
-                    message_error[0] = f'The value of field {field.name} not found.'
+                    message_error[0] = f'Data truncated for column "{field.name}"'
                     return message_error
             else:
                 if request_data[f'{field.name}'] == '' and field.nullable == False:
-                    message_error = [f'{field.name} cannot be empty.']
+                    message_error = [
+                        f'Data truncated for column "{field.name}"']
                     return message_error
         return None
     except Exception as e:
         raise Exception(
-            f'The field {e} is required!')
+            f'Data truncated for column "{e}"')
 
 
 def validate_and_parse_interval(column, request_data):
