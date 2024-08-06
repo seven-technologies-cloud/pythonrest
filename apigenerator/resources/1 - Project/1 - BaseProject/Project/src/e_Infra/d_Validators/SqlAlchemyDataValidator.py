@@ -25,6 +25,8 @@ def validate_request_data_object(declarative_meta, request_data_object):
         declarative_meta.validate_custom_rules(request_data_object)
         # Apply valid date/datetime/timestamp masks #
         validate_datetime_masks(declarative_meta, request_data_object)
+        # Apply valid type set and enum #
+        validate_types_enum_and_set(declarative_meta, request_data_object)
     except Exception as e:
         raise e
 
@@ -172,19 +174,22 @@ def validate_non_serializable_types(query, declarative_meta):
         result = []
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
-        for item in query:
-            item_dict = {}
-            for field in column_attributes:
-                value = getattr(item, field.name, None)
-                if value is not None:
-                    if f'{field.type}' == 'SET' and value is not None:
-                        set_to_string = ",".join(map(str, value))
-                        item_dict[field.name] = set_to_string
-                    else:
-                        value = getattr(item, field.name)
-                        item_dict[field.name] = value
-            result.append(item_dict)
-        return result
+        has_set_type = any(f'{field.type}' == 'SET' for field in column_attributes)
+        if has_set_type:
+            for item in query:
+                item_dict = {}
+                for field in column_attributes:
+                    value = getattr(item, field.name, None)
+                    if value is not None:
+                        if f'{field.type}' == 'SET' and value is not None:
+                            set_to_string = ",".join(map(str, value))
+                            item_dict[field.name] = set_to_string
+                        else:
+                            value = getattr(item, field.name)
+                            item_dict[field.name] = value
+                result.append(item_dict)
+            return result
+        return query
     except Exception as e:
         raise Exception(
             f'Failed to validate non serializable types:  {e}')
@@ -194,40 +199,18 @@ def validate_types_enum_and_set(declarative_meta, request_data, message_error):
     try:
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
-        fields_errors = list()
-        message_error_incomplete = 'Data truncated for column'
-        for field in column_attributes:
-            if message_error is not None:
-                if field.name in message_error[0] and f'{field.type}' == 'SET' or f'{field.type}' == 'Enum':
-                    fields_errors.append(field.name)
-            else:
-                if request_data[f'{field.name}'] == '' and field.nullable == False:
-                    fields_errors.append(field.name)
-        
-        if fields_errors is not None:
-            if message_error is not None:
-                if len(fields_errors) > 1:
-                    for i in range(0, len(fields_errors)):
-                        if i == len(fields_errors) - 1:
-                            more_fields = f'{more_fields}{fields_errors[i]}'
-                        more_fields = f'{more_fields}{fields_errors[i]}, '    
-                    message_error[0] = f'{message_error_incomplete} "{more_fields}"'
-                else:
-                    message_error[0] = f'{message_error_incomplete} "{fields_errors[0]}"'
-                    message_error = f'{message_error_incomplete} "{fields_errors[0]}"'
-            else:
-                if len(fields_errors) > 1:
-                    for i in range(0, len(fields_errors)):
-                        if i == len(fields_errors) - 1:
-                            more_fields = f'{more_fields}{fields_errors[i]}'
-                        more_fields = f'{more_fields}{fields_errors[i]}, '    
-                    message_error = [f'{message_error_incomplete} "{more_fields}"']
-                else:
-                    message_error = [f'{message_error_incomplete} "{fields_errors[0]}"']
+        has_set_or_enum_type = any(f'{field.type}' == 'SET' or f'{field.type}' == 'Enum' for field in column_attributes)
+        is_field_null_or_empty = any(request_data[f'{field.name}'] == '' and field.nullable == False for field in column_attributes)
+        empty_keys = [key for key, value in request_data.items() if not value]
+        field_names = [field.name for field in column_attributes if f'{field.type}' == 'SET' or f'{field.type}' == 'Enum'] 
+        is_field_null_or_empty = bool(empty_keys)
+        if has_set_or_enum_type:
+            if is_field_null_or_empty:
+                common_elements = set(field_names) & set(empty_keys)
+                empty_keys_str = ", ".join(common_elements)
         return None
     except Exception as e:
-        raise Exception(
-            f'Data truncated for column "{e}"')
+        raise Exception(f'Data truncated for column "{empty_keys_str}"')
 
 
 def validate_and_parse_interval(column, request_data):

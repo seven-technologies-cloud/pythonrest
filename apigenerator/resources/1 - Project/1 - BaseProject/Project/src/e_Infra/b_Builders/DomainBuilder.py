@@ -52,11 +52,11 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                         if request_args:
                             for key, query_param in request_args.items():
 
-                                if '[to]' in query_param.lower():
+                                if type(query_param) == str and '[to]' in query_param.lower():
                                     # Apply filter by interval datetime #
                                     query = apply_query_filter_datetime(
                                       query, query_param, key, declarative_meta)
-                                elif '[or]' in query_param.lower():
+                                elif type(query_param) == str and '[or]' in query_param.lower():
                                     # Apply selecting multiple values #
                                     query = apply_query_selecting_multiple_values(
                                         query, query_param, key, declarative_meta)
