@@ -194,16 +194,36 @@ def validate_types_enum_and_set(declarative_meta, request_data, message_error):
     try:
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
+        fields_errors = list()
+        message_error_incomplete = 'Data truncated for column'
         for field in column_attributes:
             if message_error is not None:
                 if field.name in message_error[0] and f'{field.type}' == 'SET' or f'{field.type}' == 'Enum':
-                    message_error[0] = f'Data truncated for column "{field.name}"'
-                    return message_error
+                    fields_errors.append(field.name)
             else:
                 if request_data[f'{field.name}'] == '' and field.nullable == False:
-                    message_error = [
-                        f'Data truncated for column "{field.name}"']
-                    return message_error
+                    fields_errors.append(field.name)
+        
+        if fields_errors is not None:
+            if message_error is not None:
+                if len(fields_errors) > 1:
+                    for i in range(0, len(fields_errors)):
+                        if i == len(fields_errors) - 1:
+                            more_fields = f'{more_fields}{fields_errors[i]}'
+                        more_fields = f'{more_fields}{fields_errors[i]}, '    
+                    message_error[0] = f'{message_error_incomplete} "{more_fields}"'
+                else:
+                    message_error[0] = f'{message_error_incomplete} "{fields_errors[0]}"'
+                    message_error = f'{message_error_incomplete} "{fields_errors[0]}"'
+            else:
+                if len(fields_errors) > 1:
+                    for i in range(0, len(fields_errors)):
+                        if i == len(fields_errors) - 1:
+                            more_fields = f'{more_fields}{fields_errors[i]}'
+                        more_fields = f'{more_fields}{fields_errors[i]}, '    
+                    message_error = [f'{message_error_incomplete} "{more_fields}"']
+                else:
+                    message_error = [f'{message_error_incomplete} "{fields_errors[0]}"']
         return None
     except Exception as e:
         raise Exception(
