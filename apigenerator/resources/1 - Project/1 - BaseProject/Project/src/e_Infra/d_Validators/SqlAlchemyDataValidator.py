@@ -178,7 +178,7 @@ def validate_non_serializable_types(query, declarative_meta):
                 value = getattr(item, field.name, None)
                 if value is not None:
                     if f'{field.type}' == 'SET' and value is not None:
-                        set_to_string = ", ".join(map(str, value))
+                        set_to_string = ",".join(map(str, value))
                         item_dict[field.name] = set_to_string
                     else:
                         value = getattr(item, field.name)
