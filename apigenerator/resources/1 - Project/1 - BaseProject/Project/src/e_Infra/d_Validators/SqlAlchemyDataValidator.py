@@ -174,19 +174,16 @@ def validate_non_serializable_types(query, declarative_meta):
         result = []
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
-        has_set_type = any(f'{field.type}' == 'SET' for field in column_attributes)
+        has_set_type = any(f'{field.type}' ==
+                           'SET' for field in column_attributes)
         if has_set_type:
             for item in query:
                 item_dict = {}
                 for field in column_attributes:
                     value = getattr(item, field.name, None)
-                    if value is not None:
-                        if f'{field.type}' == 'SET' and value is not None:
-                            set_to_string = ",".join(map(str, value))
-                            item_dict[field.name] = set_to_string
-                        else:
-                            value = getattr(item, field.name)
-                            item_dict[field.name] = value
+                    if value is not None and f'{field.type}' == 'SET':
+                        set_to_string = ",".join(map(str, value))
+                        item_dict[field.name] = set_to_string
                 result.append(item_dict)
             return result
         return query
@@ -199,8 +196,10 @@ def validate_types_enum_and_set(declarative_meta, request_data):
     try:
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
-        has_set_or_enum_type = any(f'{field.type}' == 'SET' or f'{field.type}' == 'Enum' for field in column_attributes)
-        empty_fields = [field.name for field in column_attributes if f'{field.type}' == 'SET' or f'{field.type}' == 'Enum' and field.nullable is False and request_data.get(field.name) is None]
+        has_set_or_enum_type = any(
+            f'{field.type}' == 'SET' or f'{field.type}' == 'Enum' for field in column_attributes)
+        empty_fields = [field.name for field in column_attributes if f'{field.type}' ==
+                        'SET' or f'{field.type}' == 'Enum' and field.nullable is False and request_data.get(field.name) is None]
 
         if has_set_or_enum_type and empty_fields:
             empty_keys_str = ", ".join(empty_fields)
@@ -278,7 +277,8 @@ def validate_python_type(declarative_meta, request_data_object):
     annotations = declarative_meta.__annotations__
     for key in request_data_object:
         if type(request_data_object[key]) != annotations[key]:
-            casted_value = cast_types_that_match(request_data_object[key], annotations[key])
+            casted_value = cast_types_that_match(
+                request_data_object[key], annotations[key])
             if casted_value is not None:
                 request_data_object[key] = casted_value
             else:
