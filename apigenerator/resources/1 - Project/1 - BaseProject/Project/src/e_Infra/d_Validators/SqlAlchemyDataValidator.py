@@ -195,22 +195,21 @@ def validate_non_serializable_types(query, declarative_meta):
             f'Failed to validate non serializable types:  {e}')
 
 
-def validate_types_enum_and_set(declarative_meta, request_data, message_error):
+def validate_types_enum_and_set(declarative_meta, request_data):
     try:
         column_attributes = [getattr(declarative_meta, col.name)
                              for col in declarative_meta.__table__.columns]
         has_set_or_enum_type = any(f'{field.type}' == 'SET' or f'{field.type}' == 'Enum' for field in column_attributes)
-        is_field_null_or_empty = any(request_data[f'{field.name}'] == '' and field.nullable == False for field in column_attributes)
-        empty_keys = [key for key, value in request_data.items() if not value]
-        field_names = [field.name for field in column_attributes if f'{field.type}' == 'SET' or f'{field.type}' == 'Enum'] 
-        is_field_null_or_empty = bool(empty_keys)
-        if has_set_or_enum_type:
-            if is_field_null_or_empty:
-                common_elements = set(field_names) & set(empty_keys)
-                empty_keys_str = ", ".join(common_elements)
+        empty_fields = [field.name for field in column_attributes if f'{field.type}' == 'SET' or f'{field.type}' == 'Enum' and field.nullable is False and request_data.get(field.name) is None]
+
+        if has_set_or_enum_type and empty_fields:
+            empty_keys_str = ", ".join(empty_fields)
+            return f"Data truncated for column '{empty_keys_str}'"
+
         return None
+
     except Exception as e:
-        raise Exception(f'Data truncated for column "{empty_keys_str}"')
+        raise Exception(f"Unexpected error during validation: {e}")
 
 
 def validate_and_parse_interval(column, request_data):
