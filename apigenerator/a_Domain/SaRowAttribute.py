@@ -24,17 +24,22 @@ def get_sa_row_attr_object(row_attr, attr_params):
         'boolean': get_boolean_list(),
         'array': get_array_list(),
         'object': []  # default catch-all if no other type matches
-    }.items() if list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in value_list), 'object')
+    }.items() if ('sa.' not in attr_params[0]) or (list(parse('sa.{}', attr_params[0]))[0].split('(')[0] in value_list)), 'object')
 
     # Check attribute characteristics
-    is_primary_key = any('primary_key' in attr_param for attr_param in attr_params)
-    is_nullable = not any('nullable=False' in attr_param or is_primary_key for attr_param in attr_params)
-    is_foreign_key = any('ForeignKey' in attr_param for attr_param in attr_params)
-    has_default_value = any('default=' in attr_param and 'server_default=' not in attr_param for attr_param in attr_params)
+    is_primary_key = any(
+        'primary_key' in attr_param for attr_param in attr_params)
+    is_nullable = not any(
+        'nullable=False' in attr_param or is_primary_key for attr_param in attr_params)
+    is_foreign_key = any(
+        'ForeignKey' in attr_param for attr_param in attr_params)
+    has_default_value = any(
+        'default=' in attr_param and 'server_default=' not in attr_param for attr_param in attr_params)
 
     # Extract default value if present
     if has_default_value:
-        default_value_param = next(attr_param for attr_param in attr_params if 'default=' in attr_param)
+        default_value_param = next(
+            attr_param for attr_param in attr_params if 'default=' in attr_param)
         parsed_value = list(parse('default={}', default_value_param.strip()))
         if parsed_value:
             default_value = parsed_value[0]

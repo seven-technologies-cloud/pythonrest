@@ -5,5 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from marshmallow_sqlalchemy import SQLAlchemySchema
 import sqlalchemy as sa
 
+
 # Initializing Declarative Base #
 Base = declarative_base()

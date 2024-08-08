@@ -167,6 +167,30 @@ def validate_all_datetime_types(column, start_and_end_strings):
         f'Failed to validate {column.name} as datetime, date, or time')
 
 
+def validate_non_serializable_types(query, declarative_meta):
+    try:
+        result = []
+        column_attributes = [getattr(declarative_meta, col.name)
+                             for col in declarative_meta.__table__.columns]
+        has_set_type = any(f'{field.type}' ==
+                           'SET' for field in column_attributes)
+        if has_set_type:
+            for item in query:
+                item_dict = {}
+                for field in column_attributes:
+                    value = getattr(item, field.name, None)
+                    item_dict[field.name] = value
+                    if value is not None and f'{field.type}' == 'SET':
+                        set_to_string = ",".join(map(str, value))
+                        item_dict[field.name] = set_to_string
+                result.append(item_dict)
+            return result
+        return query
+    except Exception as e:
+        raise Exception(
+            f'Failed to validate non serializable types:  {e}')
+
+
 def validate_and_parse_interval(column, request_data):
     # This function will convert a string like "2 days" into a timedelta object.
     interval_pattern = re.compile(r'(?P<number>\d+)\s*(?P<unit>days?)')
@@ -233,7 +257,8 @@ def validate_python_type(declarative_meta, request_data_object):
     annotations = declarative_meta.__annotations__
     for key in request_data_object:
         if type(request_data_object[key]) != annotations[key]:
-            casted_value = cast_types_that_match(request_data_object[key], annotations[key])
+            casted_value = cast_types_that_match(
+                request_data_object[key], annotations[key])
             if casted_value is not None:
                 request_data_object[key] = casted_value
             else:

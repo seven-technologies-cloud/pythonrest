@@ -12,7 +12,7 @@ from src.e_Infra.GlobalVariablesManager import *
 from src.e_Infra.b_Builders.StringBuilder import *
 import datetime
 import re
-from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_all_datetime_types
+from src.e_Infra.d_Validators.SqlAlchemyDataValidator import validate_all_datetime_types, validate_non_serializable_types
 
 
 # Method builds a domain query filter object from standard or custom definitions #
@@ -52,11 +52,11 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
                         if request_args:
                             for key, query_param in request_args.items():
 
-                                if '[to]' in query_param.lower():
+                                if type(query_param) == str and '[to]' in query_param.lower():
                                     # Apply filter by interval datetime #
                                     query = apply_query_filter_datetime(
                                       query, query_param, key, declarative_meta)
-                                elif '[or]' in query_param.lower():
+                                elif type(query_param) == str and '[or]' in query_param.lower():
                                     # Apply selecting multiple values #
                                     query = apply_query_selecting_multiple_values(
                                         query, query_param, key, declarative_meta)
@@ -70,6 +70,8 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     query = apply_query_offset(query, header_args)
     # Apply limit to query #
     query = apply_query_limit(query, header_args, limit)
+    # Validate column type non serialiable
+    query = validate_non_serializable_types(query, declarative_meta)
     # Returning filtered query #
     return query
 
@@ -117,7 +119,6 @@ def apply_query_filter_datetime(query, query_param, key, declarative_meta):
                 ):
                     date_type = validate_all_datetime_types(field,
                                                             start_and_end_dates)
-                    print(date_type)
                     if date_type == 'time':
                         query = query.filter(func.cast(field, Time).between(
                             start_datetime, end_datetime))

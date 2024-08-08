@@ -137,7 +137,8 @@ def delete_by_id(declarative_meta, id_value_list, id_name_list):
         if result > 0:
             # Returning API built response  #
             return build_proxy_response_insert_dumps(
-                200, {get_system_message('message'): get_system_message('object_deleted_success')}
+                200, {get_system_message('message'): get_system_message(
+                    'object_deleted_success')}
             )
         else:
             return build_proxy_response_insert_dumps(
@@ -178,14 +179,14 @@ def put_object_set(request_data, declarative_meta, id_name_list):
             # Validating request data object #
             try:
                 validate_request_data_object(
-                   declarative_meta, request_data_object
+                    declarative_meta, request_data_object
                 )
             except Exception as e:
                 # Appending error message #
                 error_message_list.append(
-                        build_object_error_message(
-                            request_data_object, e
-                        )
+                    build_object_error_message(
+                        request_data_object, e
+                    )
                 )
                 error_status_code = 406
                 continue
@@ -203,12 +204,13 @@ def put_object_set(request_data, declarative_meta, id_name_list):
                             request_data_object, insert_result
                         )
                     )
+
                     for error in insert_result:
                         if 'Duplicate entry' in error:
                             error_status_code = 409
                         if 'cannot be null' in error:
                             error_status_code = 406
-                continue
+                    continue
 
             if request.method == 'PATCH':
                 missing_pk = next(
@@ -220,7 +222,8 @@ def put_object_set(request_data, declarative_meta, id_name_list):
                 if missing_pk:
                     error_message_list.append(
                         build_object_error_message(
-                            request_data_object, get_system_message('dict_from_body_no_pk_patch')
+                            request_data_object, get_system_message(
+                                'dict_from_body_no_pk_patch')
                         )
                     )
                     error_status_code = 406
@@ -234,7 +237,8 @@ def put_object_set(request_data, declarative_meta, id_name_list):
                 if pk_only:
                     error_message_list.append(
                         build_object_error_message(
-                            request_data_object, get_system_message('cannot_update_with_id_only')
+                            request_data_object, get_system_message(
+                                'cannot_update_with_id_only')
                         )
                     )
                     error_status_code = 406
@@ -253,7 +257,8 @@ def put_object_set(request_data, declarative_meta, id_name_list):
                 if update_result == 0:
                     error_message_list.append(
                         build_object_error_message(
-                            request_data_object, get_system_message('patch_no_items_found')
+                            request_data_object, get_system_message(
+                                'patch_no_items_found')
                         )
                     )
                     error_status_code = 404
@@ -335,7 +340,8 @@ def put_object_set(request_data, declarative_meta, id_name_list):
         # Returning full success API built response #
         if error_message_list == get_system_empty_list():
             return build_proxy_response_insert_dumps(
-                200, {get_system_message('message'): get_system_message('object_set_persisted_success')}
+                200, {get_system_message('message'): get_system_message(
+                    'object_set_persisted_success')}
             )
 
         # Checking if there is more than one error #
@@ -377,8 +383,8 @@ def insert_object_from_set(declarative_meta, request_data_object, main_connectio
         )
         # Creating object for insert #
         transact_object = build_domain_object_from_dict(
-                declarative_meta, request_data_object
-            )
+            declarative_meta, request_data_object
+        )
         # Result for insert transaction method #
         result = insert_object(
             transact_object, main_connection_session
@@ -411,6 +417,8 @@ def update_object_from_set(declarative_meta, request_data_object, id_name_list, 
     return result
 
 # Deletes a given entity by providing all fields of the entity table #
+
+
 def delete_set_by_full_match(request_data, declarative_meta):
     # Setting Default Error Status Code #
     error_status_code = 400
@@ -441,14 +449,14 @@ def delete_set_by_full_match(request_data, declarative_meta):
             # Validating request data object #
             try:
                 validate_request_data_object(
-                   declarative_meta, request_data_object
+                    declarative_meta, request_data_object
                 )
             except Exception as e:
                 # Appending error message #
                 error_message_list.append(
-                        build_object_error_message(
-                            request_data_object, e
-                        )
+                    build_object_error_message(
+                        request_data_object, e
+                    )
                 )
                 continue
 
@@ -468,7 +476,8 @@ def delete_set_by_full_match(request_data, declarative_meta):
             if result == 0:
                 error_message_list.append(
                     build_object_error_message(
-                        request_data_object, get_system_message('delete_no_items_found')
+                        request_data_object, get_system_message(
+                            'delete_no_items_found')
                     )
                 )
                 error_status_code = 404
@@ -476,7 +485,8 @@ def delete_set_by_full_match(request_data, declarative_meta):
         # Returning full success API built response #
         if error_message_list == get_system_empty_list():
             return build_proxy_response_insert_dumps(
-                200, {get_system_message('message'): get_system_message('object_deleted_success')}
+                200, {get_system_message('message'): get_system_message(
+                    'object_deleted_success')}
             )
 
         # Returning error list as an API built response #
@@ -502,7 +512,8 @@ def execute_sql_stored_procedure(stored_procedure_name, stored_procedure_args):
         for key, value in out_params.items():
             con.execute(text(f"SET @{key} = {value}"))
 
-        in_values = ', '.join([f"'{value}'" for value in stored_procedure_args.get("in", [])])
+        in_values = ', '.join(
+            [f"'{value}'" for value in stored_procedure_args.get("in", [])])
         call_proc = text(
             f"CALL {stored_procedure_name}({in_values}"
             f"{', ' if (out_params and in_values) else ''}"
@@ -534,7 +545,8 @@ def execute_sql_stored_procedure(stored_procedure_name, stored_procedure_args):
             )
         else:
             return build_proxy_response_insert_dumps(
-                200, {get_system_message('message'): get_system_message('query_success')}
+                200, {get_system_message(
+                    'message'): get_system_message('query_success')}
             )
 
 
