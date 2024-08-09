@@ -750,7 +750,7 @@ setup.py, like this:
 All of this must be done to successfully add those files to the pip generated and installed library
 To uninstall the local pip package, you can just use a common pip uninstall command:
 ```commandline
-pip uninstall pythonrest
+pip uninstall pythonrest3
 ```
 When reinstalling the local pip package for tests, make sure to delete the build folder generated on the root folder of the project,
 as retaining that folder can lead to the project being built using that folder and not catching any changes you made to

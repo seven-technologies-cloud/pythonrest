@@ -3,7 +3,7 @@ import sys
 import os
 import shutil
 from apigenerator.e_Enumerables.Enumerables import *
-import site
+import importlib.util
 
 
 # Check if script is running directly or via exe file to get the path
@@ -27,14 +27,8 @@ def define_script_path_based_on_run_context():
 
 
 def is_pip_installed(package_name):
-    site_packages = site.getsitepackages()
-
-    for path in site_packages:
-        package_path = os.path.join(path, package_name)
-        if os.path.exists(package_path):
-            return True
-
-    return False
+    spec = importlib.util.find_spec(package_name)
+    return spec is not None
 
 
 # Method removes all files under a certain directory #
