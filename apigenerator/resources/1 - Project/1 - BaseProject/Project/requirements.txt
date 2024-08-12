@@ -14,3 +14,4 @@ cffi
 pycparser
 pyasn1
 flask-admin
+uuid6
