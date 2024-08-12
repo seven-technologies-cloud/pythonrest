@@ -4,6 +4,7 @@ import os
 from typing import Optional
 import typer
 import json
+import sys
 from databaseconnector.RegexHandler import *
 from databaseconnector.FilesHandler import check_if_provided_directory_is_unsafe, check_if_current_working_directory_is_unsafe, check_if_given_result_path_is_unsafe
 from databaseconnector.MySqlMetadataGeneratorWorker import generate_mysql_database_metadata
@@ -49,10 +50,10 @@ def generate(
     else:
         result_path = get_directory_data()['result_path_suffix']
 
-    result_full_path = os.path.abspath(os.path.join(os.getcwd(), result_path))
+    result_full_path = os.path.abspath(os.path.join(os.getenv('PWD', os.getcwd()), result_path))
 
-    if check_if_current_working_directory_is_unsafe(os.getcwd()):
-        typer.echo(f"Error: pythonrest is running from an unsafe directory: {os.getcwd()}, please run from another directory, API generation aborted!")
+    if check_if_current_working_directory_is_unsafe(os.getenv('PWD', os.getcwd())):
+        typer.echo(f"Error: pythonrest is running from an unsafe directory: {os.getenv('PWD', os.getcwd())}, please run from another directory, API generation aborted!")
         return
 
     if check_if_provided_directory_is_unsafe(result_full_path):
