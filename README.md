@@ -190,10 +190,18 @@ This behavior can be modified on the project's environment variables file(src/e_
 
 #### --project-name:
 This options allows the user to define a custom name for his project, which will be displayed on the Swagger and Redoc 
-pages. If not defined, the default value for this parameter is PythonREST:
+pages. If not defined, the default value for this parameter is `PythonREST`:
 
 ```bash
 pythonrest generate --postgres-connection-string <POSTGRES_CONNECTION_STRING> --project-name MarketPlaceAPI
+```
+
+#### --uid-type:
+This options allows the user to define if the Unique Identifier generation of the API will generate a UUIDv7 or a ULID.
+the allowed values are `uuid` and `ulid`. If not defined, the default value for this parameter is `uuid`:
+
+```bash
+pythonrest generate --sqlserver-connection-string <SQLSERVER_CONNECTION_STRING> --uid-type ulid
 ```
 
 ## How to Run Generated API
