@@ -10,6 +10,8 @@ import os
 
 # ------------------------------------------ Domain ------------------------------------------ #
 
+# UID Generation Type #
+
 # Filter generation environment variables #
 os.environ['domain_like_left'] = ''
 os.environ['domain_like_right'] = ''
