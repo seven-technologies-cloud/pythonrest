@@ -195,7 +195,7 @@ def apply_query_selecting_multiple_values(query, query_param, key, declarative_m
 
 
 def auto_fill_guid_in_request_body(declarative_meta, dictionary):
-    auto_fill_guid_allowed_types = {'CHAR(36)', 'UUID'}
+    auto_fill_guid_allowed_types = {'CHAR(36)', 'UUID', 'VARCHAR(36)'}
     ins = inspect(declarative_meta)
     for column in ins.tables[0].columns:
         if column.primary_key:

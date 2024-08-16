@@ -25,6 +25,7 @@ def generate(
     use_pascal_case: Optional[bool] = True,
     us_datetime: Optional[bool] = False,
     project_name: Optional[str] = "PythonREST",
+    uid_type: Optional[str] = "uuid",
     mysql_connection_parameters: Optional[str] = None,
     mysql_connection_string: Optional[str] = None,
     postgres_connection_parameters: Optional[str] = None,
@@ -93,7 +94,7 @@ def generate(
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
             generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params,
-                                     base_project_exists, project_name)
+                                     base_project_exists, project_name, uid_type)
         except Exception as e:
             typer.echo(e)
             return
@@ -115,7 +116,8 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params, base_project_exists, project_name)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params,
+                                     base_project_exists, project_name, uid_type)
         except Exception as e:
             typer.echo(e)
             return
@@ -137,7 +139,8 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params, base_project_exists, project_name)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params,
+                                     base_project_exists, project_name, uid_type)
         except Exception as e:
             typer.echo(e)
             return
@@ -159,7 +162,8 @@ def generate(
             os.makedirs(generated_domains_path)
             generate_domain_files(result_full_path, generated_domains_path)
             # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params, base_project_exists, project_name)
+            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params,
+                                     base_project_exists, project_name, uid_type)
         except Exception as e:
             typer.echo(e)
             return
