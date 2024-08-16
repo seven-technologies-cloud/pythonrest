@@ -10,7 +10,7 @@ def list_files_by_extension(directory='.', extension=()):
             values = [file for file in files if file.endswith(extension)]
             if values:
                 new_path = 'pythonrest/' + \
-                    relative_path.replace(os.replace(os.sep, '/'))
+                    relative_path.replace(os.sep, '/')
                 new_path = new_path.replace('/', '.')
                 package_data[new_path] = values
     return package_data
