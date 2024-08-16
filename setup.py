@@ -6,10 +6,11 @@ def list_files_by_extension(directory='.', extension=()):
     package_data = {}
     for root, dirs, files in os.walk(directory):
         relative_path = os.path.relpath(root, directory)
-        if 'apigenerator/resources/' in relative_path:
+        if 'apigenerator/resources/' in relative_path.replace(os.sep, '/'):
             values = [file for file in files if file.endswith(extension)]
             if values:
-                new_path = 'pythonrest/' + relative_path
+                new_path = 'pythonrest/' + \
+                    relative_path.replace(os.replace(os.sep, '/'))
                 new_path = new_path.replace('/', '.')
                 package_data[new_path] = values
     return package_data
