@@ -9,7 +9,7 @@ from apigenerator.f_Builders.RedocBuilder import modify_redoc_related_files
 
 
 def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists,
-                             project_name):
+                             project_name, uid_type):
     try:
         print('Preparing to generate API...')
         proj_domain_folder = os.path.join(result_full_path, 'src', 'c_Domain')
@@ -39,7 +39,7 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ----------------------------- Environment Variables ----------------------------- #
 
-        install_environment_variables(result_full_path, us_datetime, db, db_params, script_absolute_path)
+        install_environment_variables(result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type)
 
         # ---------------------------------- Flask-Admin ---------------------------------- #
         build_flask_admin_files(result_full_path, proj_domain_folder)
