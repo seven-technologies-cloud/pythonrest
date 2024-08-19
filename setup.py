@@ -25,7 +25,7 @@ setup(
     maintainer='Seven Technologies Cloud',
     keywords=['api', 'rest api', 'database', 'python',
               'mysql', 'mssql', 'postgres', 'aurora', 'mariadb'],
-    package_data=list_files_by_extension(extension=('.yaml', '.txt', '.html')),
+    package_data=list_files_by_extension(extension=('.yaml', '.txt', '.html', '.md')),
     packages=find_packages(where='..', include=['pythonrest', 'pythonrest.*']),
     package_dir={'pythonrest': '.'},
     install_requires=open('requirements.txt').readlines(),
