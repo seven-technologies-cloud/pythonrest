@@ -4,7 +4,8 @@ import re
 
 # This function will check for column types that can't use flask admin filters, to then remove them on the build of column_filters
 def extract_columns_to_exclude_from_column_filters(file_path):
-    types_to_exclude_from_column_filters = [r"^.*\bsa\.JSON\b.*$", r"^.*\bSET\b.*?\)$"]
+    types_to_exclude_from_column_filters = [r"^.*\bsa\.JSON\b.*$", r"^.*\bSET\b.*?\)$", r"^.*\bsa\.BINARY\b.*$",
+                                            r"^.*\bsa\.VARBINARY\b.*$", r"^.*\bsa\.BLOB\b.*$"]
 
     columns = []
 
@@ -33,7 +34,8 @@ def parse_model_attributes(file_path):
     fields_match = re.search(fields_pattern, content, re.S)
 
     if fields_match:
-        fields = fields_match.group(1).replace('"', '').replace("'", "").split(",")
+        fields = fields_match.group(1).replace(
+            '"', '').replace("'", "").split(",")
         fields = [field.strip() for field in fields]
     else:
         fields = []
@@ -44,9 +46,11 @@ def parse_model_attributes(file_path):
 
 
 def create_model_view(model_name, fields, pk_autoincrement, file_path):
-    fields_to_remove = extract_columns_to_exclude_from_column_filters(file_path)
+    fields_to_remove = extract_columns_to_exclude_from_column_filters(
+        file_path)
     if fields_to_remove:
-        column_filters = [field for field in fields if field not in fields_to_remove]
+        column_filters = [
+            field for field in fields if field not in fields_to_remove]
     else:
         column_filters = fields
     form_columns = fields if not pk_autoincrement else fields[1:]
@@ -54,6 +58,11 @@ def create_model_view(model_name, fields, pk_autoincrement, file_path):
     return f"""
 
 class {model_name}ModelView(ModelView):
+    @expose('/{model_name.lower()}')
+    @login_required
+    def index(self):
+        # Content view
+        pass
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
     column_filters = {tuple(column_filters)}
@@ -61,17 +70,25 @@ class {model_name}ModelView(ModelView):
 """
 
 
-def generate_flask_admin_files(result, project_domain_folder, domain_files):
-    views_code = "from flask_admin.contrib.sqla import ModelView\n"
+def generate_flask_admin_files(result, project_domain_folder, domain_files, database):
+    views_code = "from flask_admin.contrib.sqla import ModelView\nfrom flask_login import login_required\nfrom flask_admin import expose\n"
     admin_views = ""
     model_imports = ""
+    database_mapper = {
+        "mysql": "MySql",
+        "pgsql": "PgSql",
+        "mssql": "MsSql",
+        "mariadb": "MariaDb"
+    }
 
     for domain_file in domain_files:
         model_name = domain_file[:-3]  # Remove .py extension
-        fields, pk_autoincrement = parse_model_attributes(os.path.join(project_domain_folder, domain_file))
-        views_code += create_model_view(model_name, fields, pk_autoincrement, os.path.join(project_domain_folder, domain_file))
+        fields, pk_autoincrement = parse_model_attributes(
+            os.path.join(project_domain_folder, domain_file))
+        views_code += create_model_view(model_name, fields, pk_autoincrement,
+                                        os.path.join(project_domain_folder, domain_file))
         model_imports += f"from src.c_Domain.{model_name} import {model_name}\n"
-        admin_views += f"admin.add_view({model_name}ModelView({model_name}, get_mysql_connection_session()))\n"
+        admin_views += f"admin.add_view({model_name}ModelView({model_name}, get_{database}_connection_session()))\n"
 
     # Write FlaskAdminModelViews.py
     if not os.path.exists(os.path.join(project_domain_folder, 'a_FlaskAdminPanel')):
@@ -82,9 +99,10 @@ def generate_flask_admin_files(result, project_domain_folder, domain_files):
 
     # Write FlaskAdminPanelBuilder.py
     builder_code = f"""from src.e_Infra.b_Builders.FlaskBuilder import app_handler
-from flask_admin import Admin
+from flask_admin import Admin, BaseView, expose
+from flask_login import LoginManager, UserMixin, login_required, current_user, login_user
 from src.c_Domain.a_FlaskAdminPanel.FlaskAdminModelViews import *
-from src.e_Infra.c_Resolvers.MySqlConnectionResolver import get_mysql_connection_session
+from src.e_Infra.c_Resolvers.{database_mapper[database]}ConnectionResolver import get_{database}_connection_session
 {model_imports}
 
 admin = Admin(app_handler)
@@ -107,11 +125,11 @@ app_handler.secret_key = '1234'
             file.truncate()
 
 
-def build_flask_admin_files(result, project_domain_folder):
+def build_flask_admin_files(result, project_domain_folder, database):
     print('Adding Flask Admin to API')
     domain_files = [
         f for f in os.listdir(f'{project_domain_folder}')
         if f.endswith('.py') and f not in ['__init__.py', 'FlaskAdminModelViews.py']
     ]
-    generate_flask_admin_files(result, project_domain_folder, domain_files)
-
+    generate_flask_admin_files(
+        result, project_domain_folder, domain_files, database)
