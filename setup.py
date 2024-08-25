@@ -2,6 +2,15 @@ from setuptools import setup, find_packages
 import os
 
 
+def find_packages_custom(directory='.', exclude=(), prefix='pythonrest'):
+    yield prefix
+    for root, dirs, files in os.walk(directory):
+        dirs[:] = [d for d in dirs if d not in exclude]
+        if '__init__.py' in files:
+            package_path = f"{prefix}.{os.path.relpath(root, directory).replace(os.sep, '.')}"
+            if package_path != f"{prefix}..":
+                yield package_path
+
 def list_files_by_extension(directory='.', extension=()):
     package_data = {}
     for root, dirs, files in os.walk(directory):
@@ -15,6 +24,9 @@ def list_files_by_extension(directory='.', extension=()):
                 package_data[new_path] = values
     return package_data
 
+# Include requirements.txt in package_data
+package_data = list_files_by_extension(extension=('.yaml', '.txt', '.html', '.md'))
+package_data['pythonrest'] = ['requirements.txt']
 
 setup(
     name='pythonrest3',
@@ -26,9 +38,9 @@ setup(
     keywords=['api', 'rest api', 'database', 'python',
               'mysql', 'mssql', 'postgres', 'aurora', 'mariadb'],
     package_data=list_files_by_extension(extension=('.yaml', '.txt', '.html', '.md')),
-    packages=find_packages(where='..', include=['pythonrest', 'pythonrest.*']),
+    packages=list(find_packages_custom(exclude=['venv'])),
     package_dir={'pythonrest': '.'},
-    install_requires=open('requirements.txt').readlines(),
+    install_requires=[],
     entry_points={
         'console_scripts': [
             'pythonrest=pythonrest:app',
