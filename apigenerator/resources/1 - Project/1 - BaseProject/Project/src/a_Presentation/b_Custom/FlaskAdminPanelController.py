@@ -6,7 +6,7 @@ from src.e_Infra.b_Builders.FlaskAdminPanelBuilder import *
 from src.b_Application.b_Service.b_Custom.SQLService import *
 
 login_manager = LoginManager(app_handler)
-login_manager.login_view = 'auth.login_get_route'  # Rota para a página de login
+login_manager.login_view = 'auth.login_route'  # Rota para a página de login
 
 # Usuário fixo (em produção, utilize uma forma mais segura de armazenar credenciais)
 
@@ -39,7 +39,11 @@ def login_route():
         if username == 'admin' and password == 'admin':
             login_user(admin_user)
             return redirect('/admin')
+        else:
+            flash('Please check your login details and try again.')
+            return redirect(url_for('auth.login_route'))
     return render_template('auth.html')
+
 
 # Register the blueprint
 app_handler.register_blueprint(auth_blueprint)

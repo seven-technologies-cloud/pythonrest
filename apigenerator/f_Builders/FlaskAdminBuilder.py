@@ -58,11 +58,9 @@ def create_model_view(model_name, fields, pk_autoincrement, file_path):
     return f"""
 
 class {model_name}ModelView(ModelView):
-    @expose('/{model_name.lower()}')
-    @login_required
-    def index(self):
-        # Content view
-        pass
+    def is_accessible(self):
+        return current_user.is_authenticated
+
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
     column_filters = {tuple(column_filters)}
@@ -71,7 +69,7 @@ class {model_name}ModelView(ModelView):
 
 
 def generate_flask_admin_files(result, project_domain_folder, domain_files, database):
-    views_code = "from flask_admin.contrib.sqla import ModelView\nfrom flask_login import login_required\nfrom flask_admin import expose\n"
+    views_code = "from flask_admin.contrib.sqla import ModelView\nfrom flask_login import login_required, current_user\n"
     admin_views = ""
     model_imports = ""
     database_mapper = {
