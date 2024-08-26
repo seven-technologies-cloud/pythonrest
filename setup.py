@@ -1,15 +1,18 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 import os
 
 
-def find_packages_custom(directory='.', exclude=(), prefix='pythonrest'):
-    yield prefix
-    for root, dirs, files in os.walk(directory):
-        dirs[:] = [d for d in dirs if d not in exclude]
-        if '__init__.py' in files:
-            package_path = f"{prefix}.{os.path.relpath(root, directory).replace(os.sep, '.')}"
-            if package_path != f"{prefix}..":
-                yield package_path
+def find_packages_custom(start_directory='.', include=None, prefix='pythonrest'):
+  if include is None:
+      include = [start_directory]
+
+  packages = [prefix]
+  for dir in include:
+      for root, dirs, files in os.walk(dir):
+          if '__init__.py' in files:
+              package_path = f"{prefix}.{os.path.relpath(root, start_directory).replace(os.sep, '.')}"
+              packages.append(package_path)
+  return packages
 
 def list_files_by_extension(directory='.', extension=()):
     package_data = {}
@@ -30,7 +33,7 @@ package_data['pythonrest'] = ['requirements.txt']
 
 setup(
     name='pythonrest3',
-    version='0.1.3',
+    version='0.1.9',
     description='PythonRestCLI tool, created and managed by Seven Technologies Cloud.\nIt generates a complete API based on a connection string for relational databases as mysql, mssql, maria db, aurora and postgres',
     author='Seven Technologies Cloud',
     author_email='admin@seventechnologies.cloud',
@@ -38,7 +41,7 @@ setup(
     keywords=['api', 'rest api', 'database', 'python',
               'mysql', 'mssql', 'postgres', 'aurora', 'mariadb'],
     package_data=list_files_by_extension(extension=('.yaml', '.txt', '.html', '.md')),
-    packages=list(find_packages_custom(exclude=['venv'])),
+    packages=find_packages_custom(include=['apigenerator', 'databaseconnector', 'domaingenerator']),
     package_dir={'pythonrest': '.'},
     install_requires=[],
     entry_points={
