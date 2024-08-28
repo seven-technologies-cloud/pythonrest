@@ -43,7 +43,7 @@ setup(
     package_data=list_files_by_extension(extension=('.yaml', '.txt', '.html', '.md')),
     packages=find_packages_custom(include=['apigenerator', 'databaseconnector', 'domaingenerator']),
     package_dir={'pythonrest': '.'},
-    install_requires=[],
+    install_requires=open('requirements.txt').readlines(),
     entry_points={
         'console_scripts': [
             'pythonrest=pythonrest:app',
