@@ -21,7 +21,9 @@ class Auth(UserMixin):
         return self.id
 
 
-admin_user = Auth(1, 'admin', 'admin')
+username = get_global_variable(variable_name='ADMIN_USER')
+password = get_global_variable(variable_name='ADMIN_PASSWORD')
+admin_user = Auth(1, username, password)
 
 
 @login_manager.user_loader
