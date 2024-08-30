@@ -28,7 +28,6 @@ Below is the command to create a python venv:
       ```commandline
       pip install -r requirements.txt
       ```
-
 4. Run app.py
 
     After completing libraries installation, you can use the below command to run the project:

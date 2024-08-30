@@ -6,9 +6,7 @@ from src.e_Infra.b_Builders.FlaskAdminPanelBuilder import *
 from src.b_Application.b_Service.b_Custom.SQLService import *
 
 login_manager = LoginManager(app_handler)
-login_manager.login_view = 'auth.login_route'  # Rota para a página de login
-
-# Usuário fixo (em produção, utilize uma forma mais segura de armazenar credenciais)
+login_manager.login_view = 'auth.login_route'
 
 
 class Auth(UserMixin):
@@ -21,9 +19,10 @@ class Auth(UserMixin):
         return self.id
 
 
-username = get_global_variable(variable_name='ADMIN_USER')
-password = get_global_variable(variable_name='ADMIN_PASSWORD')
-admin_user = Auth(1, username, password)
+admin_panel_user = get_global_variable(variable_name='admin_panel_user')
+admin_panel_password = get_global_variable(
+    variable_name='admin_panel_password')
+admin_user = Auth(1, admin_panel_user, admin_panel_password)
 
 
 @login_manager.user_loader
@@ -38,7 +37,7 @@ def login_route():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'admin' and password == 'admin':
+        if username == admin_panel_user and password == admin_panel_password:
             login_user(admin_user)
             return redirect('/admin')
         else:

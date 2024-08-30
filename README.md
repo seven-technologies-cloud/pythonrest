@@ -312,13 +312,13 @@ python app.py
 From there you can access the URL localhost:5000, which is the base endpoint to go to the project routes and make requests following the **API Usage Examples** section on this readme, our [blog](https://medium.com/@seventechnologiescloud/) and documentation at [readthedocs](https://readthedocs.org/projects/pythonrest/)
 <br></br>
 
-## Create file '.env'
+## Add Environment Variables to use flask admin panel
 
-    To access the administration panel you have to create a file called '.env' and define the username and password.
-    Example:
+    To access the administration panel you have to add the two environment variables below:
     ```
-    ADMIN_USER='<your_username>'
-    ADMIN_PASSWORD='<your_password>'
+    os.environ['admin_panel_user'] = 'admin'
+    os.environ['admin_panel_password'] = 'admin'
+    ```
 
 ## Run and Debug using venv with VSCode
 
