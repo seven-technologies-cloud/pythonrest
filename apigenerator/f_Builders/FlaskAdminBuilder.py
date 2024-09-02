@@ -60,7 +60,7 @@ def create_model_view(model_name, fields, pk_autoincrement, file_path):
 class {model_name}ModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated
-
+        
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
     column_filters = {tuple(column_filters)}
