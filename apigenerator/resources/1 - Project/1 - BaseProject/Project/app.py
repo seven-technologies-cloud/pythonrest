@@ -8,6 +8,7 @@ from src.a_Presentation.b_Custom.OptionsController import *
 from src.a_Presentation.b_Custom.SQLController import *
 from src.a_Presentation.b_Custom.BeforeRequestController import *
 from src.a_Presentation.b_Custom.ExceptionHandlerController import *
+from src.a_Presentation.b_Custom.FlaskAdminPanelController import *
 
 
 # LocalHost run #

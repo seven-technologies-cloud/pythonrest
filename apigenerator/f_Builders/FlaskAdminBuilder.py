@@ -58,6 +58,9 @@ def create_model_view(model_name, fields, pk_autoincrement, file_path):
     return f"""
 
 class {model_name}ModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+        
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
     column_filters = {tuple(column_filters)}
@@ -66,7 +69,7 @@ class {model_name}ModelView(ModelView):
 
 
 def generate_flask_admin_files(result, project_domain_folder, domain_files, database):
-    views_code = "from flask_admin.contrib.sqla import ModelView\n"
+    views_code = "from flask_admin.contrib.sqla import ModelView\nfrom flask_login import login_required, current_user\n"
     admin_views = ""
     model_imports = ""
     database_mapper = {
@@ -94,7 +97,8 @@ def generate_flask_admin_files(result, project_domain_folder, domain_files, data
 
     # Write FlaskAdminPanelBuilder.py
     builder_code = f"""from src.e_Infra.b_Builders.FlaskBuilder import app_handler
-from flask_admin import Admin
+from flask_admin import Admin, BaseView, expose
+from flask_login import LoginManager, UserMixin, login_required, current_user, login_user
 from src.c_Domain.a_FlaskAdminPanel.FlaskAdminModelViews import *
 from src.e_Infra.c_Resolvers.{database_mapper[database]}ConnectionResolver import get_{database}_connection_session
 {model_imports}
