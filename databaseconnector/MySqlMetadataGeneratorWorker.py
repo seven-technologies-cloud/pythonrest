@@ -6,17 +6,29 @@ from databaseconnector.JSONDictHelper import *
 from databaseconnector.FilesHandler import get_domain_result_files
 
 
-def generate_mysql_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path):
+def generate_mysql_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None):
     json_generated_metadata_folder = os.path.join(generated_api_path, "JSONMetadata")
     os.makedirs(json_generated_metadata_folder)
 
     try:
-        connected_schema = get_mysql_db_connection(
-            project_database_data[f'{project_database}_host'],
-            int(project_database_data[f'{project_database}_port']),
-            project_database_data[f'{project_database}_user'],
-            project_database_data[f'{project_database}_password'],
-            project_database_data[f'{project_database}_schema'])
+        if ssh_params_with_password:
+            connected_schema = get_mysql_db_connection_with_ssh_password(
+                project_database_data[f'{project_database}_host'],
+                int(project_database_data[f'{project_database}_port']),
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'],
+                ssh_params_with_password['ssh_host'],
+                int(ssh_params_with_password['ssh_port']),
+                ssh_params_with_password['ssh_user'],
+                ssh_params_with_password['ssh_password'])
+        else:
+            connected_schema = get_mysql_db_connection(
+                project_database_data[f'{project_database}_host'],
+                int(project_database_data[f'{project_database}_port']),
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'])
     except Exception as e:
         raise e
 

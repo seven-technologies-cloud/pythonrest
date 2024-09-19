@@ -10,10 +10,12 @@ from databaseconnector.FilesHandler import check_if_provided_directory_is_unsafe
 from databaseconnector.MySqlMetadataGeneratorWorker import generate_mysql_database_metadata
 from databaseconnector.PostgreSqlMetadataGeneratorWorker import generate_postgresql_database_metadata
 from databaseconnector.SqlServerMetadataGeneratorWorker import generate_sqlserver_database_metadata
+from databaseconnector.SSHConnection import get_ssh_connection
 from domaingenerator.DomainFilesGeneratorWorker import generate_domain_files
 from apigenerator.b_Workers.DirectoryManager import check_if_base_project_exists
 from apigenerator.b_Workers.ApiGeneratorWorker import generate_python_rest_api
 from apigenerator.e_Enumerables.Enumerables import get_directory_data
+
 
 app = typer.Typer()
 pythonrest_version = "0.1.7"
@@ -34,6 +36,7 @@ def generate(
     sqlserver_connection_string: Optional[str] = None,
     mariadb_connection_parameters: Optional[str] = None,
     mariadb_connection_string: Optional[str] = None,
+    ssh_connection_with_password_string: Optional[str] = None,
 ):
     # Application start and database connection
     if (mysql_connection_string or mysql_connection_parameters) and (postgres_connection_string or postgres_connection_parameters) and (sqlserver_connection_string or sqlserver_connection_parameters) and (mariadb_connection_string or mariadb_connection_parameters):
@@ -87,7 +90,13 @@ def generate(
     elif mysql_connection_string:
         try:
             mysql_params = extract_mysql_params(mysql_connection_string)
-            generate_mysql_database_metadata('mysql', mysql_params, use_pascal_case, result_full_path)
+            if ssh_connection_with_password_string:
+                ssh_params = extract_ssh_params(ssh_connection_with_password_string)
+                generate_mysql_database_metadata(
+                    'mysql', mysql_params, use_pascal_case, result_full_path, ssh_params
+                )
+            else:
+                generate_mysql_database_metadata('mysql', mysql_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
             generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
             os.makedirs(generated_domains_path)
@@ -110,7 +119,11 @@ def generate(
     elif postgres_connection_string:
         try:
             postgres_params = extract_postgres_params(postgres_connection_string)
-            generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path)
+            if ssh_connection_with_password_string:
+                ssh_params = extract_ssh_params(ssh_connection_with_password_string)
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path, ssh_params)
+            else:
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
             generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
             os.makedirs(generated_domains_path)
@@ -133,7 +146,11 @@ def generate(
     elif sqlserver_connection_string:
         try:
             sqlserver_params = extract_sqlserver_params(sqlserver_connection_string)
-            generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path)
+            if ssh_connection_with_password_string:
+                ssh_params = extract_ssh_params(ssh_connection_with_password_string)
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path, ssh_params)
+            else:
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
             generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
             os.makedirs(generated_domains_path)
@@ -156,7 +173,11 @@ def generate(
     elif mariadb_connection_string:
         try:
             mariadb_params = extract_mariadb_params(mariadb_connection_string)
-            generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path)
+            if ssh_connection_with_password_string:
+                ssh_params = extract_ssh_params(ssh_connection_with_password_string)
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path, ssh_params)
+            else:
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
             generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
             os.makedirs(generated_domains_path)

@@ -1,5 +1,20 @@
 import re
 
+def extract_ssh_params(connection_string):
+    pattern = re.compile(r"ssh:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)")
+    match = pattern.match(connection_string)
+
+
+    if match:
+        return {
+            "ssh_user": match.group(1),
+            "ssh_password": match.group(2),
+            "ssh_host": match.group(3),
+            "ssh_port": int(match.group(4)),
+        }
+    else:
+        raise ValueError("Invalid SSH connection string format.")
+
 
 def extract_mysql_params(connection_string):
     pattern = re.compile(r"mysql:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)\/(.+)")
