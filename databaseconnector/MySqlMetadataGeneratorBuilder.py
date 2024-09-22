@@ -12,7 +12,7 @@ def get_mysql_db_connection_with_ssh_password(
             ssh_username=ssh_user,
             ssh_password=ssh_password,
             remote_bind_address=(_host, _port),
-            local_bind_address=(_host, 3307),
+            local_bind_address=(ssh_host, 3307),
             set_keepalive=10
         )
 

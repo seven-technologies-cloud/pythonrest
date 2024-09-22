@@ -11,7 +11,7 @@ def get_postgresql_db_connection_with_ssh_password(
             ssh_username=ssh_user,
             ssh_password=ssh_password,
             remote_bind_address=(_host, _port),
-            local_bind_address=(_host, 5433),
+            local_bind_address=(ssh_host, 5433),
             set_keepalive=10
         )
 

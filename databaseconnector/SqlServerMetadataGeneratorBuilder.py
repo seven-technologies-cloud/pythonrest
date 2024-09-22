@@ -10,7 +10,7 @@ def get_sqlserver_db_connection_with_ssh_password(
             ssh_username=ssh_user,
             ssh_password=ssh_password,
             remote_bind_address=(server, port),
-            local_bind_address=(server, 1434),
+            local_bind_address=(ssh_host, 1434),
             set_keepalive=10
         )
 
