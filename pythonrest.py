@@ -36,6 +36,7 @@ def generate(
     mariadb_connection_parameters: Optional[str] = None,
     mariadb_connection_string: Optional[str] = None,
     ssh_connection_with_password_string: Optional[str] = None,
+    ssh_connection_with_publickey_string: Optional[str] = None,
 ):
     # Application start and database connection
     if (mysql_connection_string or mysql_connection_parameters) and (postgres_connection_string or postgres_connection_parameters) and (sqlserver_connection_string or sqlserver_connection_parameters) and (mariadb_connection_string or mariadb_connection_parameters):
@@ -94,6 +95,11 @@ def generate(
                 generate_mysql_database_metadata(
                     'mysql', mysql_params, use_pascal_case, result_full_path, ssh_params
                 )
+            elif ssh_connection_with_publickey_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_connection_with_publickey_string)
+                generate_mysql_database_metadata(
+                    'mysql', mysql_params, use_pascal_case, result_full_path, ssh_publickey_params=ssh_publickey_params
+                )
             else:
                 generate_mysql_database_metadata('mysql', mysql_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
@@ -121,6 +127,10 @@ def generate(
             if ssh_connection_with_password_string:
                 ssh_params = extract_ssh_params(ssh_connection_with_password_string)
                 generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path, ssh_params)
+            elif ssh_connection_with_publickey_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_connection_with_publickey_string)
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path,
+                                                      ssh_publickey_params=ssh_publickey_params)
             else:
                 generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
@@ -148,6 +158,10 @@ def generate(
             if ssh_connection_with_password_string:
                 ssh_params = extract_ssh_params(ssh_connection_with_password_string)
                 generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path, ssh_params)
+            elif ssh_connection_with_publickey_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_connection_with_publickey_string)
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path,
+                                                     ssh_publickey_params=ssh_publickey_params)
             else:
                 generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation
@@ -175,6 +189,10 @@ def generate(
             if ssh_connection_with_password_string:
                 ssh_params = extract_ssh_params(ssh_connection_with_password_string)
                 generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path, ssh_params)
+            elif ssh_connection_with_publickey_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_connection_with_publickey_string)
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path,
+                                                 ssh_publickey_params=ssh_publickey_params)
             else:
                 generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path)
             # Python Domain Files Generation

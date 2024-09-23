@@ -6,7 +6,7 @@ from databaseconnector.JSONDictHelper import *
 from databaseconnector.FilesHandler import get_domain_result_files
 
 
-def generate_mysql_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None):
+def generate_mysql_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None, ssh_publickey_params=None):
     json_generated_metadata_folder = os.path.join(generated_api_path, "JSONMetadata")
     os.makedirs(json_generated_metadata_folder)
 
@@ -22,6 +22,17 @@ def generate_mysql_database_metadata(project_database, project_database_data, us
                 int(ssh_params_with_password['ssh_port']),
                 ssh_params_with_password['ssh_user'],
                 ssh_params_with_password['ssh_password'])
+        elif ssh_publickey_params:
+            connected_schema = get_mysql_db_connection_with_ssh_publickey(
+                project_database_data[f'{project_database}_host'],
+                int(project_database_data[f'{project_database}_port']),
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'],
+                ssh_publickey_params['ssh_host'],
+                int(ssh_publickey_params['ssh_port']),
+                ssh_publickey_params['ssh_user'],
+                ssh_publickey_params['ssh_key_path'])
         else:
             connected_schema = get_mysql_db_connection(
                 project_database_data[f'{project_database}_host'],

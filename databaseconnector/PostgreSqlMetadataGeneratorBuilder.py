@@ -1,6 +1,38 @@
 from psycopg2 import *
 from databaseconnector.JSONDictHelper import retrieve_json_from_sql_query
 from sshtunnel import SSHTunnelForwarder
+from pathlib import Path
+
+def get_postgresql_db_connection_with_ssh_publickey(
+        _dbname, _host, _port, _user, _password, _schema, ssh_host, ssh_port, ssh_user, ssh_key_path
+):
+    try:
+        ssh_key_path = Path(ssh_key_path).as_posix()
+
+        tunnel = SSHTunnelForwarder(
+            ssh_address_or_host=(ssh_host, ssh_port),
+            ssh_username=ssh_user,
+            ssh_pkey=ssh_key_path,
+            remote_bind_address=(_host, _port),
+            local_bind_address=(ssh_host, 5433),
+            set_keepalive=10
+        )
+
+        tunnel.start()
+
+        con = connect(
+            dbname=_dbname,
+            host=_host, user=_user,
+            password=_password,
+            port=tunnel.local_bind_port,
+            options=f'-c search_path={_schema}'
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
 
 def get_postgresql_db_connection_with_ssh_password(
         _dbname, _host, _port, _user, _password, _schema, ssh_host, ssh_port, ssh_user, ssh_password

@@ -1,5 +1,19 @@
 import re
 
+def extract_ssh_publickey_params(connection_string):
+    pattern = re.compile(r"ssh:\/\/([^@]+)@([^:]+):(\d+)\?key_path=([A-Za-z]:[\\\/].+|[\\\/].+)")
+    match = pattern.match(connection_string)
+
+    if match:
+        return {
+            "ssh_user": match.group(1),       # Usuário SSH
+            "ssh_host": match.group(2),       # Host SSH
+            "ssh_port": int(match.group(3)),  # Porta SSH
+            "ssh_key_path": match.group(4)    # Caminho da chave privada
+        }
+    else:
+        raise ValueError("Invalid SSH connection string format.")
+
 def extract_ssh_params(connection_string):
     pattern = re.compile(r"ssh:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)")
     match = pattern.match(connection_string)

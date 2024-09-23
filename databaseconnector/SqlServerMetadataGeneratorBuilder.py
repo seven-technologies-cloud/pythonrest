@@ -1,5 +1,38 @@
 from pymssql import *
 from sshtunnel import SSHTunnelForwarder
+from pathlib import Path
+
+def get_sqlserver_db_connection_with_ssh_publickey(
+        server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_key_path
+):
+    try:
+        ssh_key_path = Path(ssh_key_path).as_posix()
+
+        tunnel = SSHTunnelForwarder(
+            ssh_address_or_host=(ssh_host, ssh_port),
+            ssh_username=ssh_user,
+            ssh_pkey=ssh_key_path,
+            remote_bind_address=(server, port),
+            local_bind_address=(ssh_host, 1434),
+            set_keepalive=10
+        )
+
+        tunnel.start()
+
+        conn = connect(
+            server=server,
+            port=tunnel.local_bind_port,
+            user=user,
+            password=password,
+            database=database
+        )
+
+        cursor = conn.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
 
 def get_sqlserver_db_connection_with_ssh_password(
         server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_password
