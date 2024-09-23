@@ -2,6 +2,30 @@ from pymssql import *
 from sshtunnel import SSHTunnelForwarder
 from pathlib import Path
 
+def get_sqlserver_db_connection_with_ssl(
+        server, port, user, password, database, ssl_ca, ssl_cert, ssl_key
+):
+    try:
+        conn = connect(
+            server=server,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            ssl={
+                'ca': ssl_ca,
+                'cert': ssl_cert,
+                'key': ssl_key,
+                'check_hostname': False # TODO Configuração apenas para nivel de teste, para produção necessario a remoção desta linha.
+            }
+        )
+
+        cursor = conn.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
 def get_sqlserver_db_connection_with_ssh_publickey(
         server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_key_path
 ):

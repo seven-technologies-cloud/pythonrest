@@ -3,6 +3,30 @@ from databaseconnector.JSONDictHelper import retrieve_json_from_sql_query
 from sshtunnel import SSHTunnelForwarder
 from pathlib import Path
 
+def get_mysql_db_connection_with_ssl(
+        _host, _port, _user, _password, _database, ssl_ca, ssl_cert, ssl_key
+):
+    try:
+        con = connect(
+            host=_host,
+            user=_user,
+            password=_password,
+            db=_database,
+            port=_port,
+            ssl={
+                'ca': ssl_ca,
+                'cert': ssl_cert,
+                'key': ssl_key,
+                'check_hostname': False #TODO Configuração apenas para nivel de teste, para produção necessario a remoção desta linha.
+            }
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
 def get_mysql_db_connection_with_ssh_publickey(
         _host, _port, _user, _password, _database, ssh_host, ssh_port, ssh_user, ssh_key_path
 ):

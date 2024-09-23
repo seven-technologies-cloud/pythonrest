@@ -6,7 +6,7 @@ from databaseconnector.JSONDictHelper import *
 from databaseconnector.FilesHandler import get_domain_result_files
 
 
-def generate_sqlserver_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None, ssh_publickey_params=None):
+def generate_sqlserver_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None, ssh_publickey_params=None, ssl_params=None):
     json_generated_metadata_folder = os.path.join(generated_api_path, "JSONMetadata")
     os.makedirs(json_generated_metadata_folder)
 
@@ -33,6 +33,16 @@ def generate_sqlserver_database_metadata(project_database, project_database_data
                 int(ssh_publickey_params['ssh_port']),
                 ssh_publickey_params['ssh_user'],
                 ssh_publickey_params['ssh_key_path'])
+        elif ssl_params:
+            cursor = get_sqlserver_db_connection_with_ssl(
+                project_database_data[f'{project_database}_host'],
+                project_database_data[f'{project_database}_port'],
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'],
+                ssl_params['ssl_ca'],
+                ssl_params['ssl_cert'],
+                ssl_params['ssl_key'])
         else:
             cursor = get_sqlserver_connection(project_database_data[f'{project_database}_host'],
                                               project_database_data[f'{project_database}_port'],
