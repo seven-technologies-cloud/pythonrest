@@ -3,11 +3,11 @@ from sshtunnel import SSHTunnelForwarder
 from pathlib import Path
 
 def get_sqlserver_db_connection_with_ssl(
-        server, port, user, password, database, ssl_ca, ssl_cert, ssl_key
+        server, port, user, password, database, ssl_ca, ssl_cert, ssl_key, ssl_hostname
 ):
     try:
         conn = connect(
-            server=server,
+            server=ssl_hostname,
             port=port,
             user=user,
             password=password,
@@ -27,7 +27,7 @@ def get_sqlserver_db_connection_with_ssl(
         print(f"Failed to connect: {e}")
 
 def get_sqlserver_db_connection_with_ssh_publickey(
-        server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_key_path
+        server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_key_path, ssh_local_bind_port
 ):
     try:
         ssh_key_path = Path(ssh_key_path).as_posix()
@@ -37,7 +37,7 @@ def get_sqlserver_db_connection_with_ssh_publickey(
             ssh_username=ssh_user,
             ssh_pkey=ssh_key_path,
             remote_bind_address=(server, port),
-            local_bind_address=(ssh_host, 1434),
+            local_bind_address=(ssh_host, ssh_local_bind_port),
             set_keepalive=10
         )
 
@@ -59,7 +59,7 @@ def get_sqlserver_db_connection_with_ssh_publickey(
 
 
 def get_sqlserver_db_connection_with_ssh_password(
-        server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_password
+        server, port, user, password, database, ssh_host, ssh_port, ssh_user, ssh_password, ssh_local_bind_port
 ):
     try:
         tunnel = SSHTunnelForwarder(
@@ -67,7 +67,7 @@ def get_sqlserver_db_connection_with_ssh_password(
             ssh_username=ssh_user,
             ssh_password=ssh_password,
             remote_bind_address=(server, port),
-            local_bind_address=(ssh_host, 1434),
+            local_bind_address=(ssh_host, ssh_local_bind_port),
             set_keepalive=10
         )
 

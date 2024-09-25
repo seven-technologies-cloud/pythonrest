@@ -1,36 +1,39 @@
 import re
+from pathlib import Path
 
 def extract_ssl_params(connection_string):
-    pattern = re.compile(r"ssl:\/\/ssl_ca=([^?]+)\?ssl_cert=([^?]+)\?ssl_key=([^?]+)")
+    pattern = re.compile(r"ssl:\/\/ssl_ca=([^?]+)\?ssl_cert=([^?]+)\?ssl_key=([^?]+)\?hostname=([^?]+)")
     match = pattern.match(connection_string)
 
     if match:
         return {
             "ssl_ca": match.group(1),
             "ssl_cert": match.group(2),
-            "ssl_key": match.group(3)
+            "ssl_key": match.group(3),
+            "ssl_hostname": match.group(4),
         }
     else:
         raise ValueError("Invalid SSL connection string format.")
 
 def extract_ssh_publickey_params(connection_string):
-    pattern = re.compile(r"ssh:\/\/([^@]+)@([^:]+):(\d+)\?key_path=([A-Za-z]:[\\\/].+|[\\\/].+)")
+    pattern = re.compile(r"ssh:\/\/([^@]+)@([^:]+):(\d+)\?key_path=([A-Za-z]:[\\\/].+|[\\\/].+)\?local_bind_port=(\d+)")
     match = pattern.match(connection_string)
+    ssh_key_path = Path(match.group(4)).as_posix()
 
     if match:
         return {
             "ssh_user": match.group(1),
             "ssh_host": match.group(2),
             "ssh_port": int(match.group(3)),
-            "ssh_key_path": match.group(4)
+            "ssh_key_path": ssh_key_path,
+            "ssh_local_bind_port": int(match.group(5)),
         }
     else:
         raise ValueError("Invalid SSH connection string format.")
 
 def extract_ssh_params(connection_string):
-    pattern = re.compile(r"ssh:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)")
+    pattern = re.compile(r"ssh:\/\/([^:]+):([^@]+)@([^:]+):(\d+)(?:\?local_bind_port=(\d+))?")
     match = pattern.match(connection_string)
-
 
     if match:
         return {
@@ -38,6 +41,7 @@ def extract_ssh_params(connection_string):
             "ssh_password": match.group(2),
             "ssh_host": match.group(3),
             "ssh_port": int(match.group(4)),
+            "ssh_local_bind_port": int(match.group(5)),
         }
     else:
         raise ValueError("Invalid SSH connection string format.")

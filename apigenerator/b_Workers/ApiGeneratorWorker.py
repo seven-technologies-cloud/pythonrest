@@ -9,7 +9,7 @@ from apigenerator.f_Builders.RedocBuilder import modify_redoc_related_files
 
 
 def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists,
-                             project_name, uid_type):
+                             project_name, uid_type, connection_types_params=None, connection_types=None):
     try:
         print('Preparing to generate API...')
         proj_domain_folder = os.path.join(result_full_path, 'src', 'c_Domain')
@@ -22,7 +22,10 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ---------------------------- Copying Database Files ---------------------------- #
         if not base_project_exists:
-            install_database_files(result_full_path, db, script_absolute_path)
+            if connection_types:
+                install_database_files(result_full_path, db, script_absolute_path, connection_types)
+            else:
+                install_database_files(result_full_path, db, script_absolute_path)
 
         # ------------------------------------ Domain ------------------------------------ #
 
@@ -40,8 +43,12 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ----------------------------- Environment Variables ----------------------------- #
 
-        install_environment_variables(
-            result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type)
+        if connection_types_params:
+            install_environment_variables(
+                result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type, connection_types_params)
+        else:
+            install_environment_variables(
+                result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type)
 
         # ---------------------------------- Flask-Admin ---------------------------------- #
         build_flask_admin_files(result_full_path, proj_domain_folder, db)

@@ -22,7 +22,8 @@ def generate_postgresql_database_metadata(project_database, project_database_dat
                 ssh_params_with_password['ssh_host'],
                 int(ssh_params_with_password['ssh_port']),
                 ssh_params_with_password['ssh_user'],
-                ssh_params_with_password['ssh_password'])
+                ssh_params_with_password['ssh_password'],
+                ssh_params_with_password['ssh_local_bind_port'])
         elif ssh_publickey_params:
             connected_db = get_postgresql_db_connection_with_ssh_publickey(
                 project_database_data[f'{project_database}_database_name'],
@@ -34,9 +35,10 @@ def generate_postgresql_database_metadata(project_database, project_database_dat
                 ssh_publickey_params['ssh_host'],
                 int(ssh_publickey_params['ssh_port']),
                 ssh_publickey_params['ssh_user'],
-                ssh_publickey_params['ssh_key_path'])
+                ssh_publickey_params['ssh_key_path'],
+                ssh_publickey_params['ssh_local_bind_port'])
         elif ssl_params:
-            connected_db = get_postgresql_db_connection_with_ssh_publickey(
+            connected_db = get_postgresql_db_connection_with_ssl(
                 project_database_data[f'{project_database}_database_name'],
                 project_database_data[f'{project_database}_host'],
                 project_database_data[f'{project_database}_port'],
@@ -45,7 +47,8 @@ def generate_postgresql_database_metadata(project_database, project_database_dat
                 project_database_data[f'{project_database}_schema'],
                 ssl_params['ssl_ca'],
                 ssl_params['ssl_cert'],
-                ssl_params['ssl_key'])
+                ssl_params['ssl_key'],
+                ssl_params['ssl_hostname'])
         else:
             connected_db = get_postgresql_db_connection(
                 project_database_data[f'{project_database}_database_name'],

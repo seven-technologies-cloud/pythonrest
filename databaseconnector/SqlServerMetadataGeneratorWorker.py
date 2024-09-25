@@ -21,7 +21,8 @@ def generate_sqlserver_database_metadata(project_database, project_database_data
                 ssh_params_with_password['ssh_host'],
                 int(ssh_params_with_password['ssh_port']),
                 ssh_params_with_password['ssh_user'],
-                ssh_params_with_password['ssh_password'])
+                ssh_params_with_password['ssh_password'],
+                ssh_params_with_password['ssh_local_bind_port'])
         elif ssh_publickey_params:
             cursor = get_sqlserver_db_connection_with_ssh_publickey(
                 project_database_data[f'{project_database}_host'],
@@ -32,7 +33,8 @@ def generate_sqlserver_database_metadata(project_database, project_database_data
                 ssh_publickey_params['ssh_host'],
                 int(ssh_publickey_params['ssh_port']),
                 ssh_publickey_params['ssh_user'],
-                ssh_publickey_params['ssh_key_path'])
+                ssh_publickey_params['ssh_key_path'],
+                ssh_publickey_params['ssh_local_bind_port'])
         elif ssl_params:
             cursor = get_sqlserver_db_connection_with_ssl(
                 project_database_data[f'{project_database}_host'],
@@ -42,7 +44,8 @@ def generate_sqlserver_database_metadata(project_database, project_database_data
                 project_database_data[f'{project_database}_schema'],
                 ssl_params['ssl_ca'],
                 ssl_params['ssl_cert'],
-                ssl_params['ssl_key'])
+                ssl_params['ssl_key'],
+                ssl_params['ssl_hostname'])
         else:
             cursor = get_sqlserver_connection(project_database_data[f'{project_database}_host'],
                                               project_database_data[f'{project_database}_port'],
