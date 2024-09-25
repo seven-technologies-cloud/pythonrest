@@ -30,8 +30,8 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.2.0',
-    description='PythonRestCLI tool, created and managed by Seven Technologies Cloud.\nIt generates a complete API based on a connection string for relational databases as mysql, mssql, maria db, aurora and postgres',
+    version='0.2.1',
+    description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
     author='Seven Technologies Cloud',
     author_email='admin@seventechnologies.cloud',
     maintainer='Seven Technologies Cloud',
