@@ -2,7 +2,8 @@
 # Methods to build declarative_meta Redoc docs #
 @redoc_blueprint.route('/redoc/meta_string')
 def meta_string_redoc():
-    return render_template('declarative_meta.html')
+    redoc_spec_url = '/redoc/spec/meta_string'
+    return render_template('redoc.html', spec_url=redoc_spec_url)
 
 
 @redoc_blueprint.route('/redoc/spec/meta_string')
@@ -11,4 +12,3 @@ def meta_string_spec():
     with open(yaml_path, 'r') as yaml_file:
         yaml_content = yaml_file.read()
     return yaml_content
-
