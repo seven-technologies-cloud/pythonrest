@@ -4,7 +4,7 @@ from shutil import copytree
 from apigenerator.g_Utils.OpenFileExeHandler import open
 
 
-def install_environment_variables(result, us_datetime, db, db_params, script_absolute_path, uid_type, connection_types_params=None):
+def install_environment_variables(result, us_datetime, db, db_params, script_absolute_path, uid_type, db_secure_connection_params=None):
     # Installs and configures environment variables in environment variables file.
     print('Adding Environment Variables to API')
     copytree(os.path.join(script_absolute_path, 'apigenerator/resources/3 - Variables/EnvironmentVariablesFile'),
@@ -24,10 +24,10 @@ def install_environment_variables(result, us_datetime, db, db_params, script_abs
                     append_line = append_line + "os.environ['{}'] = '{}'\n".format(key, db_params[key])
                 line = line + append_line
 
-                if connection_types_params:
+                if db_secure_connection_params:
                     append_line = ''
-                    for key in connection_types_params:
-                        append_line = append_line + "os.environ['{}'] = '{}'\n".format(key, connection_types_params[key])
+                    for key in db_secure_connection_params:
+                        append_line = append_line + "os.environ['{}'] = '{}'\n".format(key, db_secure_connection_params[key])
                     line = line + append_line
 
             if '# UID Generation Type #' in line:

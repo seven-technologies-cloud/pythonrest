@@ -9,7 +9,7 @@ from apigenerator.f_Builders.RedocBuilder import modify_redoc_related_files
 
 
 def generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, db, db_params, base_project_exists,
-                             project_name, uid_type, connection_types_params=None, connection_types=None):
+                             project_name, uid_type, db_secure_connection_params=None, db_authentication_method=None):
     try:
         print('Preparing to generate API...')
         proj_domain_folder = os.path.join(result_full_path, 'src', 'c_Domain')
@@ -22,8 +22,8 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ---------------------------- Copying Database Files ---------------------------- #
         if not base_project_exists:
-            if connection_types:
-                install_database_files(result_full_path, db, script_absolute_path, connection_types)
+            if db_authentication_method:
+                install_database_files(result_full_path, db, script_absolute_path, db_authentication_method)
             else:
                 install_database_files(result_full_path, db, script_absolute_path)
 
@@ -43,9 +43,9 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ----------------------------- Environment Variables ----------------------------- #
 
-        if connection_types_params:
+        if db_secure_connection_params:
             install_environment_variables(
-                result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type, connection_types_params)
+                result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type, db_secure_connection_params)
         else:
             install_environment_variables(
                 result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type)
