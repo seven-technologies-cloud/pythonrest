@@ -55,6 +55,7 @@ setup(
         'pyasn1==0.6.0',
         'psycopg2-binary==2.9.9',
         'pymssql==2.2.11',
+        'sshtunnel==0.4.0',
     ],
     entry_points={
         'console_scripts': [

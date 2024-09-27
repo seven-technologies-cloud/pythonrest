@@ -22,7 +22,9 @@ def get_mssql_connection_schema_internet():
                                                  + get_global_variable('mssql_schema') + '?' \
                                                  + 'ssl_ca=' + get_global_variable('ssl_ca') + '&' \
                                                  + 'ssl_cert=' + get_global_variable('ssl_cert') + '&' \
-                                                 + 'ssl_key=' + get_global_variable('ssl_key')
+                                                 + 'ssl_key=' + get_global_variable('ssl_key') + '&' \
+                                                 + 'ssl_verify_cert=true&' \
+                                                 + 'ssl_verify_identity=true'
     # Returning connection result #
     # Returning connection result #
     return mssql_internet_conn

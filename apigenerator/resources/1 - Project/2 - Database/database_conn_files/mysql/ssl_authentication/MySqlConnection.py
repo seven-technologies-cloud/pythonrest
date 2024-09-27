@@ -22,6 +22,8 @@ def get_mysql_connection_schema_internet():
                                                  + get_global_variable('mysql_schema') + '?' \
                                                  + 'ssl_ca=' + get_global_variable('ssl_ca') + '&' \
                                                  + 'ssl_cert=' + get_global_variable('ssl_cert') + '&' \
-                                                 + 'ssl_key=' + get_global_variable('ssl_key')
+                                                 + 'ssl_key=' + get_global_variable('ssl_key') + '&' \
+                                                 + 'ssl_verify_cert=true&' \
+                                                 + 'ssl_verify_identity=true'
     # Returning connection result #
     return mysql_internet_conn
