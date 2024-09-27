@@ -4,12 +4,15 @@ from pathlib import Path
 def extract_ssl_params(connection_string):
     pattern = re.compile(r"ssl:\/\/ssl_ca=([^?]+)\?ssl_cert=([^?]+)\?ssl_key=([^?]+)\?hostname=([^?]+)")
     match = pattern.match(connection_string)
+    ssl_ca_path = Path(match.group(1)).as_posix()
+    ssl_cert_path = Path(match.group(2)).as_posix()
+    ssl_key_path = Path(match.group(3)).as_posix()
 
     if match:
         return {
-            "ssl_ca": match.group(1),
-            "ssl_cert": match.group(2),
-            "ssl_key": match.group(3),
+            "ssl_ca": ssl_ca_path,
+            "ssl_cert": ssl_cert_path,
+            "ssl_key": ssl_key_path,
             "ssl_hostname": match.group(4),
         }
     else:

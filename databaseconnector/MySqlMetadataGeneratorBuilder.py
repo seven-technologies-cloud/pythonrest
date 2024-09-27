@@ -16,7 +16,7 @@ def get_mysql_db_connection_with_ssl(
                 'ca': ssl_ca,
                 'cert': ssl_cert,
                 'key': ssl_key,
-                'check_hostname': False #TODO Configuração apenas para nivel de teste, para produção necessario a remoção desta linha.
+                'check_hostname': True #TODO Configuração apenas para nivel de teste, para produção necessario a remoção desta linha.
             }
         )
 
