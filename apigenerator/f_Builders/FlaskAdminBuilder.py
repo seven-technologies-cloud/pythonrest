@@ -36,9 +36,9 @@ def parse_model_attributes(file_path):
     if fields_match:
         fields = fields_match.group(1).replace(
             '"', '').replace("'", "").split(",")
-        fields = [field.strip() for field in fields]
+        fields = tuple(field.strip() for field in fields if field.strip())
     else:
-        fields = []
+        fields = ()
 
     pk_autoincrement = 'primary_key=True' in content and 'autoincrement=True' in content
 
@@ -60,7 +60,7 @@ def create_model_view(model_name, fields, pk_autoincrement, file_path):
 class {model_name}ModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated
-        
+
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
     column_filters = {tuple(column_filters)}

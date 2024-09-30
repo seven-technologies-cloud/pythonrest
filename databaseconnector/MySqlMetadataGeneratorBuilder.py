@@ -1,6 +1,88 @@
 from pymysql import *
 from databaseconnector.JSONDictHelper import retrieve_json_from_sql_query
+from sshtunnel import SSHTunnelForwarder
 
+def get_mysql_db_connection_with_ssl(
+        _host, _port, _user, _password, _database, ssl_ca, ssl_cert, ssl_key, ssl_hostname
+):
+    try:
+        con = connect(
+            host=ssl_hostname,
+            user=_user,
+            password=_password,
+            db=_database,
+            port=_port,
+            ssl={
+                'ca': ssl_ca,
+                'cert': ssl_cert,
+                'key': ssl_key,
+                'check_hostname': True
+            }
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
+def get_mysql_db_connection_with_ssh_publickey(
+        _host, _port, _user, _password, _database, ssh_host, ssh_port, ssh_user, ssh_key_path, ssh_local_bind_port
+):
+    try:
+        tunnel = SSHTunnelForwarder(
+            ssh_address_or_host=(ssh_host, ssh_port),
+            ssh_username=ssh_user,
+            ssh_pkey=ssh_key_path,
+            remote_bind_address=(_host, _port),
+            local_bind_address=(ssh_host, ssh_local_bind_port),
+            set_keepalive=10
+        )
+
+        tunnel.start()
+
+        con = connect(
+            host=_host,
+            user=_user,
+            password=_password,
+            db=_database,
+            port=tunnel.local_bind_port
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
+def get_mysql_db_connection_with_ssh_password(
+        _host, _port, _user, _password, _database, ssh_host, ssh_port, ssh_user, ssh_password, ssh_local_bind_port
+):
+    try:
+        tunnel = SSHTunnelForwarder(
+            ssh_address_or_host=(ssh_host, ssh_port),
+            ssh_username=ssh_user,
+            ssh_password=ssh_password,
+            remote_bind_address=(_host, _port),
+            local_bind_address=(ssh_host, ssh_local_bind_port),
+            set_keepalive=10
+        )
+
+        tunnel.start()
+
+        con = connect(
+            host=_host,
+            user=_user,
+            password=_password,
+            db=_database,
+            port=tunnel.local_bind_port
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
 
 def get_mysql_db_connection(_host, _port, _user, _password, _database):
     con = connect(host=_host, port=_port, user=_user,
@@ -33,6 +115,7 @@ def convert_retrieved_table_name_tuple_list_from_connected_schema(tuple_name_lis
 def retrieve_table_name_tuple_list_from_connected_schema(connected_schema):
     connected_schema.execute('SHOW tables')
     response = connected_schema.fetchall()
+
     return response
 
 
