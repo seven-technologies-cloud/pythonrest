@@ -113,7 +113,7 @@ def generate(
             # PythonRest API Generation
             generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params, base_project_exists)
         except Exception as e:
-            typer.echo(e)
+            typer.echo(repr(e))
             return
 
     elif sqlserver_connection_parameters:
