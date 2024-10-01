@@ -1,6 +1,6 @@
 
 
-# Method to build Swagger Blueprint #
+# Method to build declarative_meta Swagger Blueprint #
 def build_meta_string_swagger_blueprint(app_handler):
 
     @app_handler.route('/swagger/meta_string', methods=['GET'])

@@ -1,6 +1,91 @@
 from psycopg2 import *
 from databaseconnector.JSONDictHelper import retrieve_json_from_sql_query
+from sshtunnel import SSHTunnelForwarder
+from pathlib import Path
 
+def get_postgresql_db_connection_with_ssl(
+        _dbname, _host, _port, _user, _password, _schema, ssl_ca, ssl_cert, ssl_key, ssl_hostname
+):
+    try:
+        con = connect(
+            dbname=_dbname,
+            host=ssl_hostname, user=_user,
+            password=_password,
+            port=_port,
+            options=f'-c search_path={_schema}',
+            ssl={
+                'ca': ssl_ca,
+                'cert': ssl_cert,
+                'key': ssl_key,
+                'check_hostname': False # TODO Configuração apenas para nivel de teste, para produção necessario a remoção desta linha.
+            }
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
+def get_postgresql_db_connection_with_ssh_publickey(
+        _dbname, _host, _port, _user, _password, _schema, ssh_host, ssh_port, ssh_user, ssh_key_path, ssh_local_bind_port
+):
+    try:
+        ssh_key_path = Path(ssh_key_path).as_posix()
+
+        tunnel = SSHTunnelForwarder(
+            ssh_address_or_host=(ssh_host, ssh_port),
+            ssh_username=ssh_user,
+            ssh_pkey=ssh_key_path,
+            remote_bind_address=(_host, _port),
+            local_bind_address=(ssh_host, ssh_local_bind_port),
+            set_keepalive=10
+        )
+
+        tunnel.start()
+
+        con = connect(
+            dbname=_dbname,
+            host=_host, user=_user,
+            password=_password,
+            port=tunnel.local_bind_port,
+            options=f'-c search_path={_schema}'
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
+
+def get_postgresql_db_connection_with_ssh_password(
+        _dbname, _host, _port, _user, _password, _schema, ssh_host, ssh_port, ssh_user, ssh_password, ssh_local_bind_port
+):
+    try:
+        tunnel = SSHTunnelForwarder(
+            ssh_address_or_host=(ssh_host, ssh_port),
+            ssh_username=ssh_user,
+            ssh_password=ssh_password,
+            remote_bind_address=(_host, _port),
+            local_bind_address=(ssh_host, ssh_local_bind_port),
+            set_keepalive=10
+        )
+
+        tunnel.start()
+
+        con = connect(
+            dbname=_dbname,
+            host=_host, user=_user,
+            password=_password,
+            port=tunnel.local_bind_port,
+            options=f'-c search_path={_schema}'
+        )
+
+        cursor = con.cursor()
+        return cursor
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
 
 def get_postgresql_db_connection(_dbname, _host, _port, _user, _password, _schema):
     conn = connect(dbname=_dbname, host=_host, user=_user, password=_password, port=_port, options=f'-c search_path={_schema}')

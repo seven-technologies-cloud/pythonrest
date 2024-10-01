@@ -4,6 +4,7 @@ import os
 from typing import Optional
 import typer
 import json
+import sys
 from databaseconnector.RegexHandler import *
 from databaseconnector.FilesHandler import check_if_provided_directory_is_unsafe, check_if_current_working_directory_is_unsafe, check_if_given_result_path_is_unsafe
 from databaseconnector.MySqlMetadataGeneratorWorker import generate_mysql_database_metadata
@@ -14,7 +15,9 @@ from apigenerator.b_Workers.DirectoryManager import check_if_base_project_exists
 from apigenerator.b_Workers.ApiGeneratorWorker import generate_python_rest_api
 from apigenerator.e_Enumerables.Enumerables import get_directory_data
 
+
 app = typer.Typer()
+pythonrest_version = "0.1.7"
 
 
 @app.command()
@@ -22,6 +25,8 @@ def generate(
     result_path: Optional[str] = None,
     use_pascal_case: Optional[bool] = True,
     us_datetime: Optional[bool] = False,
+    project_name: Optional[str] = "PythonREST",
+    uid_type: Optional[str] = "uuid",
     mysql_connection_parameters: Optional[str] = None,
     mysql_connection_string: Optional[str] = None,
     postgres_connection_parameters: Optional[str] = None,
@@ -30,6 +35,9 @@ def generate(
     sqlserver_connection_string: Optional[str] = None,
     mariadb_connection_parameters: Optional[str] = None,
     mariadb_connection_string: Optional[str] = None,
+    ssh_password_authentication_string: Optional[str] = None,
+    ssh_publickey_authentication_string: Optional[str] = None,
+    ssl_authentication_string: Optional[str] = None,
 ):
     # Application start and database connection
     if (mysql_connection_string or mysql_connection_parameters) and (postgres_connection_string or postgres_connection_parameters) and (sqlserver_connection_string or sqlserver_connection_parameters) and (mariadb_connection_string or mariadb_connection_parameters):
@@ -47,10 +55,10 @@ def generate(
     else:
         result_path = get_directory_data()['result_path_suffix']
 
-    result_full_path = os.path.abspath(os.path.join(os.getcwd(), result_path))
+    result_full_path = os.path.abspath(os.path.join(os.getenv('PWD', os.getcwd()), result_path))
 
-    if check_if_current_working_directory_is_unsafe(os.getcwd()):
-        typer.echo(f"Error: pythonrest is running from an unsafe directory: {os.getcwd()}, please run from another directory, API generation aborted!")
+    if check_if_current_working_directory_is_unsafe(os.getenv('PWD', os.getcwd())):
+        typer.echo(f"Error: pythonrest is running from an unsafe directory: {os.getenv('PWD', os.getcwd())}, please run from another directory, API generation aborted!")
         return
 
     if check_if_provided_directory_is_unsafe(result_full_path):
@@ -83,13 +91,51 @@ def generate(
     elif mysql_connection_string:
         try:
             mysql_params = extract_mysql_params(mysql_connection_string)
-            generate_mysql_database_metadata('mysql', mysql_params, use_pascal_case, result_full_path)
-            # Python Domain Files Generation
-            generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
-            os.makedirs(generated_domains_path)
-            generate_domain_files(result_full_path, generated_domains_path)
-            # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params, base_project_exists)
+            if ssh_password_authentication_string:
+                ssh_params = extract_ssh_params(ssh_password_authentication_string)
+                generate_mysql_database_metadata(
+                    'mysql', mysql_params, use_pascal_case, result_full_path, ssh_params
+                )
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params,
+                                         base_project_exists, project_name, uid_type, ssh_params, 'ssh_password_authentication')
+            elif ssh_publickey_authentication_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_publickey_authentication_string)
+                generate_mysql_database_metadata(
+                    'mysql', mysql_params, use_pascal_case, result_full_path, ssh_publickey_params=ssh_publickey_params
+                )
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params,
+                                         base_project_exists, project_name, uid_type, ssh_publickey_params, 'ssh_publickey_authentication')
+            elif ssl_authentication_string:
+                ssl_params = extract_ssl_params(ssl_authentication_string)
+                generate_mysql_database_metadata(
+                    'mysql', mysql_params, use_pascal_case, result_full_path, ssl_params=ssl_params
+                )
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params,
+                                         base_project_exists, project_name, uid_type, ssl_params, 'ssl_authentication')
+            else:
+                generate_mysql_database_metadata('mysql', mysql_params, use_pascal_case, result_full_path)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mysql', mysql_params,
+                                         base_project_exists, project_name, uid_type, db_authentication_method='direct_connection')
         except Exception as e:
             typer.echo(e)
             return
@@ -105,13 +151,50 @@ def generate(
     elif postgres_connection_string:
         try:
             postgres_params = extract_postgres_params(postgres_connection_string)
-            generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path)
-            # Python Domain Files Generation
-            generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
-            os.makedirs(generated_domains_path)
-            generate_domain_files(result_full_path, generated_domains_path)
-            # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params, base_project_exists)
+            if ssh_password_authentication_string:
+                ssh_params = extract_ssh_params(ssh_password_authentication_string)
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path, ssh_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql',
+                                         postgres_params,
+                                         base_project_exists, project_name, uid_type, ssh_params, 'ssh_password_authentication')
+            elif ssh_publickey_authentication_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_publickey_authentication_string)
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path,
+                                                      ssh_publickey_params=ssh_publickey_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql',
+                                         postgres_params,
+                                         base_project_exists, project_name, uid_type, ssh_publickey_params, 'ssh_publickey_authentication')
+            elif ssl_authentication_string:
+                ssl_params = extract_ssl_params(ssl_authentication_string)
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path,
+                                                      ssl_params=ssl_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql',
+                                         postgres_params,
+                                         base_project_exists, project_name, uid_type, ssl_params, 'ssl_authentication')
+            else:
+                generate_postgresql_database_metadata('pgsql', postgres_params, use_pascal_case, result_full_path)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params,
+                                         base_project_exists, project_name, uid_type, db_authentication_method='direct_connection')
         except Exception as e:
             typer.echo(repr(e))
             return
@@ -127,13 +210,50 @@ def generate(
     elif sqlserver_connection_string:
         try:
             sqlserver_params = extract_sqlserver_params(sqlserver_connection_string)
-            generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path)
-            # Python Domain Files Generation
-            generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
-            os.makedirs(generated_domains_path)
-            generate_domain_files(result_full_path, generated_domains_path)
-            # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params, base_project_exists)
+            if ssh_password_authentication_string:
+                ssh_params = extract_ssh_params(ssh_password_authentication_string)
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path, ssh_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql',
+                                         sqlserver_params,
+                                         base_project_exists, project_name, uid_type, ssh_params, 'ssh_password_authentication')
+            elif ssh_publickey_authentication_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_publickey_authentication_string)
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path,
+                                                     ssh_publickey_params=ssh_publickey_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql',
+                                         sqlserver_params,
+                                         base_project_exists, project_name, uid_type, ssh_publickey_params, 'ssh_publickey_authentication')
+            elif ssl_authentication_string:
+                ssl_params = extract_ssl_params(ssl_authentication_string)
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path,
+                                                     ssl_params=ssl_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql',
+                                         sqlserver_params,
+                                         base_project_exists, project_name, uid_type, ssl_params, 'ssl_authentication')
+            else:
+                generate_sqlserver_database_metadata('mssql', sqlserver_params, use_pascal_case, result_full_path)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mssql', sqlserver_params,
+                                         base_project_exists, project_name, uid_type, db_authentication_method='direct_connection')
         except Exception as e:
             typer.echo(e)
             return
@@ -149,13 +269,50 @@ def generate(
     elif mariadb_connection_string:
         try:
             mariadb_params = extract_mariadb_params(mariadb_connection_string)
-            generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path)
-            # Python Domain Files Generation
-            generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
-            os.makedirs(generated_domains_path)
-            generate_domain_files(result_full_path, generated_domains_path)
-            # PythonRest API Generation
-            generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params, base_project_exists)
+            if ssh_password_authentication_string:
+                ssh_params = extract_ssh_params(ssh_password_authentication_string)
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path, ssh_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb',
+                                         mariadb_params,
+                                         base_project_exists, project_name, uid_type, ssh_params, 'ssh_password_authentication')
+            elif ssh_publickey_authentication_string:
+                ssh_publickey_params = extract_ssh_publickey_params(ssh_publickey_authentication_string)
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path,
+                                                 ssh_publickey_params=ssh_publickey_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb',
+                                         mariadb_params,
+                                         base_project_exists, project_name, uid_type, ssh_publickey_params, 'ssh_publickey_authentication')
+            elif ssl_authentication_string:
+                ssl_params = extract_ssl_params(ssl_authentication_string)
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path,
+                                                 ssl_params=ssl_params)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb',
+                                         mariadb_params,
+                                         base_project_exists, project_name, uid_type, ssl_params, 'ssl_authentication')
+            else:
+                generate_mysql_database_metadata('mariadb', mariadb_params, use_pascal_case, result_full_path)
+                # Python Domain Files Generation
+                generated_domains_path = os.path.join(result_full_path, 'PythonGeneratedDomain')
+                os.makedirs(generated_domains_path)
+                generate_domain_files(result_full_path, generated_domains_path)
+                # PythonRest API Generation
+                generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'mariadb', mariadb_params,
+                                         base_project_exists, project_name, uid_type, db_authentication_method='direct_connection')
         except Exception as e:
             typer.echo(e)
             return
@@ -166,7 +323,7 @@ def generate(
 
 @app.command()
 def version():
-    typer.echo("pythonrest v0.1.4")
+    typer.echo(f"pythonrest v{pythonrest_version}")
 
 
 if __name__ == "__main__":

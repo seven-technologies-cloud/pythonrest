@@ -1,0 +1,14 @@
+version : '3.5'
+services:
+  mysql:
+    image: mysql
+    command: --mysql-native-password=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: adminuserdb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: adminuserdb
+      MYSQL_DATABASE: database_mapper_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./database_mapper_mysql.sql:/docker-entrypoint-initdb.d/1.sql"

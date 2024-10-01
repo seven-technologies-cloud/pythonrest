@@ -13,3 +13,7 @@ cryptography
 cffi
 pycparser
 pyasn1
+flask-admin
+uuid6
+python-ulid
+flask-login

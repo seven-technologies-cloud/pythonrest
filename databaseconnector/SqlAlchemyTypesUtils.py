@@ -2,7 +2,7 @@ import sys
 import os
 
 
-################################################ SaAuSQLTypes
+######################################################################################################################## SaAuSQLTypes
 def get_sa_AuSQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Interval', 'NCHAR', 'NVARCHAR',
@@ -34,7 +34,7 @@ def get_sa_AuSQL_dict_types_list():
     return []
 
 
-################################################ SaMaSQLTypes
+######################################################################################################################## SaMaSQLTypes
 def get_sa_MaSQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Interval', 'NCHAR', 'NVARCHAR',
@@ -66,7 +66,7 @@ def get_sa_MaSQL_dict_types_list():
     return []
 
 
-################################################ SaMySQLTypes
+######################################################################################################################## SaMySQLTypes
 def get_sa_MySQL_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Set', 'Interval', 'NCHAR', 'NVARCHAR', "YEAR", "year",
@@ -99,7 +99,7 @@ def get_sa_MySQL_dict_types_list():
     return []
 
 
-################################################ SaOcSQLTypes
+######################################################################################################################## SaOcSQLTypes
 def get_sa_OcSQL_string_types_list():
     return ['CHAR', 'VARCHAR2', 'VARCHAR', ]
 
@@ -130,7 +130,7 @@ def get_sa_OcSQL_dict_types_list():
     return []
 
 
-################################################ SaPgSQLTypes
+######################################################################################################################## SaPgSQLTypes
 def get_sa_PgSQL_string_types_list():
     return ['character varying', 'char', 'bpchar', 'BLOB', 'character', 'varchar', 'Binary', 'interval', 'enum', 'ENUM',
             'name', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'time', 'time with time zone',
@@ -168,7 +168,7 @@ def get_sa_PgSQL_dict_types_list():
     return []
 
 
-################################################ SaSeSQLTypes
+######################################################################################################################## SaSeSQLTypes
 def get_sa_SeSQL_string_types_list():
     return ['char', 'varchar', 'text', 'nchar', 'nvarchar', 'ntext', 'date', 'smalldatetime', 'datetime', 'datetime2', 'datetimeoffset', 'time']
 
@@ -197,6 +197,8 @@ def get_sa_SeSQL_dict_types_list():
     return []
 
 ########################################################################################################################
+
+
 def get_sa_string_types_list():
     return ['String', 'TIMESTAMP', 'timestamp', 'TIME', 'Time', 'Date', 'JSON', 'jsonb', 'JSONB' 'DateTime',
             'CHAR',  'DATE', 'DATETIME', 'Enum', 'Set', 'Interval', 'NCHAR', 'NVARCHAR', 'UUID',
@@ -229,6 +231,7 @@ def get_sa_dict_types_list():
 
 ################################################################################################################
 
+
 def type_with_size(column_type):
     return True if '(' in column_type and ')' in column_type else False
 
@@ -244,26 +247,26 @@ def get_sa_type_match(type_list, column_type_no_size, python_type_value, python_
         return first_result
 
     contains_list = [sa_type for sa_type in type_list
-                        if sa_type.lower() in column_type_no_size.lower() and python_type_value == python_type]
+                     if sa_type.lower() in column_type_no_size.lower() and python_type_value == python_type]
 
     if contains_list != list():
         result = max(contains_list, key=len)
         return result
 
-    third_result = next((sa_type for sa_type in type_list if python_type_value == python_type), None)
+    third_result = next(
+        (sa_type for sa_type in type_list if python_type_value == python_type), None)
     if third_result:
         return third_result
 
 
-def convert_set_or_enum_to_Enum(input_string):
-    # Check if the input is in 'set(...)' format
-    if input_string.lower().startswith("set(") and input_string.lower().endswith(")"):
-        values_string = input_string[4:-1]  # Strip 'set(' from the start and ')' from the end
+def convert_enum_to_Enum(input_string):
     # Check if the input is in 'enum(...)' format
-    elif input_string.lower().startswith("enum(") and input_string.lower().endswith(")"):
-        values_string = input_string[5:-1]  # Strip 'enum(' from the start and ')' from the end
+    if input_string.lower().startswith("enum(") and input_string.lower().endswith(")"):
+        # Strip 'enum(' from the start and ')' from the end
+        values_string = input_string[5:-1]
     else:
-        raise ValueError("Input string is not in the expected format: 'set(...)' or 'enum(...)'")
+        raise ValueError(
+            "Input string is not in the expected format: 'enum(...)'")
 
     # Extract the values and split by comma, keeping the quotes
     values = [value.strip().strip("'") for value in values_string.split(",")]
@@ -274,11 +277,33 @@ def convert_set_or_enum_to_Enum(input_string):
     return enum_declaration
 
 
+def convert_set_to_SET(input_string):
+    # Check if the input is in 'SET(...)' format
+    if input_string.lower().startswith("set(") and input_string.lower().endswith(")"):
+        # Strip 'set(' from the start and ')' from the end
+        values_string = input_string[4:-1]
+    else:
+        raise ValueError(
+            "Input string is not in the expected format: 'set(...)'")
+
+    # Extract the values and split by comma, keeping the quotes
+    values = [value.strip().strip("'") for value in values_string.split(",")]
+
+    # Create the Set declaration
+    set_declaration = f"Set({', '.join(repr(value) for value in values)})"
+
+    return set_declaration
+
+
 def handle_sql_to_sa_types_conversion(column_type):
-    if "set" in column_type.lower() or "enum" in column_type.lower():  # TODO remove this when SET types are fully supported by PythonREST
-        converted_column_type = convert_set_or_enum_to_Enum(column_type)
+    if "enum" in column_type.lower():
+        converted_column_type = convert_enum_to_Enum(column_type)
         return converted_column_type
-    if "decimal" in column_type.lower() or "numeric" in column_type.lower():  # TODO remove this when float type casting to Decimal or a way to send data of decimal type on requests is supported by PythonREST
+    if "set" in column_type.lower():
+        converted_column_type = convert_set_to_SET(column_type)
+        return converted_column_type
+    # TODO remove this when float type casting to Decimal or a way to send data of decimal type on requests is supported by PythonREST
+    if "decimal" in column_type.lower() or "numeric" in column_type.lower():
         return "Float"
     if "year" in column_type.lower():  # TODO remove this when YEAR types are fully supported by PythonREST
         return "String"
@@ -288,10 +313,12 @@ def handle_sql_to_sa_types_conversion(column_type):
         return "MONEY"
 
 
+
 def get_sa_type(column_type, python_type_value, database):
     base_column_type = column_type.split(" ")[0]
 
-    column_type_no_size = base_column_type.split('(')[0] if '(' in base_column_type else base_column_type
+    column_type_no_size = base_column_type.split(
+        '(')[0] if '(' in base_column_type else base_column_type
 
     str_type_list = get_sa_string_types_list()
     bytes_type_list = get_sa_bytes_types_list()
@@ -310,7 +337,8 @@ def get_sa_type(column_type, python_type_value, database):
         return converted_type
 
     for python_type, type_list in types_list_object.items():
-        result = get_sa_type_match(type_list, column_type_no_size, python_type_value, python_type)
+        result = get_sa_type_match(
+            type_list, column_type_no_size, python_type_value, python_type)
         if result:
             if type_with_size(column_type):
                 if python_type == "int" or python_type == "float" and database == "MYSQL":

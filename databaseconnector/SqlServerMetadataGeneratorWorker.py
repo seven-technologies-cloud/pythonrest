@@ -6,16 +6,52 @@ from databaseconnector.JSONDictHelper import *
 from databaseconnector.FilesHandler import get_domain_result_files
 
 
-def generate_sqlserver_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path):
+def generate_sqlserver_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None, ssh_publickey_params=None, ssl_params=None):
     json_generated_metadata_folder = os.path.join(generated_api_path, "JSONMetadata")
     os.makedirs(json_generated_metadata_folder)
 
     try:
-        cursor = get_sqlserver_connection(project_database_data[f'{project_database}_host'],
-                                          project_database_data[f'{project_database}_port'],
-                                          project_database_data[f'{project_database}_user'],
-                                          project_database_data[f'{project_database}_password'],
-                                          project_database_data[f'{project_database}_schema'])
+        if ssh_params_with_password:
+            cursor = get_sqlserver_db_connection_with_ssh_password(
+                project_database_data[f'{project_database}_host'],
+                project_database_data[f'{project_database}_port'],
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'],
+                ssh_params_with_password['ssh_host'],
+                int(ssh_params_with_password['ssh_port']),
+                ssh_params_with_password['ssh_user'],
+                ssh_params_with_password['ssh_password'],
+                ssh_params_with_password['ssh_local_bind_port'])
+        elif ssh_publickey_params:
+            cursor = get_sqlserver_db_connection_with_ssh_publickey(
+                project_database_data[f'{project_database}_host'],
+                project_database_data[f'{project_database}_port'],
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'],
+                ssh_publickey_params['ssh_host'],
+                int(ssh_publickey_params['ssh_port']),
+                ssh_publickey_params['ssh_user'],
+                ssh_publickey_params['ssh_key_path'],
+                ssh_publickey_params['ssh_local_bind_port'])
+        elif ssl_params:
+            cursor = get_sqlserver_db_connection_with_ssl(
+                project_database_data[f'{project_database}_host'],
+                project_database_data[f'{project_database}_port'],
+                project_database_data[f'{project_database}_user'],
+                project_database_data[f'{project_database}_password'],
+                project_database_data[f'{project_database}_schema'],
+                ssl_params['ssl_ca'],
+                ssl_params['ssl_cert'],
+                ssl_params['ssl_key'],
+                ssl_params['ssl_hostname'])
+        else:
+            cursor = get_sqlserver_connection(project_database_data[f'{project_database}_host'],
+                                              project_database_data[f'{project_database}_port'],
+                                              project_database_data[f'{project_database}_user'],
+                                              project_database_data[f'{project_database}_password'],
+                                              project_database_data[f'{project_database}_schema'])
     except Exception as e:
         raise e
 

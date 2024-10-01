@@ -1,5 +1,6 @@
 # System Imports #
 import json
+import re
 
 # Infra Imports #
 from src.e_Infra.CustomVariables import *
@@ -57,6 +58,45 @@ def build_sql_error_invalid_syntax(original_exception):
         return True
     else:
         return False
+
+
+def build_sql_error_duplicate_entry(original_exception):
+    table_duplicate_entry_error_list = ["Duplicate entry", "for key"]
+    if all(x in original_exception for x in table_duplicate_entry_error_list):
+        return extract_pymysql_error_log(original_exception)
+    else:
+        return None
+
+
+def build_sql_error_missing_foreign_key(original_exception):
+    table_missing_foreign_key_error_list = ["Cannot add or update a child row: a foreign key constraint fails", "REFERENCES"]
+    if all(x in original_exception for x in table_missing_foreign_key_error_list):
+        return extract_pymysql_error_log(original_exception)
+    else:
+        return None
+
+
+def build_sql_error_no_default_value(original_exception):
+    table_duplicate_entry_error_list = ["Field", "doesn't have a default value"]
+    if all(x in original_exception for x in table_duplicate_entry_error_list):
+        return extract_pymysql_error_log(original_exception)
+    else:
+        return None
+
+
+def extract_pymysql_error_log(error_message):
+    # Regular expression to match generic part of pymysql err Error and the error code next
+    start_pattern = r"\(pymysql\.err\.[\w]+\) \([\d]+, [\"']"
+
+    start_match = re.search(start_pattern, error_message)
+
+    if start_match:
+        # Extract what comes after generic part of error
+        start_index = start_match.end()
+        remaining_error_message = error_message[start_index:]
+        return remaining_error_message
+    else:
+        return "The transaction could not be completed right now."
 
 
 def print_logs(response_log):
