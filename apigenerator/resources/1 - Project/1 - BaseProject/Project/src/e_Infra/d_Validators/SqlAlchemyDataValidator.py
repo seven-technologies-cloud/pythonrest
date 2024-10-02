@@ -29,9 +29,6 @@ def validate_request_data_object(declarative_meta, request_data_object):
         # Apply valid date/datetime/timestamp masks
         validate_datetime_masks(declarative_meta, request_data_object)
 
-        # Validate monetary values
-        validate_money(declarative_meta, request_data_object)
-
     except Exception as e:
         raise e
 
@@ -231,27 +228,6 @@ def validate_datetime_masks(declarative_meta, request_data_object):
             if str(declarative_meta_item.type).lower() == 'time':
                 validate_time(declarative_meta_item, request_data_object)
 
-
-def validate_money(declarative_meta, request_data_object):
-    if request.method != 'GET':
-        declarative_meta_column_list = inspect(declarative_meta).columns
-        for request_object in request_data_object:
-            declarative_meta_item = get_declarative_meta_attribute_definitions(
-                request_object, declarative_meta_column_list)
-
-            # Verifica se o tipo da coluna é Decimal (ou outro tipo monetário)
-            if str(declarative_meta_item.type).lower() in ['decimal', 'numeric', 'money']:
-                value = request_data_object.get(declarative_meta_item.name)
-
-                # Verifica se o valor é uma string representando um número
-                if not isinstance(value, str):
-                    raise ValueError(
-                        f"Expected a string for {declarative_meta_item.name} attribute, got {type(value).__name__}")
-
-                # Verifica se o valor está no formato correto
-                if not re.match(r'^\d+(\.\d{1,2})?$', value):
-                    raise ValueError(
-                        f"The value for {declarative_meta_item.name} must have at most two decimal places.")
 
 
 def get_declarative_meta_attribute_definitions(attribute, declarative_meta_attribute_list):
