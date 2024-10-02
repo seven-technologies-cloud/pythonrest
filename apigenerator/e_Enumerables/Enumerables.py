@@ -22,7 +22,7 @@ def get_directory_data():
 def get_string_list():
     string_list = ['String', 'TIMESTAMP', 'TIME', 'Time', 'Date', 'JSON', 'BLOB', 'DateTime', 'BINARY', 'Binary',
                    'CHAR', 'CLOB', 'DATE', 'DATETIME', 'Enum', 'Interval', 'LargeBinary', 'NCHAR', 'NVARCHAR',
-                   'TEXT', 'Text', 'Unicode', 'UnicodeText', 'VARBINARY', 'VARCHAR', 'UUID']
+                   'TEXT', 'Text', 'Unicode', 'UnicodeText', 'VARBINARY', 'VARCHAR', 'UUID', 'MONEY']
     return string_list
 
 

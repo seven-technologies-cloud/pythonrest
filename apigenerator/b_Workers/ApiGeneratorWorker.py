@@ -35,6 +35,8 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
         modify_swagger_related_files(
             result_full_path, proj_domain_folder, script_absolute_path)
 
+        modify_exceptional_types_in_domain_files(db, proj_domain_folder, result_full_path)
+
         # ------------------------------- Project Finalizer ------------------------------- #
         if not base_project_exists:
             finalize_project(result_full_path, script_absolute_path)

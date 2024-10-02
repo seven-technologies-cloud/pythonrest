@@ -17,14 +17,18 @@ from flask import request
 
 def validate_request_data_object(declarative_meta, request_data_object):
     try:
-        # Validate Builder attributes #
+        # Validate Builder attributes
         validate_build(declarative_meta, request_data_object)
-        # Validate Python types for attributes #
+
+        # Validate Python types for attributes
         validate_python_type(declarative_meta, request_data_object)
-        # Custom validators #
+
+        # Custom validators
         declarative_meta.validate_custom_rules(request_data_object)
-        # Apply valid date/datetime/timestamp masks #
+
+        # Apply valid date/datetime/timestamp masks
         validate_datetime_masks(declarative_meta, request_data_object)
+
     except Exception as e:
         raise e
 
@@ -53,6 +57,7 @@ def validate_datetime(column, request_data):
             del e
             continue
     raise Exception(f'Invalid datetime value for {column.name} attribute')
+
 
 
 def validate_date(column, request_data):
@@ -222,6 +227,7 @@ def validate_datetime_masks(declarative_meta, request_data_object):
                 validate_date(declarative_meta_item, request_data_object)
             if str(declarative_meta_item.type).lower() == 'time':
                 validate_time(declarative_meta_item, request_data_object)
+
 
 
 def get_declarative_meta_attribute_definitions(attribute, declarative_meta_attribute_list):

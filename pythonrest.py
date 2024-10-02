@@ -196,7 +196,7 @@ def generate(
                 generate_python_rest_api(result_full_path, generated_domains_path, us_datetime, 'pgsql', postgres_params,
                                          base_project_exists, project_name, uid_type, db_authentication_method='direct_connection')
         except Exception as e:
-            typer.echo(e)
+            typer.echo(repr(e))
             return
 
     elif sqlserver_connection_parameters:

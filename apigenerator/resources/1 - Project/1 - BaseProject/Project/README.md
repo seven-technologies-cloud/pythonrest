@@ -76,6 +76,14 @@ Below is the command to create a python venv:
 
 <br>
 
+## Add Environment Variables to use flask admin panel
+
+    To access the administration panel you have to add the two environment variables below:
+    ```
+    os.environ['admin_panel_user'] = 'admin'
+    os.environ['admin_panel_password'] = 'admin'
+    ```
+
 ## Run and Debug Using VENV on VSCode
 If you wish to go deep and debug the API, or simply wishes to run from VSCode Python extension, you'll want to configure
 a launch.json file for the API, to do that you'll go to the top bar of VSCode -> Run(if run is not visible, you may find
