@@ -15,6 +15,11 @@
         schema:
           type: string
         description: Used to order by specific attribute
+      - name: groupby
+        in: header
+        schema:
+          type: string
+        description: Used to group by specific attribute
       - name: limit
         in: header
         schema:

@@ -66,6 +66,8 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
 
     # Apply order by to query #
     query = query_order_by(query, header_args, declarative_meta)
+    # Apply group by to query #
+    query = query_group_by(query, header_args, declarative_meta)
     # Apply pagination to query #
     query = apply_query_offset(query, header_args)
     # Apply limit to query #
@@ -91,6 +93,17 @@ def query_order_by(query, header_args, declarative_meta):
                 getattr(declarative_meta, header_args['HTTP_ORDERBY'][0]))
     return query
 
+def query_group_by(query, header_args, declarative_meta):
+    header_args = dict() if header_args is None else header_args
+    if header_args.get('HTTP_GROUPBY') is not None and header_args.get('HTTP_GROUPBY')[0] != '':
+        if not len(header_args.get('HTTP_GROUPBY')) > 1:
+            query = query.group_by(
+                getattr(declarative_meta, header_args['HTTP_GROUPBY'][0]))
+        else:
+            columns_to_group = [getattr(declarative_meta, column) for column in header_args['HTTP_GROUPBY']]
+            query = query.group_by(*columns_to_group)
+
+    return query
 
 def apply_query_limit(query, header_args, limit):
     if limit:
@@ -250,6 +263,10 @@ def cast_headers_args(header_args):
 
     if header_args.get('HTTP_ORDERBY') is not None:
         header_args['HTTP_ORDERBY'] = header_args['HTTP_ORDERBY'].replace(
+            ' ', '').split(',')
+
+    if header_args.get('HTTP_GROUPBY') is not None:
+        header_args['HTTP_GROUPBY'] = header_args['HTTP_GROUPBY'].replace(
             ' ', '').split(',')
 
     if header_args.get('HTTP_LIMIT') is not None:
