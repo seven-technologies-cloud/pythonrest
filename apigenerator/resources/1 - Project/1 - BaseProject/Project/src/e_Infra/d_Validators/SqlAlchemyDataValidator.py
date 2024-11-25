@@ -278,6 +278,7 @@ def validate_python_type(declarative_meta, request_data_object):
 def validate_header_args(declarative_meta, header_args):
     validate_select_args(declarative_meta, header_args)
     validate_order_by(declarative_meta, header_args)
+    validate_group_by(declarative_meta, header_args)
 
 
 def validate_select_args(declarative_meta, header_args):
@@ -303,3 +304,17 @@ def validate_order_by(declarative_meta, header_args):
                 raise Exception(
                     f"'{header_args.get('HTTP_ORDERBY')[1]}' not a valid argument. Must be either 'asc' or 'desc'"
                 )
+
+def validate_group_by(declarative_meta, header_args):
+    if header_args.get('HTTP_GROUPBY') is not None and header_args.get('HTTP_GROUPBY')[0] != '':
+        if not len(header_args.get('HTTP_GROUPBY')) >= 1:
+            if header_args.get('HTTP_GROUPBY')[0] not in [str(key) for key in declarative_meta.schema.dump_fields]:
+                raise Exception(
+                    f"groupby got an unexpected keyword argument '{header_args.get('HTTP_GROUPBY')[0]}'"
+                )
+        else:
+            for header in header_args.get('HTTP_GROUPBY'):
+                if header not in [str(key) for key in declarative_meta.schema.dump_fields]:
+                    raise Exception(
+                        f"groupby got an unexpected keyword argument '{header}'"
+                    )

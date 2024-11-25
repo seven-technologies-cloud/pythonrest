@@ -17,6 +17,7 @@ def control_route_get():
             request.args.to_dict(), {'HTTP_SELECT': request.environ.get('HTTP_SELECT'),
                                      'HTTP_LIMIT': request.environ.get('HTTP_LIMIT'),
                                      'HTTP_ORDERBY': request.environ.get('HTTP_ORDERBY'),
+                                     'HTTP_GROUPBY': request.environ.get('HTTP_GROUPBY'),
                                      'HTTP_PAGE': request.environ.get('HTTP_PAGE')}
         )
         return result
