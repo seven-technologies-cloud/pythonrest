@@ -40,6 +40,10 @@ def modify_redoc_related_files(result, domain_path, script_absolute_path, projec
         shutil.copy(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/FlaskBuilder.py'),
                         os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'FlaskBuilder.py'))
 
+    if not os.path.exists(os.path.join(result, 'config', 'redoc.html')):
+        shutil.copy(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/config/redoc.html'),
+                        os.path.join(result, 'config', 'redoc.html'))
+
     for domain in domain_list:
         domain_name = domain[:-3]
 

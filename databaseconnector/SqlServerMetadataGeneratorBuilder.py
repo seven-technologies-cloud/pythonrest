@@ -20,7 +20,7 @@ def get_sqlserver_db_connection_with_ssl(
             }
         )
 
-        cursor = conn.cursor()
+        cursor = conn.cursor(as_dict=True)
         return cursor
 
     except Exception as e:
@@ -51,7 +51,7 @@ def get_sqlserver_db_connection_with_ssh_publickey(
             database=database
         )
 
-        cursor = conn.cursor()
+        cursor = conn.cursor(as_dict=True)
         return cursor
 
     except Exception as e:
@@ -81,7 +81,7 @@ def get_sqlserver_db_connection_with_ssh_password(
             database=database
         )
 
-        cursor = conn.cursor()
+        cursor = conn.cursor(as_dict=True)
         return cursor
 
     except Exception as e:
