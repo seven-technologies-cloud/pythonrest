@@ -1,5 +1,7 @@
+# System Imports #
 import os
 import re
+import shutil
 
 
 # This function will check for column types that can't use flask admin filters, to then remove them on the build of column_filters
@@ -68,7 +70,7 @@ class {model_name}ModelView(ModelView):
 """
 
 
-def generate_flask_admin_files(result, project_domain_folder, domain_files, database):
+def generate_flask_admin_files(result, project_domain_folder, domain_files, script_absolute_path, database):
     views_code = "from flask_admin.contrib.sqla import ModelView\nfrom flask_login import login_required, current_user\n"
     admin_views = ""
     model_imports = ""
@@ -91,6 +93,10 @@ def generate_flask_admin_files(result, project_domain_folder, domain_files, data
     # Write FlaskAdminModelViews.py
     if not os.path.exists(os.path.join(project_domain_folder, 'a_FlaskAdminPanel')):
         os.makedirs(os.path.join(project_domain_folder, 'a_FlaskAdminPanel'))
+
+    if not os.path.exists(os.path.join(result, 'config', 'auth.html')):
+        shutil.copy(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/config/auth.html'),
+                        os.path.join(result, 'config', 'auth.html'))
 
     with open(os.path.join(project_domain_folder, 'a_FlaskAdminPanel', 'FlaskAdminModelViews.py'), 'w') as file:
         file.write(views_code)
@@ -123,11 +129,11 @@ app_handler.secret_key = '1234'
             file.truncate()
 
 
-def build_flask_admin_files(result, project_domain_folder, database):
+def build_flask_admin_files(result, project_domain_folder, script_absolute_path, database):
     print('Adding Flask Admin to API')
     domain_files = [
         f for f in os.listdir(f'{project_domain_folder}')
         if f.endswith('.py') and f not in ['__init__.py', 'FlaskAdminModelViews.py']
     ]
     generate_flask_admin_files(
-        result, project_domain_folder, domain_files, database)
+        result, project_domain_folder, domain_files, script_absolute_path, database)

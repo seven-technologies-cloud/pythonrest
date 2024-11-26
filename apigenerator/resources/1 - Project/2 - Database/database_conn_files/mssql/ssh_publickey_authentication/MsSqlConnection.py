@@ -1,5 +1,5 @@
-# PyMysql Imports #
-import pymysql
+# PyMssql Imports #
+import pymssql
 from sshtunnel import SSHTunnelForwarder
 
 # Infra Imports #

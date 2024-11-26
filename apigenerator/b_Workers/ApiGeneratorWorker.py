@@ -53,7 +53,7 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
                 result_full_path, us_datetime, db, db_params, script_absolute_path, uid_type)
 
         # ---------------------------------- Flask-Admin ---------------------------------- #
-        build_flask_admin_files(result_full_path, proj_domain_folder, db)
+        build_flask_admin_files(result_full_path, proj_domain_folder, script_absolute_path, db)
 
         # ------------------------------------ Redoc -------------------------------------- #
         modify_redoc_related_files(

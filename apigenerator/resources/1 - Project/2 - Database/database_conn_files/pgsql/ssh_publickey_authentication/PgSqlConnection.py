@@ -1,5 +1,5 @@
-# PyMysql Imports #
-import pymysql
+# Psycopg2 Imports #
+import psycopg2
 from sshtunnel import SSHTunnelForwarder
 
 # Infra Imports #

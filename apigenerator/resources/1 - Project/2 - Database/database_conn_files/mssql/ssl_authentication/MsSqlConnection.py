@@ -1,4 +1,4 @@
-# PyMysql Imports #
+# PyMssql Imports #
 import pymssql
 
 # Infra Imports #
