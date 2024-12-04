@@ -2,6 +2,7 @@ import json
 from databaseconnector.RegexHandler import transform_table_name_to_pascal_case_class_name
 
 
+
 def retrieve_json_from_sql_query(sql_query, connected_schema, params=None):
     connected_schema.execute(sql_query, params if params else ())
     data = connected_schema.fetchall()
@@ -14,9 +15,6 @@ def retrieve_json_from_sql_query(sql_query, connected_schema, params=None):
         new_object = dict()
         for i in range(len(field_names)):
             new_object[field_names[i]] = _object[i]
-            if field_names[i] == 'Field':
-                if ' ' in new_object[field_names[i]]:
-                    new_object[field_names[i]] = new_object[field_names[i]].replace(' ', '_')
         result_list.append(new_object)
 
     return result_list

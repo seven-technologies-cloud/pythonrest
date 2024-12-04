@@ -6,6 +6,7 @@ class MySqlTableColumnFieldData:
     def __init__(self, column):
 
         self.name = column['Field']
+        self.key = self.name.replace(' ', '_') if ' ' in self.name else self.name
         self.primary_key = True if column['Key'] == "PRI" else False
         self.nullable = True if column['Null'] == "YES" else False
         self.unique = True if column['Key'] == "UNI" else False

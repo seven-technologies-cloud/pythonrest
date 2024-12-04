@@ -175,7 +175,7 @@ def validate_all_datetime_types(column, start_and_end_strings):
 def validate_non_serializable_types(query, declarative_meta):
     try:
         result = []
-        column_attributes = [getattr(declarative_meta, col.name)
+        column_attributes = [getattr(declarative_meta, col.key)
                              for col in declarative_meta.__table__.columns]
         has_set_type = any(f'{field.type}' ==
                            'SET' for field in column_attributes)
