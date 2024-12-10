@@ -6,7 +6,7 @@ class SqlServerTableColumnFieldData:
     def __init__(self, column_metadata, primary_key_column, unique_column, auto_increment):
 
         self.name = column_metadata['COLUMN_NAME']
-        self.key = self.name.replace(' ', '_') if ' ' in self.name else self.name
+        self.key = self.name.replace(' ', '_').replace('-', '_') if ' ' in self.name else self.name
         self.primary_key = False if primary_key_column == list() else True
         self.nullable = True if column_metadata['IS_NULLABLE'] == "YES" else False
         self.unique = False if unique_column == list() else False

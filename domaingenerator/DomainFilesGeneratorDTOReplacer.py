@@ -58,9 +58,9 @@ def get_column_arguments_string(column):
     if column['auto_increment']:
         arguments_string = arguments_string + ', autoincrement=True'
     if column['name']:
-        arguments_string = arguments_string + f', name="{column['name']}"'
+        arguments_string = arguments_string + f', name="{column["name"]}"'
     if column['key']:
-        arguments_string = arguments_string + f', key="{column['key']}"'
+        arguments_string = arguments_string + f', key="{column["key"]}"'
     if column['default_value'] is not None:
         arguments_string = arguments_string + ', server_default=sa.FetchedValue()'
     return arguments_string
