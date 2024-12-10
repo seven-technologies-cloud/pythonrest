@@ -6,6 +6,7 @@ class PostgreSqlTableColumnConstraintsData:
     def __init__(self, column_metadata, column_fk, pk_status, u_status):
 
         self.name = column_metadata['column_name']
+        self.key = self.name.replace(' ', '_') if ' ' in self.name else self.name
         self.primary_key = pk_status
         self.nullable = True if column_metadata['is_nullable'] == "YES" else False
         self.unique = u_status
