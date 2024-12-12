@@ -1,12 +1,13 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
+from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name_with_spaces
 
 
 class MySqlTableColumnConstraintsData:
     def __init__(self, column, table_origin_foreign_key):
 
         self.name = column['Field']
-        self.key = self.name.replace(' ', '_').replace('-', '_') if ' ' in self.name else self.name
+        self.key = adding_replace_in_column_name_with_spaces(self.name)
         self.primary_key = True if column['Key'] == "PRI" else False
         self.nullable = True if column['Null'] == "YES" else False
         self.unique = True if column['Key'] == "UNI" else False
