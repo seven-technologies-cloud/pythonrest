@@ -183,11 +183,11 @@ def validate_non_serializable_types(query, declarative_meta):
             for item in query:
                 item_dict = {}
                 for field in column_attributes:
-                    value = getattr(item, field.name, None)
-                    item_dict[field.name] = value
+                    value = getattr(item, field.key, None)
+                    item_dict[field.key] = value
                     if value is not None and f'{field.type}' == 'SET':
                         set_to_string = ",".join(map(str, value))
-                        item_dict[field.name] = set_to_string
+                        item_dict[field.key] = set_to_string
                 result.append(item_dict)
             return result
         return query
@@ -232,7 +232,7 @@ def validate_datetime_masks(declarative_meta, request_data_object):
 
 def get_declarative_meta_attribute_definitions(attribute, declarative_meta_attribute_list):
     for item in declarative_meta_attribute_list:
-        if str(item.name) == str(attribute):
+        if str(item.key) == str(attribute):
             return item
 
 
