@@ -6,7 +6,7 @@ from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name
 class MySqlTableColumnConstraintsData:
     def __init__(self, column, table_origin_foreign_key):
 
-        self.name = column['Field']
+        self.name = column['Field'].replace('\\', '\\\\') if '\\' in column['Field'] else column['Field']
         self.key = adding_replace_in_column_name_with_spaces(self.name)
         self.primary_key = True if column['Key'] == "PRI" else False
         self.nullable = True if column['Null'] == "YES" else False
