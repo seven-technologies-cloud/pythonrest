@@ -50,8 +50,8 @@ def validate_datetime(column, request_data):
     valid_datetime_masks = get_valid_datetime_masks()
     for datetime_mask in valid_datetime_masks:
         try:
-            request_data[column.name] = datetime.strptime(
-                request_data.get(column.name), datetime_mask.strip())
+            request_data[column.key] = datetime.strptime(
+                request_data.get(column.key), datetime_mask.strip())
             return
         except Exception as e:
             del e
