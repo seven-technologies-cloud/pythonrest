@@ -6,8 +6,8 @@ from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name
 class SqlServerTableColumnFieldData:
     def __init__(self, column_metadata, primary_key_column, unique_column, auto_increment):
 
-        self.name = column_metadata['COLUMN_NAME']
-        self.key = adding_replace_in_column_name_with_spaces(self.name)
+        self.name = column_metadata['COLUMN_NAME'].replace('\\', '\\\\') if '\\' in column_metadata['COLUMN_NAME'] else column_metadata['COLUMN_NAME']
+        self.key = adding_replace_in_column_name_with_spaces(column_metadata['COLUMN_NAME'])
         self.primary_key = False if primary_key_column == list() else True
         self.nullable = True if column_metadata['IS_NULLABLE'] == "YES" else False
         self.unique = False if unique_column == list() else False

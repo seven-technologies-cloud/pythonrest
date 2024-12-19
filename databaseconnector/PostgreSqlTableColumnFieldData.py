@@ -7,7 +7,7 @@ class PostgreSqlTableColumnFieldData:
     def __init__(self, column_metadata, pk_status, u_status):
 
         self.name = column_metadata['column_name'].replace('\\', '\\\\') if '\\' in column_metadata['column_name'] else column_metadata['column_name']
-        self.key = adding_replace_in_column_name_with_spaces(self.name)
+        self.key = adding_replace_in_column_name_with_spaces(column_metadata['column_name'])
         self.primary_key = pk_status
         self.nullable = True if column_metadata['is_nullable'] == "YES" else False
         self.unique = u_status

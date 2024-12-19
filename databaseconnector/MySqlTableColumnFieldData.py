@@ -7,7 +7,7 @@ class MySqlTableColumnFieldData:
     def __init__(self, column):
 
         self.name = column['Field'].replace('\\', '\\\\') if '\\' in column['Field'] else column['Field']
-        self.key = adding_replace_in_column_name_with_spaces(self.name)
+        self.key = adding_replace_in_column_name_with_spaces(column['Field'])
         self.primary_key = True if column['Key'] == "PRI" else False
         self.nullable = True if column['Null'] == "YES" else False
         self.unique = True if column['Key'] == "UNI" else False
