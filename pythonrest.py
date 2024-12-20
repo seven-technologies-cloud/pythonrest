@@ -17,7 +17,7 @@ from apigenerator.e_Enumerables.Enumerables import get_directory_data
 
 
 app = typer.Typer()
-pythonrest_version = "0.1.7"
+pythonrest_version = "0.2.6"
 
 
 @app.command()
