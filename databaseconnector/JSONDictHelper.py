@@ -2,6 +2,7 @@ import json
 from databaseconnector.RegexHandler import transform_table_name_to_pascal_case_class_name
 
 
+
 def retrieve_json_from_sql_query(sql_query, connected_schema, params=None):
     connected_schema.execute(sql_query, params if params else ())
     data = connected_schema.fetchall()

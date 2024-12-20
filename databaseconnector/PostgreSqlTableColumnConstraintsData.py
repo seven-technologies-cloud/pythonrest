@@ -1,11 +1,13 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
+from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name_with_spaces
 
 
 class PostgreSqlTableColumnConstraintsData:
     def __init__(self, column_metadata, column_fk, pk_status, u_status):
 
-        self.name = column_metadata['column_name']
+        self.name = column_metadata['column_name'].replace('\\', '\\\\') if '\\' in column_metadata['column_name'] else column_metadata['column_name']
+        self.key = adding_replace_in_column_name_with_spaces(column_metadata['column_name'])
         self.primary_key = pk_status
         self.nullable = True if column_metadata['is_nullable'] == "YES" else False
         self.unique = u_status

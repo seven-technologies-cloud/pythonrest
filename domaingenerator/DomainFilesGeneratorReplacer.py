@@ -3,6 +3,7 @@ from domaingenerator.DomainFilesGeneratorDTOReplacer import *
 
 class DomainFilesGeneratorReplacer:
     def __init__(self, domain_dict):
+
         self.domain_imports = get_domain_imports(domain_dict)
         self.declarative_meta = domain_dict['ClassName']
         self.meta_string = domain_dict['TableName']

@@ -1,11 +1,13 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
+from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name_with_spaces
 
 
 class SqlServerTableColumnConstraintsData:
     def __init__(self, column_metadata, primary_key_column, foreign_key_reference,unique_column, auto_increment):
 
-        self.name = column_metadata['COLUMN_NAME']
+        self.name = column_metadata['COLUMN_NAME'].replace('\\', '\\\\') if '\\' in column_metadata['COLUMN_NAME'] else column_metadata['COLUMN_NAME']
+        self.key = adding_replace_in_column_name_with_spaces(column_metadata['COLUMN_NAME'])
         self.primary_key = False if primary_key_column == list() else True
         self.nullable = True if column_metadata['IS_NULLABLE'] == "YES" else False
         self.unique = False if unique_column == list() else False
