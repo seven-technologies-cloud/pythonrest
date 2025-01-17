@@ -113,7 +113,11 @@ def convert_retrieved_table_name_tuple_list_from_connected_schema(tuple_name_lis
 
 
 def retrieve_table_name_tuple_list_from_connected_schema(connected_schema):
-    connected_schema.execute('SHOW tables')
+    connected_schema.execute("""
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'
+    """)
     response = connected_schema.fetchall()
 
     return response

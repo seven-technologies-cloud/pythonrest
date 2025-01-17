@@ -102,9 +102,14 @@ def convert_retrieved_tuple_name_list_from_sqlserver(table_name_tuple_list):
 
 
 def retrieve_table_name_tuple_list_from_connected_database(connected_database_cursor):
-    connected_database_cursor.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES")
+    connected_database_cursor.execute("""
+        SELECT TABLE_NAME 
+        FROM INFORMATION_SCHEMA.TABLES 
+        WHERE TABLE_TYPE = 'BASE TABLE'
+    """)
     response = connected_database_cursor.fetchall()
     return response
+
 
 
 def retrieve_table_columns_from_connected_database(table_name, connected_database_cursor):
