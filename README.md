@@ -120,6 +120,8 @@ Check version:
 pythonrest version
 ```
 
+### Password-based Authentication
+
 Generate APIs based on MySQL databases:
 
 ```bash
@@ -156,81 +158,117 @@ Generate APIs based on Aurora Postgres databases:
 pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public
 ```
 
-### Use authentications
+### SSH-Based Authentication
 
-#### - SSH Password
+#### SSH with Password
 
-Generate MySQL database-based APIs with ssh password authentication:
+Generate MySQL database-based APIs with SSH password authentication:
 
 ```bash
 pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate MariaDB database-based APIs with ssh password authentication:
-
-```bash
-pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
-```
-
-Generate SQLServer database-based APIs with ssh password authentication:
-
-```bash
-pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
-```
-
-Generate Postgres database-based APIs with ssh password authentication:
+Generate Postgres database-based APIs with SSH password authentication:
 
 ```bash
 pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-#### - SSH Public Key
-
-Generate MySQL database-based APIs with ssh public key authentication:
+Generate SQLServer database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate MariaDB database-based APIs with ssh public key authentication:
+Generate MariaDB database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate SQLServer database-based APIs with ssh public key authentication:
+Generate Aurora MySQL database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate Postgres database-based APIs with ssh public key authentication:
+Generate Aurora Postgres database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-#### - SSL
+#### SSH with Public Key
 
-Generate MySQL database-based APIs with ssl authentication:
+Generate MySQL database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate Postgres database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate SQLServer database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate MariaDB database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate Aurora MySQL database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate Aurora Postgres database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+### SSL/TLS-Based Authentication
+
+Generate MySQL database-based APIs with SSL authentication:
 
 ```bash
 pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
 ```
 
-Generate MariaDB database-based APIs with ssl authentication:
+Generate Postgres database-based APIs with SSL authentication:
 
 ```bash
-pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
 ```
 
-Generate SQLServer database-based APIs with ssl authentication:
+Generate SQLServer database-based APIs with SSL authentication:
 
 ```bash
 pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
 ```
 
-Generate Postgres database-based APIs with ssl authentication:
+Generate MariaDB database-based APIs with SSL authentication:
+
+```bash
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
+```
+
+Generate Aurora MySQL database-based APIs with SSL authentication:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
+```
+
+Generate Aurora Postgres database-based APIs with SSL authentication:
 
 ```bash
 pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
@@ -247,7 +285,7 @@ path to your generated API please follow the example below:
 pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\<YOUR_DESIRED_PATH_HERE>
 ```
 
-The above will generate your API on the provided path, and if the folder does not exist the generator will create it.
+The above will generate your API inside a PythonRestAPI folder created on the provided path.
 The following folders/files will be modified(content deleted and recreated) if a PythonREST project is already in place:
 
 - src/c_Domain
@@ -261,7 +299,8 @@ The following folders/files will be modified(content deleted and recreated) if a
 - src/e_Infra/b_Builders/FlaskBuilder.py
 - config
 - app.py
-  This allows you to make customizations or enhancements on your generated API and new upgrades will only affect CRUD API feature folders
+
+This allows you to make customizations or enhancements on your generated API and new upgrades will only affect CRUD API feature folders
 
 #### --use-pascal-case:
 
