@@ -99,6 +99,6 @@ def handle_repository_exception(exception):
     # Validating Database error #
     if hasattr(exception, 'orig'):
         # Returning Database error #
-        return [arg for arg in exception.orig.args if type(arg) != int]
+        return [arg.decode() if isinstance(arg, bytes) else arg for arg in exception.orig.args if type(arg) != int]
     # Returning Generic error #
     return [arg.replace("'<class ", '').replace(">'", '') for arg in exception.args if type(arg) != int]
