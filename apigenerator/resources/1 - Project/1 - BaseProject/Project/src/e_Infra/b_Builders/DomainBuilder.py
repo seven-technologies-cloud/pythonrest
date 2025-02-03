@@ -21,48 +21,46 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     query_args = get_select_query_args(header_args, declarative_meta)
     # Initializing query session by declarative_meta param #
     query = session.query(*query_args)
+
     # Building class object from given param request_args #
-    class_object = build_domain_object_from_dict(
-        declarative_meta, request_args)
-    # Iterating over instantiated class object to resolve filter #
-    for attr in class_object.__dict__:
-        # Removing SqlAlchemy's _sa_instance_state attribute from validation  #
-        if attr != '_sa_instance_state':
-            if attr in request_args:  # Check if the attribute is in request_args
-                value = getattr(class_object, attr)
-                # Check if the value is NULL or null (case-insensitive)
-                if str(value).lower() in ('null', 'null'):
-                    query = query.filter(
-                        getattr(declarative_meta, attr) == None)
-                else:
+    class_object = build_domain_object_from_dict(declarative_meta, request_args)
+
+    # Iterate over request_args
+    for key, query_param in request_args.items():
+
+        # Apply appropriate filter based on query_param
+        if type(query_param) == str and '[to]' in query_param.lower():
+            # Apply filter by interval datetime #
+            query = apply_query_filter_datetime(query, query_param, key, declarative_meta)
+        elif type(query_param) == str and '[or]' in query_param.lower():
+            # Apply filter selecting multiple values #
+            query = apply_query_selecting_multiple_values(query, query_param, key, declarative_meta)
+        else:
+            # Loop through class_object attributes #
+            for attr in class_object.__dict__:
+                if attr == key and attr != '_sa_instance_state':
+                    value = getattr(class_object, attr)
+                    # Check if the value is NULL or null (case-insensitive) #
+                    if str(value).lower() in ('null', 'null'):
+                        query = query.filter(getattr(declarative_meta, attr) == None)
                     # Checking if in global list for left-sided like filter #
-                    if str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_left').replace(' ', '').split(','):
+                    elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_left').replace(' ',
+                                                                                                                   '').split(
+                            ','):
                         query = resolve_string_filter(
                             declarative_meta, class_object, attr, query, 'left_like')
                     # Checking if in global list for right-sided like filter #
-                    elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_right').replace(' ', '').split(','):
+                    elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_right').replace(
+                            ' ', '').split(','):
                         query = resolve_string_filter(
                             declarative_meta, class_object, attr, query, 'right_like')
                     # Checking if in global list for full like filter #
-                    elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_full').replace(' ', '').split(','):
+                    elif str(getattr(declarative_meta, attr)) in get_global_variable('domain_like_full').replace(
+                            ' ', '').split(','):
                         query = resolve_string_filter(
                             declarative_meta, class_object, attr, query, 'full_like')
-                    # Not in any global list for like filter #
                     else:
-                        if request_args:
-                            for key, query_param in request_args.items():
-
-                                if type(query_param) == str and '[to]' in query_param.lower():
-                                    # Apply filter by interval datetime #
-                                    query = apply_query_filter_datetime(
-                                      query, query_param, key, declarative_meta)
-                                elif type(query_param) == str and '[or]' in query_param.lower():
-                                    # Apply selecting multiple values #
-                                    query = apply_query_selecting_multiple_values(
-                                        query, query_param, key, declarative_meta)
-                                else:
-                                    query = resolve_string_filter(
-                                        declarative_meta, class_object, attr, query, 'regular')
+                        query = resolve_string_filter(declarative_meta, class_object, attr, query, 'regular')
 
     # Apply order by to query #
     query = query_order_by(query, header_args, declarative_meta)
@@ -72,7 +70,7 @@ def build_query_from_api_request(declarative_meta, request_args, session, header
     query = apply_query_offset(query, header_args)
     # Apply limit to query #
     query = apply_query_limit(query, header_args, limit)
-    # Validate column type non serialiable
+    # Validate column type non serialiable #
     query = validate_non_serializable_types(query, declarative_meta)
     # Returning filtered query #
     return query
