@@ -2,19 +2,20 @@
 import json
 import yaml
 
-# Flask Imports #
-from flask import request
+# Infra Imports #
 from src.e_Infra.b_Builders.FlaskBuilder import *
+from src.e_Infra.b_Builders.a_Swagger.SwaggerBuilder import *
 
 
-# /swaggerdata route #
-@app_handler.route('/swaggerdata', methods=['GET'])
-def swagger_route():
-    # Routing request to /swaggerdata GET method #
-    if request.method == 'GET':
-
-        yaml_file = open("config/swagger.yaml")
+# /swagger route #
+@app_handler.route('/swagger', methods=['GET'])
+def swagger_ui():
+    with open("config/swagger.yaml", "r") as yaml_file:
         data = yaml.safe_load(yaml_file)
-        data['servers'] = [{"url": ''}]
 
-        return json.dumps(data), 200, {'Content-Type': 'application/json'}
+    api_title = data.get("info", {}).get("title")
+
+    data['servers'] = [{"url": ''}]
+    swagger_json = json.dumps(data)
+
+    return render_template_string(build_swagger_html(api_title, swagger_json)), 200, {'Content-Type': 'text/html'}
