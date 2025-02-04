@@ -57,7 +57,7 @@ def generate_python_rest_api(result_full_path, generated_domains_path, us_dateti
 
         # ------------------------------------ Redoc -------------------------------------- #
         modify_redoc_related_files(
-            result_full_path, proj_domain_folder, script_absolute_path, project_name)
+            result_full_path, proj_domain_folder, script_absolute_path)
     except Exception as e:
         print(e)
         return

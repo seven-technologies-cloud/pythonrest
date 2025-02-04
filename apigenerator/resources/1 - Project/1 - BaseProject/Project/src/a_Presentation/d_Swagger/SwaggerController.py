@@ -4,7 +4,7 @@ import yaml
 
 # Infra Imports #
 from src.e_Infra.b_Builders.FlaskBuilder import *
-from src.e_Infra.b_Builders.a_Swagger.SwaggerBuilder import *
+from src.e_Infra.b_Builders.ApiSpecBuilder import build_swagger_html
 
 
 # /swagger route #

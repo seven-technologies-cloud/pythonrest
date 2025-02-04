@@ -9,8 +9,5 @@ from flask import Flask, Blueprint, render_template_string, render_template, red
 app_handler = Flask(__name__)
 app_handler.template_folder = os.path.join(os.getcwd(), 'config')
 
-# Creating Redoc blueprint #
-redoc_blueprint = Blueprint('redoc', __name__)
-
 # Creating FlaskAdminPanel blueprint #
 auth_blueprint = Blueprint('auth', __name__)

@@ -1,14 +1,13 @@
 
-# Methods to build declarative_meta Redoc docs #
-@redoc_blueprint.route('/redoc/meta_string')
-def meta_string_redoc():
-    redoc_spec_url = '/redoc/spec/meta_string'
-    return render_template('redoc.html', spec_url=redoc_spec_url)
 
+# /redoc/meta_string route #
+@app_handler.route('/redoc/meta_string', methods=['GET'])
+def redoc_ui_meta_string():
+    with open("config/declarative_meta.yaml", "r") as yaml_file:
+        data = yaml.safe_load(yaml_file)
 
-@redoc_blueprint.route('/redoc/spec/meta_string')
-def meta_string_spec():
-    yaml_path = os.path.join(os.getcwd(), 'config', 'declarative_meta.yaml')
-    with open(yaml_path, 'r') as yaml_file:
-        yaml_content = yaml_file.read()
-    return yaml_content
+    api_title = data.get("info", {}).get("title")
+
+    redoc_json = json.dumps(data)
+
+    return render_template_string(build_redoc_html(api_title, redoc_json)), 200, {'Content-Type': 'text/html'}
