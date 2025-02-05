@@ -147,7 +147,6 @@ def check_if_base_project_exists(result_full_path):
         'src/b_Application/b_Service/a_Domain',
         'src/d_Repository/a_Domain',
         'src/a_Presentation/d_Swagger',
-        'src/e_Infra/b_Builders/a_Swagger',
         'src/e_Infra/d_Validators/a_Domain',
         'src/e_Infra/g_Environment',
         'src/e_Infra/b_Builders/FlaskBuilder.py',

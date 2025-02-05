@@ -293,7 +293,6 @@ The following folders/files will be modified(content deleted and recreated) if a
 - src/b_Application/b_Service/a_Domain
 - src/d_Repository/a_Domain
 - src/a_Presentation/d_Swagger
-- src/e_Infra/b_Builders/a_Swagger
 - src/e_Infra/d_Validators/a_Domain
 - src/e_Infra/g_Environment
 - src/e_Infra/b_Builders/FlaskBuilder.py
@@ -671,7 +670,6 @@ The generated API has a structure of a number of directories with sub-directorie
 - src/e_Infra: Contains files or components that deal with the foundational structure, setup and configuration of the project.
   - src/e_Infra/a_Handlers: Contains files used to configure exceptions and system messages returned by the API
   - src/e_Infra/b_Builders: Contains files used to configure and build date times, domain objects, flask, proxy responses, sql alchemy, strings
-    - src/e_Infra/b_Builders/a_Swagger: Contains the functions to build the Swagger blueprints that renders the Swagger page.
   - src/e_Infra/c_Resolvers: Contains functions to deal with some logics and operations like creation of engine and session of a connected database and filtering queries with left like, right lke and the such.
   - src/e_Infra/d_Validators: Contains functions that validates if given requests have correct data, like JSON bodies, datetimes values, types of table parameters.
   - src/e_Infra/d_Validators/a_Domain: Contains functions for each domain in which custom validators can be set.

@@ -133,19 +133,6 @@ def build_swagger_yaml_no_pk(script_absolute_path, domain_obj, data, id_from_fil
                                                                                                       'attr_type') else 'string'}})
 
 
-def add_methods_to_flaskbuilder(result, domain_name):
-    with open(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'FlaskBuilder.py'), 'r') \
-            as py_file_in:
-        content = py_file_in.readlines()
-    with open(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'FlaskBuilder.py'), 'w') \
-            as py_file_out:
-        for line in content:
-            if line == '# Building Swagger Blueprint #\n':
-                line = line \
-                       + f'build_{domain_name.lower()}_swagger_blueprint(app_handler)\n'
-            py_file_out.write(line)
-
-
 def modify_swagger_related_files(result, domain_path, script_absolute_path):
     print('Creating SwaggerBuilder functions')
     domain_list = get_domain_files_list(domain_path)
@@ -154,9 +141,9 @@ def modify_swagger_related_files(result, domain_path, script_absolute_path):
         shutil.copytree(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/a_Presentation/d_Swagger'),
                         os.path.join(result, 'src', 'a_Presentation', 'd_Swagger'), dirs_exist_ok=True)
 
-    if not os.path.exists(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'a_Swagger', 'SwaggerBuilder.py')):
-        shutil.copytree(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/a_Swagger'),
-                        os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'a_Swagger'), dirs_exist_ok=True)
+    if not os.path.exists(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'ApiSpecBuilder.py')):
+        shutil.copytree(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/ApiSpecBuilder.py'),
+                        os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'ApiSpecBuilder.py'))
 
     if not os.path.exists(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'FlaskBuilder.py')):
         shutil.copy(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/FlaskBuilder.py'),
@@ -169,13 +156,6 @@ def modify_swagger_related_files(result, domain_path, script_absolute_path):
                                     os.path.join(script_absolute_path,
                                                  'apigenerator', 'resources', '2 - Swagger', 'GenericController', 'DomainSwaggerController.py'),
                                     os.path.join(result, 'src', 'a_Presentation', 'd_Swagger', 'SwaggerController.py'))
-
-        copy_file_and_replace_lines(domain_name,
-                                    os.path.join(script_absolute_path,
-                                                 'apigenerator', 'resources', '2 - Swagger', 'GenericBuilder', 'DomainSwaggerBuilder.py'),
-                                    os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'a_Swagger', 'SwaggerBuilder.py'))
-
-        add_methods_to_flaskbuilder(result, domain_name)
 
 
 def save_each_domain_swagger_yaml(result, swagger_data, domain_name):
