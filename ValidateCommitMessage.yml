@@ -1,0 +1,29 @@
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+- group: pythonrest-cli
+
+jobs:
+- job: ValidateCommitMessage
+  displayName: Validate commit message
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+  - script: |
+      last_commit_message=$(git log -1 --pretty=%s)
+
+      if [[ $last_commit_message =~ version[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        echo "Commit message contains a valid version format: $last_commit_message"
+      else
+        echo "Error: The commit message does not contain a valid version format (versionX.X.X)."
+        exit 1
+      fi
+    displayName: "Check commit message format"
