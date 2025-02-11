@@ -8,17 +8,19 @@ def build_swagger_html(api_title, swagger_json):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{api_title}</title>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.1.0/swagger-ui.min.css">
+        <style>
+            .servers {{
+                display: none !important;
+            }}
+        </style>
     </head>
     <body>
         <div id="swagger-ui"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.1.0/swagger-ui-bundle.min.js"></script>
         <script>
             window.onload = function() {{
-                // Remove servers directly from the spec object
-                const specWithoutServers = {{ ...{swagger_json}, servers: [] }};
-
-                SwaggerUIBundle({{
-                    spec: specWithoutServers,
+                const ui = SwaggerUIBundle({{
+                    spec: {swagger_json},
                     dom_id: "#swagger-ui",
                     deepLinking: true,
                     presets: [

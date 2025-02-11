@@ -1,8 +1,6 @@
 # PythonREST CLI
 
-<div align="center" style="padding:0px 100px 0px 0px">
-  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihYRUsjJDrLIsbUPrdDPzxBb6EC_HU4EGsQa4juabWc6g1yoP0Vcnh7R9vX93HxAwYiWloxEdGKrf7FVAP22BnduRPjFKg5aJ0Y=w1366-h641-rw-v1" alt="Logo" width="350"/>
-</div>
+![image](https://drive.google.com/uc?export=view&id=1FMzeZQL2JpKmkODdIcLVTSQC149rvFEg)
 
 PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds based on your relational database on a single CLI command. This allows you to create your APIs from scratch and update your current API previously created with our tool to always match your latest database definitions.
 
