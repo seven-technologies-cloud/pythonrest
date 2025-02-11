@@ -64,7 +64,6 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 * Fixing [or] filter of GET routes when using multiple query params simultaneously
 * Improving rendering of swagger and redoc pages
 
-
 ## Installation
 
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more
