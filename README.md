@@ -45,6 +45,25 @@ PythonREST allows you to create Web, Mobile Apps, SaaS products or simply manage
 - Filter query results by each table field
   <br>
 
+## Version Disclaimer
+
+**Version 0.2.1**
+* Added some quality of life improvements for redoc building
+
+**Version 0.2.4**
+* Adding ssh and ssl connection methods (direct file provision only where applicable)
+* Support for PostgreSQL MONEY type (mapped as string on code)
+* Implementation of GROUPBY SQL Statement as a header for tables routes
+
+**Version 0.2.6:**
+Support for column names that contain unusual characters, like "-", " ", ".", "/", "\", ":", "~", "*", "+", "|", "@"
+
+**Version 0.2.7:**
+* SQL Views are not listed as routes on generated API anymore
+* Fixing some cases of exceptions being returned improperly as bytes like object
+* Fixing [or] filter of GET routes when using multiple query params simultaneously
+* Improving rendering of swagger and redoc pages
+
 ## Installation
 
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more
@@ -992,6 +1011,11 @@ pip uninstall pythonrest3
 When reinstalling the local pip package for tests, make sure to delete any of the following folders: `build`, `dist` and `*.egg.info` generated on the root folder of the project,
 as retaining those can lead to the project being built using that folder and not catching any changes you made to
 the project files.
+
+# For Contributors: How to proceed with a PR
+* The Pull Requests must be done from your forked repository to our main.
+* The PR commit messages must follow the pattern: `versionx.x.x`
+* The next version should consider the [last package manager published version](https://pypi.org/project/pythonrest3/#history) + 0.0.1 eg.: 0.2.7 on pypi + 0.0.1 =  0.2.8
 
 <br></br>
 

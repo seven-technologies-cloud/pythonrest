@@ -1,6 +1,9 @@
 from setuptools import setup
 import os
 
+def read_file(filename):
+    with open(filename, encoding="utf-8") as f:
+        return f.read()
 
 def find_packages_custom(start_directory='.', include=None, prefix='pythonrest'):
     if include is None:
@@ -32,6 +35,40 @@ setup(
     name='pythonrest3',
     version='0.2.6',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
+    long_description=(
+        "# PythonREST\n\n"
+        "PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks "
+        "and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds "
+        "based on your relational database on a single CLI command. This allows you to create your APIs from scratch "
+        "and update your current API previously created with our tool to always match your latest database definitions.\n\n"
+        "**THIS WILL SAVE YOU MONTHS OF DEVELOPMENT TIME, GUARANTEED!**\n\n"
+        "Your new generated API will have full CRUD compatibility with your mapped database and full Swagger "
+        "documentation and specs available. With your new API in hand, you will be able to containerize or serverless "
+        "deploy it to any local, private, and public cloud providers of your choice and use it at will! If you're "
+        "interested in taking your API to the next level and don't know how, please inquire with us at the email below "
+        "for consultancy services.\n\n"
+        "This project is under active enhancement, and we have several open GitHub issues to improve it further. "
+        "If you're an Open Source enthusiast and wish to contribute, we'd be more than happy to have you on our team! "
+        "Get in touch via [admin@seventechnologies.cloud](mailto:admin@seventechnologies.cloud) if you have any doubts "
+        "or suggestions, and don't forget to star our repository!\n\n"
+        "### If you like our solution, please consider donating on our "
+        "[Patreon campaign](https://www.patreon.com/seventechnologies)!\n\n"
+        "## Version Disclaimer\n\n"
+        "**Version 0.2.1**\n"
+        "* Added some quality of life improvements for Redoc building\n\n"
+        "**Version 0.2.4**\n"
+        "* Adding SSH and SSL connection methods (direct file provision only where applicable)\n"
+        "* Support for PostgreSQL MONEY type (mapped as a string in code)\n"
+        "* Implementation of GROUPBY SQL Statement as a header for table routes\n\n"
+        "**Version 0.2.6**\n"
+        "* Support for column names that contain unusual characters like '-', ' ', '.', '/', '\\', ':', '~', '*', '+', '|', '@'\n\n"
+        "**Version 0.2.7**\n"
+        "* SQL Views are no longer listed as routes in the generated API\n"
+        "* Fixing some cases where exceptions were improperly returned as byte-like objects\n"
+        "* Fixing `[or]` filter in GET routes when using multiple query parameters simultaneously\n"
+        "* Improving rendering of Swagger and Redoc pages\n"
+    ),
+    long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
     author_email='admin@seventechnologies.cloud',
     maintainer='Seven Technologies Cloud',
