@@ -47,38 +47,44 @@ def get_valid_datetime_masks():
 
 
 def validate_datetime(column, request_data):
+    value = request_data.get(column.key, "")
     valid_datetime_masks = get_valid_datetime_masks()
     for datetime_mask in valid_datetime_masks:
         try:
             request_data[column.key] = datetime.strptime(
-                request_data.get(column.key), datetime_mask.strip())
+                datetime.now().strftime(datetime_mask.strip()) if value == "{now}" else value,
+                datetime_mask.strip()
+            )
             return
         except Exception as e:
             del e
             continue
     raise Exception(f'Invalid datetime value for {column.name} attribute')
 
-
-
 def validate_date(column, request_data):
+    value = request_data.get(column.name, "")
     valid_date_masks = get_global_variable('date_valid_masks').split(',')
     for date_mask in valid_date_masks:
         try:
             request_data[column.name] = datetime.strptime(
-                request_data.get(column.name), date_mask.strip())
+                datetime.now().strftime(date_mask.strip()) if value == "{now}" else value,
+                date_mask.strip()
+            )
             return
         except Exception as e:
             del e
             continue
     raise Exception(f'Invalid date value for {column.name} attribute')
 
-
 def validate_time(column, request_data):
+    value = request_data.get(column.name, "")
     valid_time_masks = get_global_variable('time_valid_masks').split(',')
     for time_mask in valid_time_masks:
         try:
             request_data[column.name] = datetime.strptime(
-                request_data.get(column.name), time_mask.strip())
+                datetime.now().strftime(time_mask.strip()) if value == "{now}" else value,
+                time_mask.strip()
+            )
             return
         except Exception as e:
             del e
@@ -227,6 +233,7 @@ def validate_datetime_masks(declarative_meta, request_data_object):
                 validate_date(declarative_meta_item, request_data_object)
             if str(declarative_meta_item.type).lower() == 'time':
                 validate_time(declarative_meta_item, request_data_object)
+
 
 
 
