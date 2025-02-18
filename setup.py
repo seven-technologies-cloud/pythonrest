@@ -33,7 +33,7 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.2.6',
+    version='0.2.8',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
     long_description=(
         "# PythonREST\n\n"
@@ -67,6 +67,8 @@ setup(
         "* Fixing some cases where exceptions were improperly returned as byte-like objects\n"
         "* Fixing `[or]` filter in GET routes when using multiple query parameters simultaneously\n"
         "* Improving rendering of Swagger and Redoc pages\n"
+        "**Version 0.2.8**\n"
+        "* Small fixes to swagger improved rendering\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
