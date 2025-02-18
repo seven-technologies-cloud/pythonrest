@@ -13,7 +13,7 @@ This project is under active enhancement and we have several open GitHub issues 
 ### If you like our solution, please consider donating on our [Patreon campaign](https://www.patreon.com/seventechnologies)!
 
 <br>
-
+ 
 # How Is PythonREST good for Developers?
 
 PythonREST allows you to have an entire CRUD API ready in minutes or seconds to fully manipulate your relational database. This will allow you to only need to write code specifically for functions that require third party integration or have super complex business rules. These are the project possibilities our project can provide you:
