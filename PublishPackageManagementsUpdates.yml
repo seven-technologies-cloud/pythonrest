@@ -1,12 +1,10 @@
 trigger:
-- none
+  branches:
+    include:
+      - main
 
-# parameters:
-#   - name: USERS_EMAILS_TO_NOTIFY
-#     type: string
-#     default: |
-#       gustavodaflon@seventechnologies.cloud
-#       leonardoviana@seventechnologies.cloud
+pool:
+  vmImage: 'ubuntu-latest'
 
 variables:
 - group: pythonrest-cli
@@ -18,6 +16,20 @@ jobs:
     vmImage: ubuntu-latest
   steps:
   - checkout: self
+  - script: |
+      last_commit_message=$(git log -1 --pretty=%s)
+
+      if [[ $last_commit_message =~ version[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        extracted_version="${BASH_REMATCH[0]//version/}"
+        echo "Extracted version: $extracted_version"
+      else
+        echo "Error: The last commit message does not contain a valid version."
+        exit 1
+      fi
+
+      sed -i "s/version='[0-9]\+\.[0-9]\+\.[0-9]\+'$/version='$extracted_version'/" ./setup.py
+      echo "Updated setup.py version to $extracted_version"
+      grep "version=" ./setup.py
   - script: |
       latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null)
       echo "Latest version on PyPI: $latest_version"
