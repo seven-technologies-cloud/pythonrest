@@ -67,6 +67,8 @@ setup(
         "* Fixing some cases where exceptions were improperly returned as byte-like objects\n"
         "* Fixing `[or]` filter in GET routes when using multiple query parameters simultaneously\n"
         "* Improving rendering of Swagger and Redoc pages\n"
+        "**Version 0.2.8**\n"
+        "* Small fixes to swagger improved rendering\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
