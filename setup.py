@@ -33,7 +33,7 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.2.6',
+    version='0.2.7',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
     long_description=(
         "# PythonREST\n\n"

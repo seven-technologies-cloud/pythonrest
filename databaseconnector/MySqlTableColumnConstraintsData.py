@@ -1,10 +1,12 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
-from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name_with_spaces
+from databaseconnector.ColumnNameFormatter import adding_replace_in_column_name_with_spaces, adding_replace_in_column_name_with_python_keys
 
 
 class MySqlTableColumnConstraintsData:
     def __init__(self, column, table_origin_foreign_key):
+
+        column['Field'] = adding_replace_in_column_name_with_python_keys(column['Field'])
 
         self.name = column['Field'].replace('\\', '\\\\') if '\\' in column['Field'] else column['Field']
         self.key = adding_replace_in_column_name_with_spaces(column['Field'])
