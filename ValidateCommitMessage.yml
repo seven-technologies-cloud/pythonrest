@@ -17,16 +17,18 @@ jobs:
     vmImage: ubuntu-latest
   steps:
   - checkout: self
-  - script: git log --oneline -10
-    displayName: "Show last 10 commits for debugging"
-  - script: |
-      last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
+- script: |
+    # Ensure we have full commit history in the CI environment
+    git fetch --all --unshallow
 
-      if [[ $last_commit_message =~ version\ ?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-        echo "Commit message contains a valid version format: $last_commit_message"
-      else
-        echo "Error: The commit message does not contain a valid version format (versionX.X.X)."
-        echo "Last commit message: $last_commit_message"
-        exit 1
-      fi
-    displayName: "Check commit message format"
+    # Find the last non-merge commit before the merge commit (PR source commit)
+    last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
+
+    if [[ $last_commit_message =~ version\ ?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+      echo "Commit message contains a valid version format: $last_commit_message"
+    else
+      echo "Error: The commit message does not contain a valid version format (versionX.X.X)."
+      echo "Last commit message: $last_commit_message"
+      exit 1
+    fi
+  displayName: "Check commit message format"
