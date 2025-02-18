@@ -17,6 +17,8 @@ jobs:
     vmImage: ubuntu-latest
   steps:
   - checkout: self
+  - script: git log --oneline -10
+    displayName: "Show last 10 commits for debugging"
   - script: |
       last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
 
