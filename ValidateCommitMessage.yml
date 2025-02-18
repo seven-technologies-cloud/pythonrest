@@ -18,7 +18,7 @@ jobs:
   steps:
   - checkout: self
   - script: |
-      last_commit_message=$(git log --no-merges -1 --pretty=%s)
+      last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
 
       if [[ $last_commit_message =~ version\ ?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
         echo "Commit message contains a valid version format: $last_commit_message"
