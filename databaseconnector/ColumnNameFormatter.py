@@ -4,7 +4,6 @@ def adding_replace_in_column_name_with_spaces(column_name: str) -> str:
     for separator in separators:
         if separator in column_name:
             column_name = column_name.replace(separator, '_')
-            column_name = adding_replace_in_column_name_with_python_keys(column_name)
             return column_name
     column_name = adding_replace_in_column_name_with_python_keys(column_name)
     return column_name
@@ -23,4 +22,3 @@ def adding_replace_in_column_name_with_python_keys(column_name: str) -> str:
             column_name = column_name.replace(keyword, keyword + '_prcolkey')
             return column_name
     return column_name
-
