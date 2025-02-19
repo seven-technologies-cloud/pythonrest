@@ -1,12 +1,9 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
-from databaseconnector.ColumnNameFormatter import adding_replace_in_column_name_with_spaces, adding_replace_in_column_name_with_python_keys
-
+from databaseconnector.ColumnNameFormatter import adding_replace_in_column_name_with_spaces
 
 class PostgreSqlTableColumnFieldData:
     def __init__(self, column_metadata, pk_status, u_status):
-
-        column_metadata['Field'] = adding_replace_in_column_name_with_python_keys(column_metadata['Field'])
 
         self.name = column_metadata['column_name'].replace('\\', '\\\\') if '\\' in column_metadata['column_name'] else column_metadata['column_name']
         self.key = adding_replace_in_column_name_with_spaces(column_metadata['column_name'])

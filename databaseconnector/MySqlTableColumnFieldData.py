@@ -1,13 +1,10 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
-from databaseconnector.ColumnNameFormatter import adding_replace_in_column_name_with_spaces, \
-    adding_replace_in_column_name_with_python_keys
+from databaseconnector.ColumnNameFormatter import adding_replace_in_column_name_with_spaces
 
 
 class MySqlTableColumnFieldData:
     def __init__(self, column):
-
-        column['Field'] = adding_replace_in_column_name_with_python_keys(column['Field'])
 
         self.name = column['Field'].replace('\\', '\\\\') if '\\' in column['Field'] else column['Field']
         self.key = adding_replace_in_column_name_with_spaces(column['Field'])
