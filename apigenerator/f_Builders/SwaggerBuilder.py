@@ -142,7 +142,7 @@ def modify_swagger_related_files(result, domain_path, script_absolute_path):
                         os.path.join(result, 'src', 'a_Presentation', 'd_Swagger'), dirs_exist_ok=True)
 
     if not os.path.exists(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'ApiSpecBuilder.py')):
-        shutil.copytree(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/ApiSpecBuilder.py'),
+        shutil.copy(os.path.join(script_absolute_path, 'apigenerator/resources/1 - Project/1 - BaseProject/Project/src/e_Infra/b_Builders/ApiSpecBuilder.py'),
                         os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'ApiSpecBuilder.py'))
 
     if not os.path.exists(os.path.join(result, 'src', 'e_Infra', 'b_Builders', 'FlaskBuilder.py')):
