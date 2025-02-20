@@ -1,15 +1,3 @@
-def get_domain_imports(domain_dict):
-    domain_imports = ''
-    constraint_names = list(set([constraint['referenced_class_name']
-                            for constraint in domain_dict['Constraints']]))
-
-    for constraint in constraint_names:
-        if constraint == domain_dict['ClassName']:
-            continue
-        domain_imports = domain_imports + \
-            f'from src.c_Domain.{constraint} import *\n'
-    return domain_imports if domain_imports != '' else 'import ujson\n'
-
 
 def get_columns_names_str(domain_dict):
     columns_list = [column['key'] for column in domain_dict['Columns']] + \
@@ -70,7 +58,8 @@ def get_constraint_argument(constraint, table_name):
     if constraint['referenced_table_name'] == table_name:
         return ', sa.ForeignKey(' + constraint['referenced_column_name'] + ')'
     else:
-        return ', sa.ForeignKey(' + constraint['referenced_class_name'] + '.' + constraint['referenced_column_name'] + ')'
+        return ', sa.ForeignKey("' + constraint['referenced_table_name'] + '.' + constraint['referenced_column_name'] + '")'
+
 
 
 def get_columns_init(domain_dict):
