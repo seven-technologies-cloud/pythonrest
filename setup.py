@@ -1,6 +1,9 @@
 from setuptools import setup
 import os
 
+def read_file(filename):
+    with open(filename, encoding="utf-8") as f:
+        return f.read()
 
 def find_packages_custom(start_directory='.', include=None, prefix='pythonrest'):
     if include is None:
@@ -33,6 +36,7 @@ setup(
     version='0.3.0',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
 long_description=(
+
         "# PythonREST\n\n"
         "PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks "
         "and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds "

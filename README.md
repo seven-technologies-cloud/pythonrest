@@ -1,8 +1,6 @@
-# PythonREST CLI
+# PythonREST CLI  
 
-<div align="center" style="padding:0px 100px 0px 0px">
-  <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihYRUsjJDrLIsbUPrdDPzxBb6EC_HU4EGsQa4juabWc6g1yoP0Vcnh7R9vX93HxAwYiWloxEdGKrf7FVAP22BnduRPjFKg5aJ0Y=w1366-h641-rw-v1" alt="Logo" width="350"/>
-</div>
+![image](https://drive.google.com/uc?export=view&id=1FMzeZQL2JpKmkODdIcLVTSQC149rvFEg)
 
 PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds based on your relational database on a single CLI command. This allows you to create your APIs from scratch and update your current API previously created with our tool to always match your latest database definitions.
 
@@ -44,6 +42,25 @@ PythonREST allows you to create Web, Mobile Apps, SaaS products or simply manage
 - Pagination of queries
 - Filter query results by each table field
   <br>
+
+## Version Disclaimer
+
+**Version 0.2.1**
+* Added some quality of life improvements for redoc building
+
+**Version 0.2.4**
+* Adding ssh and ssl connection methods (direct file provision only where applicable)
+* Support for PostgreSQL MONEY type (mapped as string on code)
+* Implementation of GROUPBY SQL Statement as a header for tables routes
+
+**Version 0.2.6:**
+Support for column names that contain unusual characters, like "-", " ", ".", "/", "\", ":", "~", "*", "+", "|", "@"
+
+**Version 0.2.7:**
+* SQL Views are not listed as routes on generated API anymore
+* Fixing some cases of exceptions being returned improperly as bytes like object
+* Fixing [or] filter of GET routes when using multiple query params simultaneously
+* Improving rendering of swagger and redoc pages
 
 ## Installation
 
@@ -120,6 +137,8 @@ Check version:
 pythonrest version
 ```
 
+### Password-based Authentication
+
 Generate APIs based on MySQL databases:
 
 ```bash
@@ -156,81 +175,117 @@ Generate APIs based on Aurora Postgres databases:
 pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public
 ```
 
-### Use authentications
+### SSH-Based Authentication
 
-#### - SSH Password
+#### SSH with Password
 
-Generate MySQL database-based APIs with ssh password authentication:
+Generate MySQL database-based APIs with SSH password authentication:
 
 ```bash
 pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate MariaDB database-based APIs with ssh password authentication:
-
-```bash
-pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
-```
-
-Generate SQLServer database-based APIs with ssh password authentication:
-
-```bash
-pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
-```
-
-Generate Postgres database-based APIs with ssh password authentication:
+Generate Postgres database-based APIs with SSH password authentication:
 
 ```bash
 pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-#### - SSH Public Key
-
-Generate MySQL database-based APIs with ssh public key authentication:
+Generate SQLServer database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate MariaDB database-based APIs with ssh public key authentication:
+Generate MariaDB database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate SQLServer database-based APIs with ssh public key authentication:
+Generate Aurora MySQL database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-Generate Postgres database-based APIs with ssh public key authentication:
+Generate Aurora Postgres database-based APIs with SSH password authentication:
 
 ```bash
-pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-publickey-authentication-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-password-authenticatio-string ssh://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>?local_bind_port=<LOCAL_BIND_PORT>
 ```
 
-#### - SSL
+#### SSH with Public Key
 
-Generate MySQL database-based APIs with ssl authentication:
+Generate MySQL database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate Postgres database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate SQLServer database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate MariaDB database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate Aurora MySQL database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+Generate Aurora Postgres database-based APIs with SSH public key authentication:
+
+```bash
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssh-publickey-authentication-string ssh://<USER>@<ENDPOINT>:<PORT>?key_path=/path/your/public/key/id_rsa?local_bind_port=<LOCAL_BIND_PORT>
+```
+
+### SSL/TLS-Based Authentication
+
+Generate MySQL database-based APIs with SSL authentication:
 
 ```bash
 pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
 ```
 
-Generate MariaDB database-based APIs with ssl authentication:
+Generate Postgres database-based APIs with SSL authentication:
 
 ```bash
-pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
+pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
 ```
 
-Generate SQLServer database-based APIs with ssl authentication:
+Generate SQLServer database-based APIs with SSL authentication:
 
 ```bash
 pythonrest generate --sqlserver-connection-string mssql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
 ```
 
-Generate Postgres database-based APIs with ssl authentication:
+Generate MariaDB database-based APIs with SSL authentication:
+
+```bash
+pythonrest generate --mariadb-connection-string mariadb://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
+```
+
+Generate Aurora MySQL database-based APIs with SSL authentication:
+
+```bash
+pythonrest generate --mysql-connection-string mysql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<SCHEMA> --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
+```
+
+Generate Aurora Postgres database-based APIs with SSL authentication:
 
 ```bash
 pythonrest generate --postgres-connection-string postgresql://<USER>:<PASSWORD>@<ENDPOINT>:<PORT>/<DATABASE_NAME>?options=-c%20search_path=<SCHEMA>,public --ssl-authentication-string ssl://ssl_ca=./path/your/ssl/ca-cert.pem?ssl_cert=./path/your/ssl/server-cert.pem?ssl_key=./path/your/ssl/server-key.pem?hostname=<HOST>
@@ -247,7 +302,7 @@ path to your generated API please follow the example below:
 pythonrest generate --mysql-connection-string <mysql_connection_string> --result-path C:\<YOUR_DESIRED_PATH_HERE>
 ```
 
-The above will generate your API on the provided path, and if the folder does not exist the generator will create it.
+The above will generate your API inside a PythonRestAPI folder created on the provided path.
 The following folders/files will be modified(content deleted and recreated) if a PythonREST project is already in place:
 
 - src/c_Domain
@@ -255,13 +310,13 @@ The following folders/files will be modified(content deleted and recreated) if a
 - src/b_Application/b_Service/a_Domain
 - src/d_Repository/a_Domain
 - src/a_Presentation/d_Swagger
-- src/e_Infra/b_Builders/a_Swagger
 - src/e_Infra/d_Validators/a_Domain
 - src/e_Infra/g_Environment
 - src/e_Infra/b_Builders/FlaskBuilder.py
 - config
 - app.py
-  This allows you to make customizations or enhancements on your generated API and new upgrades will only affect CRUD API feature folders
+
+This allows you to make customizations or enhancements on your generated API and new upgrades will only affect CRUD API feature folders
 
 #### --use-pascal-case:
 
@@ -632,7 +687,6 @@ The generated API has a structure of a number of directories with sub-directorie
 - src/e_Infra: Contains files or components that deal with the foundational structure, setup and configuration of the project.
   - src/e_Infra/a_Handlers: Contains files used to configure exceptions and system messages returned by the API
   - src/e_Infra/b_Builders: Contains files used to configure and build date times, domain objects, flask, proxy responses, sql alchemy, strings
-    - src/e_Infra/b_Builders/a_Swagger: Contains the functions to build the Swagger blueprints that renders the Swagger page.
   - src/e_Infra/c_Resolvers: Contains functions to deal with some logics and operations like creation of engine and session of a connected database and filtering queries with left like, right lke and the such.
   - src/e_Infra/d_Validators: Contains functions that validates if given requests have correct data, like JSON bodies, datetimes values, types of table parameters.
   - src/e_Infra/d_Validators/a_Domain: Contains functions for each domain in which custom validators can be set.
@@ -955,6 +1009,11 @@ pip uninstall pythonrest3
 When reinstalling the local pip package for tests, make sure to delete any of the following folders: `build`, `dist` and `*.egg.info` generated on the root folder of the project,
 as retaining those can lead to the project being built using that folder and not catching any changes you made to
 the project files.
+
+# For Contributors: How to proceed with a PR
+* The Pull Requests must be done from your forked repository to our main.
+* The PR commit messages must follow the pattern: `versionx.x.x`
+* The next version should consider the [last package manager published version](https://pypi.org/project/pythonrest3/#history) + 0.0.1 eg.: 0.2.7 on pypi + 0.0.1 =  0.2.8
 
 <br></br>
 

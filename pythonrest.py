@@ -20,6 +20,7 @@ app = typer.Typer()
 pythonrest_version = "0.3.0"
 
 
+
 @app.command()
 def generate(
     result_path: Optional[str] = None,
