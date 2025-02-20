@@ -1,7 +1,6 @@
 from databaseconnector.PythonTypesUtils import get_python_type
 from databaseconnector.SqlAlchemyTypesUtils import get_sa_type
-from apigenerator.g_Utils.ReplaceColumnName import adding_replace_in_column_name_with_spaces
-
+from databaseconnector.ColumnNameFormatter import adding_replace_in_column_name_with_spaces
 
 class PostgreSqlTableColumnConstraintsData:
     def __init__(self, column_metadata, column_fk, pk_status, u_status):

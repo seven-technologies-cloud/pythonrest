@@ -33,7 +33,7 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.2.8',
+    version='0.2.9',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
     long_description=(
         "# PythonREST\n\n"
@@ -66,9 +66,11 @@ setup(
         "* SQL Views are no longer listed as routes in the generated API\n"
         "* Fixing some cases where exceptions were improperly returned as byte-like objects\n"
         "* Fixing `[or]` filter in GET routes when using multiple query parameters simultaneously\n"
-        "* Improving rendering of Swagger and Redoc pages\n"
+        "* Improving rendering of Swagger and Redoc pages\n\n"
         "**Version 0.2.8**\n"
-        "* Small fixes to swagger improved rendering\n"
+        "* Small fixes to swagger improved rendering\n\n"
+        "**Version 0.2.9**\n"
+        "* Support for columns named with Python reserved keywords\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
