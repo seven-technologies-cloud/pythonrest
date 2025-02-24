@@ -675,7 +675,7 @@ your database the columns can remain the same.
 
 In this version 0.2.9, a preventive measure was added, since it was verified that if the user uses some reserved names 
 in Python, the database accepts them. To avoid errors or problems when the user uses this name, a suffix "_prcolkey" 
-was implemented, which is added right after the column name, for example:  
+was implemented, which is added right after the column name, for example:    
 
 ```python
 columnname = 'class'
