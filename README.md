@@ -664,11 +664,18 @@ Generated API environment variables can be found on src/e_Infra/g_Environment/En
 - pgsql_database_name - On PostgreSQL, this is the database name in which your selected schema resides.
   <br></br>
 
-## Column names preventions
+## Odd Column names behaviour
 
-- **version 0.2.9**
+In version 0.2.7 it was verified that it is possible to create column names with unusual separators such as:
 
-In this version, a prevention measure was added, as it was verified that if the user uses some reserved names in Python, the database accepts them. To avoid errors or problems when the user uses this name, a suffix "_prcolkey" was implemented, which is added right after the column name, for example:
+["-", "_", " ", ".", "/", "\\", ":", "~", "*", "+", "|", "@"]
+
+They will be mapped with the key using the underscore separator, so that errors do not occur in the Python code and in 
+your database the columns can remain the same.
+
+In this version 0.2.9, a preventive measure was added, since it was verified that if the user uses some reserved names 
+in Python, the database accepts them. To avoid errors or problems when the user uses this name, a suffix "_prcolkey" 
+was implemented, which is added right after the column name, for example:
 
 ```python
 columnname = 'class'
