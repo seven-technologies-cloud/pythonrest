@@ -664,6 +664,38 @@ Generated API environment variables can be found on src/e_Infra/g_Environment/En
 - pgsql_database_name - On PostgreSQL, this is the database name in which your selected schema resides.
   <br></br>
 
+## Odd Column names behaviour
+
+In version 0.2.7 it was verified that it is possible to create column names with unusual separators such as:
+
+["-", "_", " ", ".", "/", "\\", ":", "~", "*", "+", "|", "@"]
+
+They will be mapped with the key using the underscore separator, so that errors do not occur in the Python code and in 
+your database the columns can remain the same.
+
+In this version 0.2.9, a preventive measure was added, since it was verified that if the user uses some reserved names 
+in Python, the database accepts them. To avoid errors or problems when the user uses this name, a suffix "_prcolkey" 
+was implemented, which is added right after the column name, for example:    
+
+```python
+columnname = 'class'
+withsuffix = 'class_prcolkey'
+```
+
+However, it is only added in Python, in your database it remains intact.
+
+This list of words is accepted in the pythonrest API, which will have a suffix "_prcolkey":
+
+[
+"False", "None", "True", "and", "as", "assert", "async", "await",
+"break", "class", "continue", "def", "del", "elif", "else", "except",
+"finally", "for", "from", "global", "if", "import", "in", "is",
+"lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try",
+"while", "with", "yield"
+]
+
+**NOTE:** You have to be aware of this when making POST, GET and similar requests.
+
 # Generated API Directory Structure
 
 The generated API has a structure of a number of directories with sub-directories. This section will explain that division in order to enlighten the project for debugging and feature implementations. Taking from the root of the generated project, we have:
