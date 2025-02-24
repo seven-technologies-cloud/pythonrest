@@ -7,7 +7,8 @@ import shutil
 # This function will check for column types that can't use flask admin filters, to then remove them on the build of column_filters
 def extract_columns_to_exclude_from_column_filters(file_path):
     types_to_exclude_from_column_filters = [r"^.*\bsa\.JSON\b.*$", r"^.*\bSET\b.*?\)$", r"^.*\bsa\.BINARY\b.*$",
-                                            r"^.*\bsa\.VARBINARY\b.*$", r"^.*\bsa\.BLOB\b.*$",r"^.*\bMONEY\b.*?\)$"]
+                                            r"^.*\bsa\.VARBINARY\b.*$", r"^.*\bsa\.BLOB\b.*$",r"^.*\bMONEY\b.*?\)$",
+                                            r"^.*\bsa\.Interval\b.*$"]
 
     columns = []
 

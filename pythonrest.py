@@ -87,7 +87,7 @@ def generate(
         except Exception as e:
             typer.echo(f"Error parsing MySQL connection parameters: {e}")
             return
-
+ 
     elif mysql_connection_string:
         try:
             mysql_params = extract_mysql_params(mysql_connection_string)

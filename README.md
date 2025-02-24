@@ -666,25 +666,24 @@ Generated API environment variables can be found on src/e_Infra/g_Environment/En
 
 ## Odd Column names behaviour
 
-In version 0.2.7 it was verified that it is possible to create column names with unusual separators such as:
+Starting from version 0.2.7 pythonrest added support for column names with unusual separators such as:
 
-["-", "_", " ", ".", "/", "\\", ":", "~", "*", "+", "|", "@"]
+["-", " ", ".", "/", "\\", ":", "~", "*", "+", "|", "@"]
 
-They will be mapped with the key using the underscore separator, so that errors do not occur in the Python code and in 
-your database the columns can remain the same.
+As such, they will be mapped on the API replacing all instances of those separators with the underscore separator, so 
+that errors do not occur in the Python code. This mapping does not affect your database structure in any way.
 
-In this version 0.2.9, a preventive measure was added, since it was verified that if the user uses some reserved names 
-in Python, the database accepts them. To avoid errors or problems when the user uses this name, a suffix "_prcolkey" 
-was implemented, which is added right after the column name, for example:    
+Starting from version 0.2.9, support for python reserved keywords as column names was added. Any columns named with these
+words will be mapped on the pythonrest generated API with a suffix "_prcolkey", for example:    
 
 ```python
 columnname = 'class'
 withsuffix = 'class_prcolkey'
 ```
 
-However, it is only added in Python, in your database it remains intact.
+This also does not affect your database structure in any way.
 
-This list of words is accepted in the pythonrest API, which will have a suffix "_prcolkey":
+Below is a list of the words which will have the suffix "_prcolkey":
 
 [
 "False", "None", "True", "and", "as", "assert", "async", "await",
@@ -694,7 +693,7 @@ This list of words is accepted in the pythonrest API, which will have a suffix "
 "while", "with", "yield"
 ]
 
-**NOTE:** You have to be aware of this when making POST, GET and similar requests.
+**NOTE:** Beware these suffixes and separators mapping affects the name of these columns on the request and response bodies.
 
 # Generated API Directory Structure
 
