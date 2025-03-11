@@ -33,9 +33,10 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.2.9',
+    version='0.3.0',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
-    long_description=(
+long_description=(
+
         "# PythonREST\n\n"
         "PythonREST is the ultimate full API generator for Python language. Based on the best performing frameworks "
         "and software development best practices, PythonREST can create an entire CRUD API in minutes or seconds "
@@ -70,9 +71,11 @@ setup(
         "**Version 0.2.8**\n"
         "* Small fixes to swagger improved rendering\n\n"
         "**Version 0.2.9**\n"
-        "* Support for columns named with Python reserved keywords\n"
+        "* Support for columns named with Python reserved keywords\n\n"
+        "**Version 0.3.0**\n"
+        " *Support for circular foreign key relationships between tables.\n"
+       "* New `{now}` expression for auto-generating current date/time on create, update, and delete requests\n"
     ),
-    long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
     author_email='admin@seventechnologies.cloud',
     maintainer='Seven Technologies Cloud',
