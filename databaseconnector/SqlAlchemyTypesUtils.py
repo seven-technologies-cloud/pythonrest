@@ -296,10 +296,10 @@ def convert_set_to_SET(input_string):
 
 
 def handle_sql_to_sa_types_conversion(column_type):
-    if "enum" in column_type.lower():
+    if column_type.lower().startswith("enum"):
         converted_column_type = convert_enum_to_Enum(column_type)
         return converted_column_type
-    if "set" in column_type.lower():
+    if column_type.lower().startswith("set"):
         converted_column_type = convert_set_to_SET(column_type)
         return converted_column_type
     # TODO remove this when float type casting to Decimal or a way to send data of decimal type on requests is supported by PythonREST
