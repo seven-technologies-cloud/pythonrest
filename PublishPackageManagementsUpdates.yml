@@ -48,7 +48,8 @@ jobs:
 
       if [ "$latest_version" != "$local_version" ]; then
         echo "Versions are different. Uploading to PyPI."
-        pip3 install twine
+        pip3 install -U packaging==24.2
+        pip3 install twine==6.1.0
         python3 setup.py sdist
         python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
       else
