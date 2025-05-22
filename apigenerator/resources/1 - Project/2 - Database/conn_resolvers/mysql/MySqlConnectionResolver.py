@@ -22,7 +22,7 @@ def get_mysql_connection_session():
     if session is None:
         # This block creates engine and session for the database #
             conn = get_mysql_connection_schema_internet()
-            engine = sa.create_engine(conn)
+            engine = sa.create_engine(conn, isolation_level="READ COMMITTED")
             session = scoped_session(sessionmaker(bind=engine))
 
     # Returning session #
