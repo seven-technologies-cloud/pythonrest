@@ -347,5 +347,5 @@ def get_sa_type(column_type, python_type_value, database):
                     result = add_size_to_result(result, column_type)
             return result
 
-    # Caso o tipo de dado não seja encontrado, sair com mensagem de erro
-    sys.exit(f'Tipo de coluna não suportado: {column_type}')
+
+    sys.exit(f'Unsupported column type: {column_type}')

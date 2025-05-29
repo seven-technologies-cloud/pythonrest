@@ -20,6 +20,10 @@ def generate_guid():
     return id_generators.get(id_generation_method, id_generators['uuid'])()
 
 
+def generate_uuidv7():
+    return str(uuid6.uuid7())
+
+
 # Method that casts any parameter to string #
 def stringify(param):
     return str(param)
