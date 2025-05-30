@@ -74,6 +74,9 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.1:**
 * Setting READ COMMITTED isolation level on mysql and mariadb resolvers
 
+**Version 0.3.2:**
+* Adding fix for search path option not working on some PostgreSQL environments
+
 ## Installation
 
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more

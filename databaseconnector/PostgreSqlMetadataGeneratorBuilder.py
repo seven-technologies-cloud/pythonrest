@@ -12,7 +12,6 @@ def get_postgresql_db_connection_with_ssl(
             host=ssl_hostname, user=_user,
             password=_password,
             port=_port,
-            options=f'-c search_path={_schema}',
             ssl={
                 'ca': ssl_ca,
                 'cert': ssl_cert,
@@ -22,6 +21,7 @@ def get_postgresql_db_connection_with_ssl(
         )
 
         cursor = con.cursor()
+        cursor.execute(f"SET search_path TO {_schema};")
         return cursor
 
     except Exception as e:
@@ -48,11 +48,11 @@ def get_postgresql_db_connection_with_ssh_publickey(
             dbname=_dbname,
             host=_host, user=_user,
             password=_password,
-            port=tunnel.local_bind_port,
-            options=f'-c search_path={_schema}'
+            port=tunnel.local_bind_port
         )
 
         cursor = con.cursor()
+        cursor.execute(f"SET search_path TO {_schema};")
         return cursor
 
     except Exception as e:
@@ -77,19 +77,26 @@ def get_postgresql_db_connection_with_ssh_password(
             dbname=_dbname,
             host=_host, user=_user,
             password=_password,
-            port=tunnel.local_bind_port,
-            options=f'-c search_path={_schema}'
+            port=tunnel.local_bind_port
         )
 
         cursor = con.cursor()
+        cursor.execute(f"SET search_path TO {_schema};")
         return cursor
 
     except Exception as e:
         print(f"Failed to connect: {e}")
 
 def get_postgresql_db_connection(_dbname, _host, _port, _user, _password, _schema):
-    conn = connect(dbname=_dbname, host=_host, user=_user, password=_password, port=_port, options=f'-c search_path={_schema}')
+    conn = connect(
+        dbname=_dbname,
+        host=_host,
+        user=_user,
+        password=_password,
+        port=_port
+    )
     cursor = conn.cursor()
+    cursor.execute(f"SET search_path TO {_schema};")
     return cursor
 
 def convert_retrieved_table_name_tuple_list_from_connected_schema(tuple_name_list):
