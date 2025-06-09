@@ -23,6 +23,22 @@ os.environ['time_valid_masks'] = "%H:%M:%S, %I:%M:%S %p, %H:%M, %I:%M %p, %I:%M:
 
 os.environ['query_limit'] = '*'
 
+# --------------------------------------- API Behavior --------------------------------------- #
+
+# Batch Insert Strategy #
+# Defines the strategy for handling batch insert operations (e.g., via POST to a collection endpoint).
+# Possible values:
+#   'ITERATIVE': (Default) Uses an iterative approach (session.add() per item) within a single transaction.
+#                This strategy allows for more granular error reporting if some items in a batch
+#                fail due to database constraints (e.g., duplicate keys), while others might succeed.
+#                The transaction will commit successfully processed items if any, and report errors for failed ones.
+#   'BULK':      Uses session.execute(insert(), data_list) for potentially higher performance on very large batches.
+#                Database errors (like duplicate keys or other constraint violations) will likely cause
+#                the entire batch operation to fail (all-or-nothing transaction behavior for the batch).
+#                Error reporting will be for the batch as a whole, not per item.
+os.environ.setdefault('API_BATCH_INSERT_STRATEGY', 'ITERATIVE')
+
+
 # ------------------------------------------ Trace ------------------------------------------ #
 
 # Comment this variable bellow for NO STACKTRACE (production mode off) #
