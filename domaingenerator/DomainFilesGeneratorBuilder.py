@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import importlib.metadata
+# string.Template is not needed here, it's used in the Worker.
 
 
 # Check if script is running directly or via exe file to get the path
@@ -42,17 +43,38 @@ def get_domain_dict(json_metadata_path):
         return json.load(json_in)
 
 
-def build_domain_file(domain_mask_file_path, replacer, generated_domains_path):
-    with open(domain_mask_file_path, 'r') as file_in:
-        mask_data = file_in.readlines()
+def build_domain_file(mask_template, replacer, generated_domains_path): # Signature changed
+    # Removed:
+    # with open(domain_mask_file_path, 'r') as file_in:
+    #     mask_data = file_in.readlines()
 
-    with open(os.path.join(generated_domains_path, replacer.declarative_meta + '.py'), 'w') as domain_out:
-        for line in mask_data:
-            domain_out.write(line
-            .replace('${domain_imports}', replacer.domain_imports)
-            .replace('${declarative_meta}', replacer.declarative_meta)
-            .replace('${meta_string}', replacer.meta_string)
-            .replace('${columns_names}', replacer.columns_names)
-            .replace('${sa_columns}', replacer.sa_columns)
-            .replace('${columns_init}', replacer.columns_init)
-            .replace('${self_columns}', replacer.self_columns))
+    substitutions = {
+        'domain_imports': replacer.domain_imports,
+        'declarative_meta': replacer.declarative_meta,
+        'meta_string': replacer.meta_string,
+        'columns_names': replacer.columns_names,
+        'sa_columns': replacer.sa_columns,
+        'columns_init': replacer.columns_init,
+        'self_columns': replacer.self_columns
+    }
+
+    # Perform the substitution using the pre-loaded string.Template object
+    output_content = mask_template.substitute(substitutions)
+
+    output_file_name = replacer.declarative_meta + '.py'
+    output_file_path = os.path.join(generated_domains_path, output_file_name)
+
+    try:
+        with open(output_file_path, 'w') as domain_out:
+            domain_out.write(output_content)
+    except IOError as e:
+        print(f"Error writing domain file {output_file_path}: {e}")
+        # Optionally re-raise or handle as appropriate for the application
+        raise # Re-raise the exception to be caught by the worker
+    except Exception as e: # Catch any other unexpected errors during write
+        print(f"Unexpected error writing domain file {output_file_path}: {e}")
+        raise
+
+# Added basic error handling for file writing in build_domain_file.
+# The rest of the functions in this file remain unchanged as they are not
+# directly related to the template substitution logic being refactored.
