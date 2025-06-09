@@ -1,4 +1,5 @@
 import os
+from pathlib import Path # Import Path
 from databaseconnector.MySqlMetadataGeneratorBuilder import *
 from databaseconnector.MySqlTableColumnFieldData import *
 from databaseconnector.MySqlTableColumnConstraintsData import *
@@ -6,9 +7,12 @@ from databaseconnector.JSONDictHelper import *
 from databaseconnector.FilesHandler import get_domain_result_files
 
 
-def generate_mysql_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path, ssh_params_with_password=None, ssh_publickey_params=None, ssl_params=None):
-    json_generated_metadata_folder = os.path.join(generated_api_path, "JSONMetadata")
-    os.makedirs(json_generated_metadata_folder)
+def generate_mysql_database_metadata(project_database, project_database_data, use_pascal_case, generated_api_path_str, ssh_params_with_password=None, ssh_publickey_params=None, ssl_params=None):
+    generated_api_path = Path(generated_api_path_str) # Convert to Path
+    json_generated_metadata_folder_path = generated_api_path / "JSONMetadata" # Use Path object
+
+    # Use pathlib to create directories
+    json_generated_metadata_folder_path.mkdir(parents=True, exist_ok=True)
 
     try:
         if ssh_params_with_password:
@@ -62,29 +66,33 @@ def generate_mysql_database_metadata(project_database, project_database_data, us
     converted_table_name_list = convert_retrieved_table_name_tuple_list_from_connected_schema(
         tuple_name_list)
 
+    # Hoist schema name lookup out of the loop
+    db_schema_name = project_database_data[f'{project_database}_schema']
+
     for table_name in converted_table_name_list:
         create_domain_result_file(
-            table_name, json_generated_metadata_folder, use_pascal_case)
+            table_name, str(json_generated_metadata_folder_path), use_pascal_case) # Convert Path to string
 
         table_fields_metadata = retrieve_table_field_metadata(
             table_name, connected_schema)
 
         for column in table_fields_metadata:
             table_origin_foreign_key = retrieve_table_relative_column_constraints(
-                column['Field'], table_name, project_database_data[f'{project_database}_schema'], connected_schema)
+                column['Field'], table_name, db_schema_name, connected_schema)
 
             if column['Field'] == table_origin_foreign_key.get('COLUMN_NAME'):
-                table_origin_foreign_key = retrieve_table_relative_column_constraints(
-                    column['Field'], table_name, project_database_data[f'{project_database}_schema'], connected_schema)
+                # The second call to retrieve_table_relative_column_constraints was redundant
+                # as table_origin_foreign_key is already populated with the same data.
                 table_constraints_data = MySqlTableColumnConstraintsData(
                     column, table_origin_foreign_key).__dict__
                 add_table_constraint_to_json_domain(
-                    table_name, table_constraints_data, json_generated_metadata_folder)
+                    table_name, table_constraints_data, str(json_generated_metadata_folder_path)) # Convert Path to string
 
             else:
                 mysql_field_data = MySqlTableColumnFieldData(column).__dict__
                 add_table_column_to_json_domain(
-                    table_name, mysql_field_data, json_generated_metadata_folder)
-    domain_result_json_files = get_domain_result_files(json_generated_metadata_folder)
+                    table_name, mysql_field_data, str(json_generated_metadata_folder_path)) # Convert Path to string
+
+    domain_result_json_files = get_domain_result_files(str(json_generated_metadata_folder_path)) # Convert Path to string
     for domain_result_json_file in domain_result_json_files:
-        add_referenced_class_name_to_constraints(domain_result_json_file, domain_result_json_files, json_generated_metadata_folder)
+        add_referenced_class_name_to_constraints(domain_result_json_file, domain_result_json_files, str(json_generated_metadata_folder_path)) # Convert Path to string

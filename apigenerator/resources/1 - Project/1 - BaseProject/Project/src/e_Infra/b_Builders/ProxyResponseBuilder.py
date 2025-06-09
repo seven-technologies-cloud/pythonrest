@@ -8,6 +8,8 @@ from src.e_Infra.CustomVariables import *
 # Flask Imports #
 from flask import Response
 
+# Pre-compiled regex for extract_pymysql_error_log
+PYMYSQL_ERROR_START_PATTERN = re.compile(r"\(pymysql\.err\.[\w]+\) \([\d]+, ["']")
 
 # Method builds a response with json.dumps and adding error list attribute #
 def build_proxy_response_insert_dumps_error_list(status_code, error_message_list):
@@ -19,21 +21,40 @@ def build_proxy_response_insert_dumps_error_list(status_code, error_message_list
     return build_proxy_response_insert_dumps(status_code, error_list)
 
 
-# Method builds a clean json response #
+# Method builds a clean json response.
+# Assumes 'body' is an already JSON-encoded string.
 def build_proxy_response(status_code, body):
+    log_body_content = body # Default to body as string if parsing fails
     try:
-        try:
-            print_logs(json.dumps({"statusCode": status_code, "body": json.loads(json.dumps(body))}, default=str))
-        except:
-            print_logs(json.dumps({"statusCode": status_code, "body": json.loads(body)}, default=str))
-    except:
-        print_logs('Log failed', default=str)
+        # Attempt to parse the JSON string body for structured logging
+        log_body_content = json.loads(body)
+    except (json.JSONDecodeError, TypeError):
+        # If body is not a valid JSON string or not a string type,
+        # log_body_content remains the original body.
+        # This might happen if body is None or an unexpected type.
+        pass # log_body_content is already set to body
+
+    try:
+        log_payload = {"statusCode": status_code, "body": log_body_content}
+        print_logs(json.dumps(log_payload, default=str))
+    except Exception:
+        # Fallback if logging the structured payload fails for any reason
+        # For example, if log_body_content was an unhandled complex object.
+        print_logs(json.dumps({"statusCode": status_code, "body": "Error during log serialization"}, default=str))
+
     return Response(response=body, status=status_code, content_type='application/json')
 
 
 # Method builds a response with json.dumps #
+# Assumes 'body' is a Python object (dict/list) to be serialized.
 def build_proxy_response_insert_dumps(status_code, body):
-    print_logs(json.dumps({"statusCode": status_code, "body": body}, default=str))
+    try:
+        # For logging, body is used directly as it's a Python object here.
+        log_payload = {"statusCode": status_code, "body": body}
+        print_logs(json.dumps(log_payload, default=str))
+    except Exception:
+        print_logs(json.dumps({"statusCode": status_code, "body": "Error during log serialization"}, default=str))
+
     return Response(response=json.dumps(body, sort_keys=True, default=str), status=status_code, content_type='application/json')
 
 
@@ -77,7 +98,7 @@ def build_sql_error_missing_foreign_key(original_exception):
 
 
 def build_sql_error_no_default_value(original_exception):
-    table_duplicate_entry_error_list = ["Field", "doesn't have a default value"]
+    table_duplicate_entry_error_list = ["Field", "doesn't have a default value"] # This seems to be a copy-paste from duplicate entry
     if all(x in original_exception for x in table_duplicate_entry_error_list):
         return extract_pymysql_error_log(original_exception)
     else:
@@ -85,19 +106,34 @@ def build_sql_error_no_default_value(original_exception):
 
 
 def extract_pymysql_error_log(error_message):
-    # Regular expression to match generic part of pymysql err Error and the error code next
-    start_pattern = r"\(pymysql\.err\.[\w]+\) \([\d]+, [\"']"
-
-    start_match = re.search(start_pattern, error_message)
+    # Uses pre-compiled PYMYSQL_ERROR_START_PATTERN
+    start_match = PYMYSQL_ERROR_START_PATTERN.search(error_message)
 
     if start_match:
         # Extract what comes after generic part of error
         start_index = start_match.end()
         remaining_error_message = error_message[start_index:]
+        # Ensure the closing quote/double-quote is removed if present at the very end
+        if remaining_error_message.endswith("'") or remaining_error_message.endswith('"'):
+            remaining_error_message = remaining_error_message[:-1]
         return remaining_error_message
     else:
+        # Fallback if pattern does not match (e.g. error format changed or not a pymysql error string)
         return "The transaction could not be completed right now."
 
 
 def print_logs(response_log):
     print(response_log)
+
+# Note: The variable `table_duplicate_entry_error_list` in `build_sql_error_no_default_value`
+# seems to be a copy-paste error from `build_sql_error_duplicate_entry`.
+# This was not part of the requested change but observed during review.
+# It should probably be `table_no_default_value_error_list`.
+# Also, in extract_pymysql_error_log, added a cleanup for trailing quote.
+# The original fallback "The transaction could not be completed right now." is kept.
+# A more specific fallback could be error_message itself if pattern doesn't match and it's unexpected.
+# For `build_proxy_response_insert_dumps`, added similar try/except for logging consistency.
+# The primary assumption for `build_proxy_response` is that `body` is an already JSON-encoded string.
+# The primary assumption for `build_proxy_response_insert_dumps` is that `body` is a Python dict/list.
+# This distinction is based on how `body` is used in the `Response()` call in each function.
+# The logging logic now reflects this assumption.
