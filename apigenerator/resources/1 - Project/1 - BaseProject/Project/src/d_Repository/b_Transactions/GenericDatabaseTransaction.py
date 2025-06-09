@@ -51,8 +51,8 @@ def insert_object(transaction_obj, session):
         session.add(
             transaction_obj
         )
-        # Returning session commit response #
-        return session.commit()
+        # Commit is removed; will be handled by the caller.
+        # Function will implicitly return None on success here.
     except Exception as e:
         session.rollback()
         raise e
@@ -74,8 +74,7 @@ def update_object(declarative_meta, request_data, id_name_list, session):
         result = query.update(
             request_data
         )
-        # Returning session commit response #
-        session.commit()
+        # Commit is removed; will be handled by the caller.
         return result
     except Exception as e:
         session.rollback()
@@ -92,9 +91,8 @@ def delete_object_by_id(declarative_meta, id_value_list, id_name_list, session):
         for i in range(len(id_value_list)):
             query = query.filter(getattr(declarative_meta, id_name_list[i]) == id_value_list[i])
         result = query.delete()
-        # Returning session commit response #
-        session.commit()
-        # Returning number of fetched objects #
+        # Commit is removed; will be handled by the caller.
+        # Returning number of affected rows #
         return result
     except Exception as e:
         session.rollback()
@@ -110,7 +108,7 @@ def delete_object_by_full_match(declarative_meta, request_data, session):
         result = query.delete(
             synchronize_session='fetch'
         )
-        session.commit()
+        # Commit is removed; will be handled by the caller.
         return result
     except Exception as e:
         session.rollback()
