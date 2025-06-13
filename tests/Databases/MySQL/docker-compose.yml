@@ -1,14 +1,21 @@
-version : '3.5'
+version: '3.8'
 services:
   mysql:
-    image: mysql
-    command: --mysql-native-password=ON
+    image: mysql:8.0
+    container_name: mysql-mysql-1
     environment:
       MYSQL_ROOT_PASSWORD: adminuserdb
+      MYSQL_DATABASE: database_mapper_mysql
       MYSQL_USER: admin
       MYSQL_PASSWORD: adminuserdb
-      MYSQL_DATABASE: database_mapper_mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padminuserdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
-      - "./database_mapper_mysql.sql:/docker-entrypoint-initdb.d/1.sql"
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:

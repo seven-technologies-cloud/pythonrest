@@ -1,0 +1,13 @@
+database:
+  type: sqlserver
+  host: localhost
+  port: 1433
+  user: sa
+  password: YourStrong@Passw0rd
+  database: master
+
+output:
+  directory: output
+  format: yaml
+  include_schema: true
+  include_data: true 
