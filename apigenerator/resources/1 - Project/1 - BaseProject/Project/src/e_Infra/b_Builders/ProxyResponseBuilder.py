@@ -9,7 +9,7 @@ from src.e_Infra.CustomVariables import *
 from flask import Response
 
 # Pre-compiled regex for extract_pymysql_error_log
-PYMYSQL_ERROR_START_PATTERN = re.compile(r"\(pymysql\.err\.[\w]+\) \([\d]+, ["']")
+PYMYSQL_ERROR_START_PATTERN = re.compile(r"\(pymysql\.err\.\w+\) \(\d+, ['\"]")
 
 # Method builds a response with json.dumps and adding error list attribute #
 def build_proxy_response_insert_dumps_error_list(status_code, error_message_list):

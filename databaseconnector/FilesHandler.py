@@ -1,11 +1,27 @@
 import os
 import re
 import shutil
+import json
+from databaseconnector.RegexHandler import transform_table_name_to_pascal_case_class_name
 
 
 def get_domain_result_files(domain_result_folder):
     domain_result_json_files = os.listdir(domain_result_folder)
     return domain_result_json_files
+
+
+def create_domain_result_file(table_name, domain_result_folder, use_pascal_case):
+    data = dict()
+    data["TableName"] = table_name
+    if use_pascal_case:
+        data["ClassName"] = transform_table_name_to_pascal_case_class_name(table_name)
+    else:
+        data["ClassName"] = input('Write the classname for the table ' + table_name + ': ')
+    data["Columns"] = list()
+    data["Constraints"] = list()
+    with open(f'{domain_result_folder}/{table_name}.json', 'w') as domain_file:
+        domain_file = json.dump(data, domain_file, indent=4)
+    return domain_file
 
 
 def normalize_path(path):

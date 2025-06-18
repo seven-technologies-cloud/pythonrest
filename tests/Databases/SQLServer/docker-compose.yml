@@ -7,7 +7,18 @@ services:
     environment:
       SA_PASSWORD: 24ad0a77-c59b-4479-b508-72b83615f8ed
       ACCEPT_EULA: Y
+      MSSQL_DATABASE: database_mapper_sqlserver
     ports:
       - "1433:1433"
     volumes:
-      - "./database_mapper_sqlserver.sql:/docker-entrypoint-initdb.d/1.sql"
+      - sqlserver_data:/var/opt/mssql
+      - ./database_mapper_sqlserver.sql:/docker-entrypoint-initdb.d/database_mapper_sqlserver.sql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P '24ad0a77-c59b-4479-b508-72b83615f8ed' -Q 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  sqlserver_data:

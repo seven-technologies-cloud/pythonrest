@@ -48,18 +48,8 @@ def parse_model_attributes(file_path: Path): # Expect Path object
 
 
 def create_model_view(model_name, fields, pk_autoincrement, file_path: Path): # Expect Path object
-    fields_to_remove = extract_columns_to_exclude_from_column_filters(
-        file_path)
-    if fields_to_remove:
-        # List comprehension is efficient here
-        column_filters = [
-            field for field in fields if field not in fields_to_remove]
-    else:
-        column_filters = list(fields) # Ensure it's a list if fields was a tuple
-
     # Ensure form_columns is also a list/tuple as expected by the f-string formatting later
     form_columns_list = list(fields) if not pk_autoincrement else list(fields[1:])
-
 
     return f"""
 
@@ -69,7 +59,6 @@ class {model_name}ModelView(ModelView):
 
     column_list = {tuple(fields)}
     column_searchable_list = {tuple(fields)}
-    column_filters = {tuple(column_filters)}
     form_columns = {tuple(form_columns_list)}
 """
 

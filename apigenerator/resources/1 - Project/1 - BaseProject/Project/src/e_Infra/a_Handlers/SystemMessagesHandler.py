@@ -27,3 +27,15 @@ def get_system_message(message_key):
     }
 
     return system_messages.get(message_key, 'Unknown message')
+
+# Method returns an empty dictionary #
+def get_system_empty_dict():
+    return {}
+
+# Method returns an empty list #
+def get_system_empty_list():
+    return []
+
+# Method returns None #
+def get_system_null():
+    return None

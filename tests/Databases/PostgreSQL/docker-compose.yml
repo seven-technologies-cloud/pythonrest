@@ -1,14 +1,30 @@
-version: "3.9"
-
+version: '3.5'
 services:
-  db:
-    image: postgis/postgis:13-3.1
-    restart: always
+  postgres:
+    image: postgres:latest
+    container_name: postgresql-postgres-1
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminuserdb
       POSTGRES_DB: database_mapper_postgresql
     ports:
       - "5432:5432"
     volumes:
       - "./database_mapper_postgresql.sql:/docker-entrypoint-initdb.d/1.sql"
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -h localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - postgres_network
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

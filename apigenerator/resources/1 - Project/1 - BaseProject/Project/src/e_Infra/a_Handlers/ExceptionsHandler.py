@@ -7,6 +7,13 @@ from src.e_Infra.GlobalVariablesManager import get_global_variable
 from src.e_Infra.a_Handlers.SystemMessagesHandler import get_system_empty_dict
 
 
+# Custom exception class for application errors
+class ApplicationException(Exception):
+    def __init__(self, response):
+        self.response = response
+        super().__init__(str(response))
+
+
 # Main method #
 def handle_custom_exception(exception):
 
