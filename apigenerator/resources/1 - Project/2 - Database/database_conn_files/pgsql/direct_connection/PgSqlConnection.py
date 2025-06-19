@@ -19,7 +19,6 @@ def get_pgsql_connection_schema_internet():
                                                  + get_global_variable('pgsql_password') + '@' \
                                                  + get_global_variable('pgsql_host') + ':' \
                                                  + get_global_variable('pgsql_port') + '/' \
-                                                 + get_global_variable('pgsql_database_name') + '?options=-c%20search_path=' \
-                                                 + get_global_variable('pgsql_schema') + ',public'
+                                                 + get_global_variable('pgsql_database_name')
     # Returning connection result #
     return pgsql_internet_conn

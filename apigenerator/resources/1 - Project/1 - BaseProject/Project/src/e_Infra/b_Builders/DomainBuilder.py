@@ -211,7 +211,9 @@ def auto_fill_guid_in_request_body(declarative_meta, dictionary):
     for column in ins.tables[0].columns:
         if column.primary_key:
             if column.name not in dictionary:
-                if str(column.type) in auto_fill_guid_allowed_types:
+                if str(column.type) == 'UUID':
+                    dictionary[column.name] = generate_uuidv7()
+                elif str(column.type) in auto_fill_guid_allowed_types:
                     dictionary[column.name] = generate_guid()
 
 
