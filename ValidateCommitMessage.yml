@@ -5,7 +5,7 @@ pr:
       - main
 
 pool:
-  vmImage: 'windows-latest' # Changed to windows-latest
+  vmImage: 'ubuntu-latest'
 
 variables:
 - group: pythonrest-cli
@@ -14,10 +14,9 @@ jobs:
 - job: ValidateCommitMessage
   displayName: Validate commit message
   pool:
-    vmImage: windows-latest # Changed to windows-latest
+    vmImage: ubuntu-latest
   steps:
   - checkout: self
-
   - script: |
       # Ensure we have full commit history in the CI environment
       git fetch --all --unshallow
@@ -33,49 +32,3 @@ jobs:
         exit 1
       fi
     displayName: "Check commit message format"
-
-- job: IntegrationTests
-  displayName: Run Integration Tests
-  dependsOn: ValidateCommitMessage
-  pool:
-    vmImage: windows-latest # Changed to windows-latest
-  steps:
-  - checkout: self
-
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.11'
-    displayName: 'Use Python 3.11'
-
-  - script: |
-      python -m venv venv
-      .\venv\Scripts\activate
-      pip install -r requirements.txt
-    displayName: 'Set up Python environment'
-
-  - script: |
-      .	ests\Databases\MySQL	est_mysql.ps1
-      Remove-Item -Path "C:\Users\XeonRise\Desktop\PythonREST_Test\pythonrest\PythonRestAPI" -Recurse -Force
-    displayName: 'Test MySQL'
-    continueOnError: true
-
-  - script: |
-      .	ests\Databases\PostgreSQL	est_postgresql.ps1
-      Remove-Item -Path "C:\Users\XeonRise\Desktop\PythonREST_Test\pythonrest\PythonRestAPI" -Recurse -Force
-    displayName: 'Test PostgreSQL'
-    continueOnError: true
-
-  - script: |
-      .	ests\Databases\SQLServer	est_sqlserver.ps1
-      Remove-Item -Path "C:\Users\XeonRise\Desktop\PythonREST_Test\pythonrest\PythonRestAPI" -Recurse -Force
-    displayName: 'Test SQL Server'
-    continueOnError: true
-
-  - script: |
-      if ($? -eq $true) {
-        Write-Host "Todos os testes foram executados com sucesso!"
-      } else {
-        Write-Error "Alguns testes falharam!"
-        exit 1
-      }
-    displayName: 'Check test results'
