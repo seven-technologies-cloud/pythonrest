@@ -32,7 +32,8 @@ def build_proxy_response(status_code, body):
     headers = {
     'Access-Control-Allow-Origin': get_global_variable('origins')
     }
-    return Response(response=body, status=status_code, content_type='application/json')
+    return Response(response=body, status=status_code, content_type='application/json', headers=headers)
+
 
 
 # Method builds a response with json.dumps #
