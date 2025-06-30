@@ -77,6 +77,9 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.2:**
 * Adding fix for search path option not working on some PostgreSQL environments
 
+**Version 0.3.3:**
+* Adding powershell test scripts for mysql, postgresql and sqlserver
+
 **Version 0.3.4:**
 * Fix CORS issue by properly attaching headers to JSON responses in build_proxy_response
 
