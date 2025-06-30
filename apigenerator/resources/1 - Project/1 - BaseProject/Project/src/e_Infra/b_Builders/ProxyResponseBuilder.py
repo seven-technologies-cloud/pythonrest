@@ -4,6 +4,7 @@ import re
 
 # Infra Imports #
 from src.e_Infra.CustomVariables import *
+from src.e_Infra.GlobalVariablesManager import *
 
 # Flask Imports #
 from flask import Response
@@ -28,6 +29,9 @@ def build_proxy_response(status_code, body):
             print_logs(json.dumps({"statusCode": status_code, "body": json.loads(body)}, default=str))
     except:
         print_logs('Log failed', default=str)
+    headers = {
+    'Access-Control-Allow-Origin': get_global_variable('origins')
+    }
     return Response(response=body, status=status_code, content_type='application/json')
 
 
