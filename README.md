@@ -86,6 +86,9 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.5:**
 * Changed all the OptionsController.py script
 
+**Version 0.3.6:**
+* Changed the code to only set the CORS header to the requesting origin IF it's allowed, otherwise don't set the header at all.
+
 ## Installation
 
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more

@@ -83,6 +83,8 @@ setup(
         "* Adding fix: CORS headers now correctly applied to JSON responses\n\n"
         "**Version 0.3.5**\n"
         "* Changed all the OptionsController.py script\n\n"
+        "**Version 0.3.6**\n"
+        "* Changed the code to only set the CORS header to the requesting origin IF it's allowed, otherwise don't set the header at all.\n\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',

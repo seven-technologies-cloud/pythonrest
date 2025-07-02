@@ -28,7 +28,8 @@ def apply_caching(response):
                     response = build_error_response(f"Access to fetch from origin {origin} has been blocked by CORS policy")
                     return response
         else:
-            response.headers["Access-Control-Allow-Origin"] = get_global_variable('origins')
+            # Don't set CORS headers if no origin or origins not configured
+            pass
 
         response.headers["Access-Control-Allow-Headers"] = get_global_variable('headers')
         response.headers["Access-Control-Allow-Methods"] = response.allow
@@ -38,6 +39,18 @@ def apply_caching(response):
         response.data = b'{"Message": "Success"}'
         response.response = list(response.data)
     else:
-        response.headers["Access-Control-Allow-Origin"] = get_global_variable('origins')
+        # For non-OPTIONS requests, handle CORS properly
+        origin = request.headers.get("Origin")
+        origins = get_global_variable("origins")
+        
+        if origin and origins:
+            if origins.strip() == "*":
+                response.headers["Access-Control-Allow-Origin"] = "*"
+            else:
+                allowed_origins = [o.strip() for o in origins.split(",")]
+                if origin in allowed_origins:
+                    response.headers["Access-Control-Allow-Origin"] = origin
+                # If origin not allowed, don't set CORS headers at all
+        
         response.headers["Access-Control-Allow-Headers"] = get_global_variable('headers')
     return response
