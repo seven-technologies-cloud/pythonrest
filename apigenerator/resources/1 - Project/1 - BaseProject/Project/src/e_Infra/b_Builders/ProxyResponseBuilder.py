@@ -37,8 +37,17 @@ def build_proxy_response(status_code, body):
 # Method builds a response with json.dumps #
 def build_proxy_response_insert_dumps(status_code, body):
     response_body = json.dumps(body, sort_keys=True, default=str)
-    print_logs(json.dumps({"statusCode": status_code, "body": body}, default=str))
-    return Response(response=response_body, status=status_code, content_type='application/json', headers=headers)
+
+    print_logs(json.dumps({
+        "statusCode": status_code,
+        "body": body
+    }, default=str))
+
+    return Response(
+        response=response_body,
+        status=status_code,
+        content_type='application/json'
+    )
 
 
 def build_dto_error_message(e):
