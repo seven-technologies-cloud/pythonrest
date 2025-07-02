@@ -80,7 +80,9 @@ setup(
         "**Version 0.3.3**\n"
         "* Adding powershell test scripts for mysql, postgresql and sqlserver\n\n",
         "**Version 0.3.4**\n"
-        "* Adding fix: CORS headers now correctly applied to JSON responses\n"
+        "* Adding fix: CORS headers now correctly applied to JSON responses\n\n"
+        "**Version 0.3.5**\n"
+        "* Changed all the OptionsController.py script\n\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
