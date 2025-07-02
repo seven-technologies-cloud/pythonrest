@@ -81,11 +81,7 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 * Adding powershell test scripts for mysql, postgresql and sqlserver
 
 **Version 0.3.4:**
-* Fix CORS issue by properly attaching headers to JSON responses in build_proxy_response
-
-
-**Version 0.3.5:**
-* Fixed CORS trailing slash compatibility and optimized header handling. Fixed trailing slash compatibility, removed duplicate CORS headers, centralized all CORS logic in OptionsController for cleaner architecture, fixed invalid comma-separated origin headers.
+* Fix CORS issue by properly attaching headers to JSON responses in build_proxy_response. Fixed CORS trailing slash compatibility and optimized header handling. Fixed trailing slash compatibility, removed duplicate CORS headers, centralized all CORS logic in OptionsController for cleaner architecture, fixed invalid comma-separated origin headers.
 
 
 
