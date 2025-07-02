@@ -85,6 +85,8 @@ setup(
         "* Changed all the OptionsController.py script\n\n"
         "**Version 0.3.6**\n"
         "* Changed the code to only set the CORS header to the requesting origin IF it's allowed, otherwise don't set the header at all.\n\n"
+        "**Version 0.3.7**\n"
+        "* Fixed CORS trailing slash compatibility and optimized header handling.\n\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',

@@ -89,6 +89,11 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.6:**
 * Changed the code to only set the CORS header to the requesting origin IF it's allowed, otherwise don't set the header at all.
 
+**Version 0.3.7:**
+* Fixed CORS trailing slash compatibility and optimized header handling. Fixed trailing slash compatibility, removed duplicate CORS headers, centralized all CORS logic in OptionsController for cleaner architecture, fixed invalid comma-separated origin headers.
+
+
+
 ## Installation
 
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more

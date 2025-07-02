@@ -29,19 +29,14 @@ def build_proxy_response(status_code, body):
             print_logs(json.dumps({"statusCode": status_code, "body": json.loads(body)}, default=str))
     except:
         print_logs('Log failed', default=str)
-    headers = {
-    'Access-Control-Allow-Origin': get_global_variable('origins')
-    }
-    return Response(response=body, status=status_code, content_type='application/json', headers=headers)
+    
+    return Response(response=body, status=status_code, content_type='application/json')
 
 
 
 # Method builds a response with json.dumps #
 def build_proxy_response_insert_dumps(status_code, body):
     response_body = json.dumps(body, sort_keys=True, default=str)
-    headers = {
-        'Access-Control-Allow-Origin': get_global_variable('origins')
-    }
     print_logs(json.dumps({"statusCode": status_code, "body": body}, default=str))
     return Response(response=response_body, status=status_code, content_type='application/json', headers=headers)
 
