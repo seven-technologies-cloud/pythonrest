@@ -78,7 +78,7 @@ setup(
         "**Version 0.3.2**\n"
         "* Adding fix for search path option not working on some PostgreSQL environments\n\n"
         "**Version 0.3.3**\n"
-        "* Adding powershell test scripts for mysql, postgresql and sqlserver\n\n",
+        "* Adding powershell test scripts for mysql, postgresql and sqlserver\n\n"
         "**Version 0.3.4**\n"
         "* Fix CORS issue by properly configuration of after request decorator function.\n"
     ),
