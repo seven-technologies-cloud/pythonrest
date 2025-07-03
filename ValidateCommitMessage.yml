@@ -35,14 +35,25 @@ jobs:
 
       if [[ $last_commit_message =~ version\ ?([0-9]+\.[0-9]+\.[0-9]+) ]]; then
         extracted_version="${BASH_REMATCH[1]}"
-        echo "Extracted version: $extracted_version"
-        # Set the output variable for this job, accessible by other jobs in the same stage
-        echo "##vso[task.setvariable variable=packageVersion;isOutput=true]$extracted_version"
+        echo "Extracted version from commit message: $extracted_version"
       else
-        echo "Error: The commit message does not contain a valid version format (version X.X.X)."
+        echo "Commit message does not contain version format (version X.X.X)."
         echo "Last commit message: $last_commit_message"
-        exit 1
+        echo "Using fallback: extracting current version from setup.py and incrementing patch version for testing"
+        
+        # Extract current version from setup.py
+        current_version=$(grep -oP "version='\K[0-9]+\.[0-9]+\.[0-9]+" ./setup.py)
+        echo "Current version in setup.py: $current_version"
+        
+        # Split version into parts and increment patch version
+        IFS='.' read -r major minor patch <<< "$current_version"
+        new_patch=$((patch + 1))
+        extracted_version="${major}.${minor}.${new_patch}"
+        echo "Generated test version: $extracted_version"
       fi
+      
+      # Set the output variable for this job, accessible by other jobs in the same stage
+      echo "##vso[task.setvariable variable=packageVersion;isOutput=true]$extracted_version"
 
       sed -i "s/version='[0-9]\+\.[0-9]\+\.[0-9]\+'$/version='$extracted_version'/" ./setup.py
       sed -i "s/pythonrest_version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/pythonrest_version = \"$extracted_version\"/" ./pythonrest.py
@@ -60,8 +71,7 @@ jobs:
     vmImage: ubuntu-latest
   variables:
     # Map the output variable from ExtractVersion job to a local variable in this job
-    # RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
-    RELEASE_VERSION: 0.0.1
+    RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
     # GITHUB_TOKEN should be a secret pipeline variable (e.g., from a variable group or configured in UI)
     # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are defined at the pipeline level or can be overridden here/passed from group
   steps:
@@ -76,6 +86,11 @@ jobs:
 
       echo "--- GitHub Release Script ---"
       echo "Version from previous job: $(RELEASE_VERSION)"
+      
+      # Get the commit message for the release body
+      git fetch --all --unshallow
+      last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
+      echo "Last commit message: $last_commit_message"
 
       # --- Determine Repository Owner and Name Dynamically ---
       REPO_FULL_NAME="$(Build.Repository.Name)" # e.g., "your-username/pythonrest"
@@ -93,16 +108,10 @@ jobs:
       fi
 
       # --- Configuration (TEMPORARY FOR MANUAL TESTING) ---
-      # Comment out or remove these lines:
-      # TAG_NAME="v$(RELEASE_VERSION)"
-      # RELEASE_NAME="Version $(RELEASE_VERSION)"
-      # RELEASE_BODY="Release of version $(RELEASE_VERSION)."
-
-      # Add these lines for manual testing:
-      TEST_VERSION="test-release-0.0.1"  # <<< CHANGE THIS FOR EACH TEST RUN
-      TAG_NAME="v${TEST_VERSION}"
-      RELEASE_NAME="Test Release ${TEST_VERSION}"
-      RELEASE_BODY="This is a manual test release for version ${TEST_VERSION}."
+      # Using dynamic version from previous job for testing
+      TAG_NAME="v$(RELEASE_VERSION)-test"
+      RELEASE_NAME="Test Release $(RELEASE_VERSION)"
+      RELEASE_BODY="This is a test release for version $(RELEASE_VERSION) generated from commit: $last_commit_message"
 
       # Consider these for safer testing:
       IS_DRAFT="true"        # Creates a draft release on GitHub (not public)
