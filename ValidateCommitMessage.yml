@@ -202,6 +202,9 @@ jobs:
       GITHUB_TOKEN: $(GITHUB_TOKEN) # $(GITHUB_TOKEN) is the ADO way to reference the secret
       # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are now determined dynamically within the script
       VERSION: $(RELEASE_VERSION) # Pass the version to the script's expected VERSION env var
+      # Map necessary variables from variable group 'pythonrest-cli'
+      pypi_app_name: $(pypi_app_name)
+      pip_api_key: $(pip_api_key)
 
 
 # jobs:
