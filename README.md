@@ -77,6 +77,14 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.2:**
 * Adding fix for search path option not working on some PostgreSQL environments
 
+**Version 0.3.3:**
+* Adding powershell test scripts for mysql, postgresql and sqlserver
+
+**Version 0.3.4:**
+* Fix CORS issue by properly configuration of after request decorator function
+
+
+
 ## Installation
 
 To begin working with PythonREST, you can visit our [website's download page](https://pythonrest.seventechnologies.cloud/en/download) and download the installer for your system or if you're more
