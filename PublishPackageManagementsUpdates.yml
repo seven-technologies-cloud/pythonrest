@@ -1,7 +1,7 @@
-trigger:
-  branches:
-    include:
-      - main
+# trigger:
+  # branches:
+    # include:
+    #  - main
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -58,7 +58,8 @@ jobs:
     vmImage: ubuntu-latest
   variables:
     # Map the output variable from ExtractVersion job to a local variable in this job
-    RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
+    # RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
+    RELEASE_VERSION:
     # GITHUB_TOKEN should be a secret pipeline variable (e.g., from a variable group or configured in UI)
     # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are defined at the pipeline level or can be overridden here/passed from group
   steps:
@@ -89,12 +90,23 @@ jobs:
         exit 1
       fi
 
-      # --- Configuration ---
-      TAG_NAME="v$(RELEASE_VERSION)"
-      RELEASE_NAME="Version $(RELEASE_VERSION)"
-      RELEASE_BODY="Release of version $(RELEASE_VERSION)."
-      IS_DRAFT="false"
-      IS_PRERELEASE="false"
+      # --- Configuration (TEMPORARY FOR MANUAL TESTING) ---
+      # Comment out or remove these lines:
+      # TAG_NAME="v$(RELEASE_VERSION)"
+      # RELEASE_NAME="Version $(RELEASE_VERSION)"
+      # RELEASE_BODY="Release of version $(RELEASE_VERSION)."
+
+      # Add these lines for manual testing:
+      TEST_VERSION="test-release-0.0.1"  # <<< CHANGE THIS FOR EACH TEST RUN
+      TAG_NAME="v${TEST_VERSION}"
+      RELEASE_NAME="Test Release ${TEST_VERSION}"
+      RELEASE_BODY="This is a manual test release for version ${TEST_VERSION}."
+
+      # Consider these for safer testing:
+      IS_DRAFT="true"        # Creates a draft release on GitHub (not public)
+      IS_PRERELEASE="true"   # Marks it as a pre-release
+      # --- End of Temporary Configuration ---
+
 
       # --- Validate Inputs ---
       if [ -z "$(GITHUB_TOKEN)" ]; then # Check Azure DevOps variable syntax for GITHUB_TOKEN
@@ -133,7 +145,7 @@ jobs:
         "draft": ${IS_DRAFT},
         "prerelease": ${IS_PRERELEASE}
       }
-EOF
+      EOF
       )
 
       echo "Payload:"
