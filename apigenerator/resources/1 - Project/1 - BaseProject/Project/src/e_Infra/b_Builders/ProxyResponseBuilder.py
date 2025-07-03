@@ -4,6 +4,7 @@ import re
 
 # Infra Imports #
 from src.e_Infra.CustomVariables import *
+from src.e_Infra.GlobalVariablesManager import *
 
 # Flask Imports #
 from flask import Response
@@ -28,13 +29,25 @@ def build_proxy_response(status_code, body):
             print_logs(json.dumps({"statusCode": status_code, "body": json.loads(body)}, default=str))
     except:
         print_logs('Log failed', default=str)
+    
     return Response(response=body, status=status_code, content_type='application/json')
+
 
 
 # Method builds a response with json.dumps #
 def build_proxy_response_insert_dumps(status_code, body):
-    print_logs(json.dumps({"statusCode": status_code, "body": body}, default=str))
-    return Response(response=json.dumps(body, sort_keys=True, default=str), status=status_code, content_type='application/json')
+    response_body = json.dumps(body, sort_keys=True, default=str)
+
+    print_logs(json.dumps({
+        "statusCode": status_code,
+        "body": body
+    }, default=str))
+
+    return Response(
+        response=response_body,
+        status=status_code,
+        content_type='application/json'
+    )
 
 
 def build_dto_error_message(e):
