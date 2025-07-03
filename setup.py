@@ -80,11 +80,7 @@ setup(
         "**Version 0.3.3**\n"
         "* Adding powershell test scripts for mysql, postgresql and sqlserver\n\n",
         "**Version 0.3.4**\n"
-        "* Adding fix: CORS headers now correctly applied to JSON responses\n\n"
-        "**Version 0.3.4.1**\n"
-        "* Changed all the OptionsController.py script\n"
-        "* Changed the code to only set the CORS header to the requesting origin IF it's allowed, otherwise don't set the header at all.\n"
-        "* Fixed CORS trailing slash compatibility and optimized header handling.\n\n"
+        "* Fix CORS issue by properly configuration of after request decorator function.\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
