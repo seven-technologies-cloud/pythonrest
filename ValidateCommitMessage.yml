@@ -87,6 +87,13 @@ jobs:
       echo "--- GitHub Release Script ---"
       echo "Version from previous job: $(RELEASE_VERSION)"
       
+      # Debug: Check if GITHUB_TOKEN is available (without revealing the actual token)
+      if [ -n "$GITHUB_TOKEN" ]; then
+        echo "GITHUB_TOKEN is available (length: ${#GITHUB_TOKEN})"
+      else
+        echo "WARNING: GITHUB_TOKEN is not available or empty"
+      fi
+      
       # Get the commit message for the release body
       git fetch --all --unshallow
       last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
@@ -120,7 +127,7 @@ jobs:
 
 
       # --- Validate Inputs ---
-      if [ -z "$(GITHUB_TOKEN)" ]; then # Check Azure DevOps variable syntax for GITHUB_TOKEN
+      if [ -z "$GITHUB_TOKEN" ]; then # Check bash environment variable for GITHUB_TOKEN
         echo "Error: GITHUB_TOKEN is not set or not available as a secret."
         exit 1
       fi
@@ -132,8 +139,8 @@ jobs:
         echo "Error: DYNAMIC_GITHUB_REPO_NAME could not be determined."
         exit 1
       fi
-      if [ -z "$(RELEASE_VERSION)" ]; then
-        echo "Error: RELEASE_VERSION is not set (should come from previous job)."
+      if [ -z "$VERSION" ]; then # Check bash environment variable for VERSION
+        echo "Error: VERSION is not set (should come from previous job)."
         exit 1
       fi
 
@@ -168,7 +175,7 @@ jobs:
       response=$(curl -s -w "%{http_code}" \
         -X POST \
         -H "Accept: application/vnd.github.v3+json" \
-        -H "Authorization: token $(GITHUB_TOKEN)" \
+        -H "Authorization: token $GITHUB_TOKEN" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
         -H "Content-Type: application/json" \
         -d "${JSON_PAYLOAD}" \
