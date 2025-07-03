@@ -8,13 +8,12 @@ pool:
 
 variables:
 - group: pythonrest-cli # This group likely contains pip_api_key, pypi_app_name
-# Add variables for GitHub repository details.
-# These can also be set in the Azure DevOps UI under Pipeline variables.
-# If defined here, they can be overridden by UI variables.
-- name: GITHUB_REPO_OWNER
-  value: 'your-github-username-or-org' # <<< TODO: User needs to set this
-- name: GITHUB_REPO_NAME
-  value: 'pythonrest' # <<< TODO: User needs to set this (or the actual repo name)
+# GITHUB_REPO_OWNER and GITHUB_REPO_NAME will now be determined dynamically.
+# These can be kept as fallbacks or for reference, but the script will prioritize dynamic values.
+# - name: GITHUB_REPO_OWNER
+#   value: 'your-github-username-or-org' # Fallback or reference
+# - name: GITHUB_REPO_NAME
+#   value: 'pythonrest' # Fallback or reference
 # GITHUB_TOKEN will be a secret variable, configured in Azure DevOps UI
 
 jobs:
@@ -69,12 +68,26 @@ jobs:
       # Script to create a GitHub Release (from previous step)
       # Environment variables expected by this script:
       # GITHUB_TOKEN: (mapped from Azure Pipelines secret $(GITHUB_TOKEN))
-      # GITHUB_REPO_OWNER: (mapped from Azure Pipelines variable $(GITHUB_REPO_OWNER))
-      # GITHUB_REPO_NAME: (mapped from Azure Pipelines variable $(GITHUB_REPO_NAME))
       # VERSION: (this is mapped to $(RELEASE_VERSION) which comes from the previous job)
+      # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are now determined dynamically within this script.
 
       echo "--- GitHub Release Script ---"
       echo "Version from previous job: $(RELEASE_VERSION)"
+
+      # --- Determine Repository Owner and Name Dynamically ---
+      REPO_FULL_NAME="$(Build.Repository.Name)" # e.g., "your-username/pythonrest"
+      DYNAMIC_GITHUB_REPO_OWNER=""
+      DYNAMIC_GITHUB_REPO_NAME=""
+
+      if [[ "$(Build.Repository.Provider)" == "GitHub" && "$REPO_FULL_NAME" == */* ]]; then
+        DYNAMIC_GITHUB_REPO_OWNER="${REPO_FULL_NAME%/*}"
+        DYNAMIC_GITHUB_REPO_NAME="${REPO_FULL_NAME#*/}"
+        echo "Dynamically determined GitHub Owner: $DYNAMIC_GITHUB_REPO_OWNER, Repo: $DYNAMIC_GITHUB_REPO_NAME"
+      else
+        echo "Error: Could not dynamically determine GitHub owner/repo. Provider: '$(Build.Repository.Provider)', Repo Name: '$REPO_FULL_NAME'."
+        echo "Ensure pipeline is connected to a GitHub repository and checkout step ran."
+        exit 1
+      fi
 
       # --- Configuration ---
       TAG_NAME="v$(RELEASE_VERSION)"
@@ -84,16 +97,16 @@ jobs:
       IS_PRERELEASE="false"
 
       # --- Validate Inputs ---
-      if [ -z "$(GITHUB_TOKEN)" ]; then # Check Azure DevOps variable syntax
+      if [ -z "$(GITHUB_TOKEN)" ]; then # Check Azure DevOps variable syntax for GITHUB_TOKEN
         echo "Error: GITHUB_TOKEN is not set or not available as a secret."
         exit 1
       fi
-      if [ -z "$(GITHUB_REPO_OWNER)" ]; then
-        echo "Error: GITHUB_REPO_OWNER is not set."
+      if [ -z "$DYNAMIC_GITHUB_REPO_OWNER" ]; then # Check dynamically determined owner
+        echo "Error: DYNAMIC_GITHUB_REPO_OWNER could not be determined."
         exit 1
       fi
-      if [ -z "$(GITHUB_REPO_NAME)" ]; then
-        echo "Error: GITHUB_REPO_NAME is not set."
+      if [ -z "$DYNAMIC_GITHUB_REPO_NAME" ]; then # Check dynamically determined repo name
+        echo "Error: DYNAMIC_GITHUB_REPO_NAME could not be determined."
         exit 1
       fi
       if [ -z "$(RELEASE_VERSION)" ]; then
@@ -102,7 +115,7 @@ jobs:
       fi
 
       echo "Creating GitHub Release..."
-      echo "Repository: $(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)"
+      echo "Repository: ${DYNAMIC_GITHUB_REPO_OWNER}/${DYNAMIC_GITHUB_REPO_NAME}"
       echo "Tag Name: ${TAG_NAME}"
       echo "Release Name: ${RELEASE_NAME}"
 
@@ -127,7 +140,7 @@ EOF
       echo "${JSON_PAYLOAD}"
 
       # --- Make API Call ---
-      API_URL="https://api.github.com/repos/$(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)/releases"
+      API_URL="https://api.github.com/repos/${DYNAMIC_GITHUB_REPO_OWNER}/${DYNAMIC_GITHUB_REPO_NAME}/releases"
 
       response=$(curl -s -w "%{http_code}" \
         -X POST \
@@ -164,8 +177,7 @@ EOF
     env:
       # Map Azure DevOps pipeline variables (including secrets) to environment variables for the script
       GITHUB_TOKEN: $(GITHUB_TOKEN) # $(GITHUB_TOKEN) is the ADO way to reference the secret
-      GITHUB_REPO_OWNER: $(GITHUB_REPO_OWNER)
-      GITHUB_REPO_NAME: $(GITHUB_REPO_NAME)
+      # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are now determined dynamically within the script
       VERSION: $(RELEASE_VERSION) # Pass the version to the script's expected VERSION env var
 
 - job: PublishToPyPi
