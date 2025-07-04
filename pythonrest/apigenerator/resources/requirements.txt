@@ -1,0 +1,10 @@
+Flask>=2.0
+Flask-RESTx>=0.5 # Or other Flask REST library if used, assuming one might be present
+Werkzeug>=2.0 # Often a Flask dependency, good to specify
+python-dotenv>=0.15
+google-generativeai>=0.3 # Or the latest version
+
+# Add other common dependencies for a Flask API project below:
+# e.g., Flask-SQLAlchemy, Flask-Migrate, gunicorn, psycopg2-binary, etc.
+# PyYAML (if MCPClient directly parses YAML spec and it's not a transitive dependency)
+PyYAML>=5.0
