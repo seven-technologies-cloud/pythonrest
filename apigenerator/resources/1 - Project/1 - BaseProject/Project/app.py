@@ -10,22 +10,20 @@ from src.a_Presentation.b_Custom.SQLController import *
 from src.a_Presentation.b_Custom.BeforeRequestController import *
 from src.a_Presentation.b_Custom.ExceptionHandlerController import *
 from src.a_Presentation.g_McpController.AskController import ask_bp
-from src.a_Presentation.h_McpConfigureController.ConfigureController import mcp_configure_bp
 
 # Registering MCP Blueprints
 # Assuming 'app_handler' is the Flask app instance from 'EnvironmentVariables.py'
 # If 'app_handler' is not the app, or if blueprint registration is centralized elsewhere
 # (e.g. inside EnvironmentVariables.py or a factory function), this will need adjustment.
 if 'app_handler' in globals() and hasattr(app_handler, 'register_blueprint'):
-    app_handler.register_blueprint(ask_bp, url_prefix='/mcp') # for /mcp/ask
-    app_handler.register_blueprint(mcp_configure_bp, url_prefix='/mcp') # for /mcp/ask/configure
-    print("INFO: MCP blueprints 'ask_bp' and 'mcp_configure_bp' registered under /mcp prefix.")
+    app_handler.register_blueprint(ask_bp, url_prefix='/mcp') # for /mcp/ask and /mcp/ask/configure
+    print("INFO: MCP blueprint 'ask_bp' (including /ask and /ask/configure routes) registered under /mcp prefix.")
 else:
     # Fallback or warning if app_handler is not found as expected.
     # This indicates a potential misunderstanding of how the app object is exposed.
     # In a real scenario, one would need to trace where 'app_handler' is defined
     # and how blueprints are meant to be registered.
-    print("WARNING: Flask app object 'app_handler' not found or does not support 'register_blueprint'. MCP blueprints not registered.")
+    print("WARNING: Flask app object 'app_handler' not found or does not support 'register_blueprint'. MCP 'ask_bp' not registered.")
 
 
 # LocalHost run #

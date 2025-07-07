@@ -2,8 +2,8 @@ import yaml # For PyYAML
 import json # For JSON if needed
 import os
 import logging
-# Now depends on the LlmServiceBase interface and not a concrete implementation
-from src.e_Infra.j_LlmManager.LlmServiceBase import LlmServiceBase
+# Now depends on the LlmServiceBase interface, re-exported by g_McpInfra
+from src.e_Infra.g_McpInfra import LlmServiceBase
 
 # Configure logging for this module
 logger = logging.getLogger(__name__)
