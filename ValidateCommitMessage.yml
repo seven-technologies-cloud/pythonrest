@@ -72,7 +72,7 @@ jobs:
   variables:
     # Map the output variable from ExtractVersion job to a local variable in this job
     # RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
-    RELEASE_VERSION: v0.3.6
+    RELEASE_VERSION: v0.3.7
     # GITHUB_TOKEN should be a secret pipeline variable (e.g., from a variable group or configured in UI)
     # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are defined at the pipeline level or can be overridden here/passed from group
   steps:
@@ -123,7 +123,7 @@ jobs:
 
       # Consider these for safer testing:
       IS_DRAFT="false"        # Creates a draft release on GitHub (not public)
-      IS_PRERELEASE="true"   # Marks it as a pre-release
+      IS_PRERELEASE="false"   # Marks it as a pre-release
       # --- End of Temporary Configuration ---
 
 
