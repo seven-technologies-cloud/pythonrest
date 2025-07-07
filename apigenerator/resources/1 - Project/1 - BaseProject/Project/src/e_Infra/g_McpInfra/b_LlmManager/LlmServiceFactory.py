@@ -64,8 +64,15 @@ class LlmServiceFactory:
         elif chosen_provider_name == "openai": api_key = OPENAI_API_KEY
         elif chosen_provider_name == "anthropic": api_key = ANTHROPIC_API_KEY
 
-        if not api_key: # Should not happen if provider is valid and API keys are set as per requirements
-            err_msg = f"API key for selected provider '{chosen_provider_name}' is not configured in environment variables."
+        # Check for empty string or placeholder values for API keys
+        api_key_placeholders = [
+            "GEMINI_API_KEY_PLACEHOLDER",
+            "OPENAI_API_KEY_PLACEHOLDER",
+            "ANTHROPIC_API_KEY_PLACEHOLDER",
+            "" # Also treat empty string as missing
+        ]
+        if not api_key or api_key in api_key_placeholders:
+            err_msg = f"API key for selected provider '{chosen_provider_name}' is missing or is a placeholder. Please set the actual API key in environment variables."
             logger.error(err_msg)
             raise ValueError(err_msg)
 
