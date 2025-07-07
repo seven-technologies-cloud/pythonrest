@@ -132,8 +132,9 @@ class LlmConfigManager:
                                            "environment (ENV_DEFAULT_LLM_PROVIDER)" if ENV_DEFAULT_LLM_PROVIDER else "None",
             "providers": {
                 "gemini": {}, "openai": {}, "anthropic": {}
-            },
-            "llm_config_file_path": self.config_file_path
+            }
+            # llm_config_file_path is an internal detail of the manager, not really part of 'effective LLM config'
+            # "llm_config_file_path": self.config_file_path
         }
 
         for provider in ["gemini", "openai", "anthropic"]:

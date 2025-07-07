@@ -27,9 +27,9 @@ def get_system_empty_list_str():
 # Gemini API Key for MCP functionality
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
-# Path to the OpenAPI specification file for the generated API
-# This path is typically relative to the root of the generated project.
-OPENAPI_SPEC_PATH = os.getenv('OPENAPI_SPEC_PATH', 'openapi.yaml')
+# Path to the directory containing multiple Swagger/OpenAPI YAML files.
+# This path is relative to the root of the generated project.
+SWAGGER_FILES_DIR = "apigenerator/resources/1 - Project/2 - Swagger/yaml/"
 
 # --- LLM Provider Configuration ---
 
