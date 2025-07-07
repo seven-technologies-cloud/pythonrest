@@ -2,7 +2,8 @@ import yaml # For PyYAML
 import json # For JSON if needed
 import os
 import logging
-from src.e_Infra.g_GeminiClient.GeminiService import GeminiService # Adjusted import path
+# Now depends on the LlmServiceBase interface and not a concrete implementation
+from src.e_Infra.j_LlmManager.LlmServiceBase import LlmServiceBase
 
 # Configure logging for this module
 logger = logging.getLogger(__name__)
@@ -10,26 +11,27 @@ logger = logging.getLogger(__name__)
 class ApiQueryService:
     """
     Service to answer questions about an API using its OpenAPI specification
-    and a generative AI model (Gemini).
+    and a configured generative AI model through LlmServiceBase.
     """
-    def __init__(self, gemini_service: GeminiService, openapi_spec_path: str):
+    def __init__(self, llm_service: LlmServiceBase, openapi_spec_path: str):
         """
         Initializes the ApiQueryService.
 
         Args:
-            gemini_service (GeminiService): An instance of the GeminiService for AI interaction.
+            llm_service (LlmServiceBase): An instance of a class that implements LlmServiceBase
+                                          (e.g., GeminiService, OpenAIService, AnthropicService).
             openapi_spec_path (str): The file path to the OpenAPI specification (YAML or JSON).
         """
-        if not isinstance(gemini_service, GeminiService):
-            logger.error("Invalid GeminiService instance provided to ApiQueryService.")
-            raise TypeError("gemini_service must be an instance of GeminiService.")
+        if not isinstance(llm_service, LlmServiceBase):
+            logger.error("Invalid LLM service instance provided to ApiQueryService. Must implement LlmServiceBase.")
+            raise TypeError("llm_service must be an instance of a class implementing LlmServiceBase.")
         if not openapi_spec_path:
             logger.error("OpenAPI spec path not provided to ApiQueryService.")
             raise ValueError("openapi_spec_path must be provided.")
 
-        self.gemini_service = gemini_service
+        self.llm_service = llm_service
         self.openapi_spec_path = openapi_spec_path
-        self.api_spec = None  # Will be loaded by load_and_parse_openapi_spec()
+        self.api_spec = None  # Will be loaded by _load_and_parse_openapi_spec()
         self._load_and_parse_openapi_spec() # Load spec during initialization
 
     def _load_and_parse_openapi_spec(self):
@@ -123,13 +125,12 @@ Do not make up information not present in the spec.
 """
 
         try:
-            answer = self.gemini_service.generate_text(prompt)
-            logger.info(f"Successfully generated answer for question: '{question}'")
+            answer = self.llm_service.generate_text(prompt) # Use the generic llm_service
+            logger.info(f"Successfully generated answer for question: '{question}' using {type(self.llm_service).__name__}")
             return answer
-        except RuntimeError as e:
-            logger.error(f"Failed to get answer from GeminiService for question '{question}': {e}", exc_info=True)
-            # Re-raise or return a user-friendly error message
-            raise RuntimeError(f"Could not get an answer from the AI service: {e}")
+        except RuntimeError as e: # Catch errors from the LlmServiceBase implementations
+            logger.error(f"Failed to get answer from LLM service ({type(self.llm_service).__name__}) for question '{question}': {e}", exc_info=True)
+            raise RuntimeError(f"Could not get an answer from the AI service ({type(self.llm_service).__name__}): {e}")
         except Exception as e:
             logger.error(f"Unexpected error in answer_api_question for question '{question}': {e}", exc_info=True)
             raise RuntimeError(f"An unexpected error occurred while trying to answer the question: {e}")

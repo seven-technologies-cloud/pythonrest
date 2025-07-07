@@ -3,8 +3,9 @@ import logging
 
 # Assuming CustomVariables are directly importable from src.e_Infra
 # Adjust the import path if your project structure resolves it differently at runtime
-from src.e_Infra.CustomVariables import GEMINI_API_KEY, OPENAPI_SPEC_PATH
-from src.e_Infra.g_GeminiClient.GeminiService import GeminiService
+from src.e_Infra.CustomVariables import OPENAPI_SPEC_PATH # GEMINI_API_KEY is no longer directly used here
+from src.e_Infra.j_LlmManager.LlmServiceFactory import LlmServiceFactory
+from src.e_Infra.j_LlmManager.LlmServiceBase import LlmServiceBase # For type hinting if needed
 from src.b_Application.b_Service.c_McpService.ApiQueryService import ApiQueryService
 
 # Configure logging for this module
@@ -30,45 +31,50 @@ def ask_api_question():
 
     # --- Healthcheck Logic ---
     if question.lower() == "healthcheck":
-        if not GEMINI_API_KEY:
-            logger.info("Healthcheck: GEMINI_API_KEY not configured.")
-            return jsonify({"answer": "no", "reason": "GEMINI_API_KEY not configured"}), 200
-
         try:
-            gemini_service = GeminiService(api_key=GEMINI_API_KEY)
-            if gemini_service.check_connection():
-                logger.info("Healthcheck: Gemini connection successful.")
-                return jsonify({"answer": "yes"}), 200
+            # LlmServiceFactory will check for LLM_PROVIDER and relevant API key
+            llm_service_instance = LlmServiceFactory.get_llm_service()
+            if llm_service_instance.check_connection():
+                logger.info(f"Healthcheck: {type(llm_service_instance).__name__} connection successful.")
+                return jsonify({"answer": "yes", "provider": type(llm_service_instance).__name__}), 200
             else:
-                logger.warn("Healthcheck: Gemini API connection test failed.")
-                return jsonify({"answer": "no", "reason": "Gemini API connection test failed"}), 200
-        except ValueError as ve: # Catch GeminiService init errors (e.g. empty API key)
-            logger.error(f"Healthcheck: Error initializing GeminiService: {ve}", exc_info=True)
-            return jsonify({"answer": "no", "reason": f"Error initializing Gemini client: {ve}"}), 200
-        except RuntimeError as re: # Catch GeminiService init or connection errors
-            logger.error(f"Healthcheck: Runtime error with GeminiService: {re}", exc_info=True)
-            return jsonify({"answer": "no", "reason": f"Runtime error with Gemini client: {re}"}), 200
-        except Exception as e:
+                logger.warn(f"Healthcheck: {type(llm_service_instance).__name__} API connection test failed.")
+                return jsonify({"answer": "no", "reason": f"{type(llm_service_instance).__name__} API connection test failed"}), 200
+        except ValueError as ve: # Catch configuration errors from LlmServiceFactory or service init
+            logger.error(f"Healthcheck: Configuration error: {ve}", exc_info=True)
+            # Return 200 as per original healthcheck spec, but indicate error in body
+            return jsonify({"answer": "no", "reason": f"Configuration error: {ve}"}), 200
+        except RuntimeError as re: # Catch runtime errors from service init or check_connection
+            logger.error(f"Healthcheck: Runtime error with LLM service: {re}", exc_info=True)
+            return jsonify({"answer": "no", "reason": f"Runtime error with LLM service: {re}"}), 200
+        except Exception as e: # Catch-all for unexpected errors
             logger.error(f"Healthcheck: Unexpected error: {e}", exc_info=True)
             return jsonify({"answer": "no", "reason": f"An unexpected error occurred during healthcheck: {e}"}), 200
 
     # --- Standard Question Logic ---
-    if not GEMINI_API_KEY:
-        logger.error("Cannot answer question: GEMINI_API_KEY not configured.")
-        return jsonify({"error": "Service not configured: Missing API Key"}), 503 # 503 Service Unavailable
+    llm_service_instance: LlmServiceBase
+    try:
+        llm_service_instance = LlmServiceFactory.get_llm_service()
+    except ValueError as ve: # Configuration error from factory
+        logger.error(f"LLM Service configuration error: {ve}", exc_info=True)
+        return jsonify({"error": f"LLM Service not configured correctly: {ve}"}), 503 # Service Unavailable
+    except RuntimeError as re: # Service initialization error
+        logger.error(f"LLM Service runtime error during initialization: {re}", exc_info=True)
+        return jsonify({"error": f"LLM Service initialization failed: {re}"}), 503
+    except Exception as e: # Other unexpected errors from factory
+        logger.error(f"Unexpected error getting LLM service: {e}", exc_info=True)
+        return jsonify({"error": f"Unexpected error configuring LLM service: {e}"}), 500
+
 
     if not OPENAPI_SPEC_PATH: # Though it has a default in CustomVariables
         logger.error("Cannot answer question: OPENAPI_SPEC_PATH not configured.")
+        # This check might be redundant if CustomVariables always provides a default.
         return jsonify({"error": "Service not configured: Missing OpenAPI spec path"}), 503
 
     try:
-        gemini_service = GeminiService(api_key=GEMINI_API_KEY)
-        # Consider how often ApiQueryService is instantiated.
-        # If spec parsing is expensive and file doesn't change often,
-        # you might cache ApiQueryService instance or its parsed spec.
-        # For now, instantiating per request for simplicity in a template.
+        # ApiQueryService now takes the generic llm_service_instance
         api_query_service = ApiQueryService(
-            gemini_service=gemini_service,
+            llm_service=llm_service_instance,
             openapi_spec_path=OPENAPI_SPEC_PATH
         )
 

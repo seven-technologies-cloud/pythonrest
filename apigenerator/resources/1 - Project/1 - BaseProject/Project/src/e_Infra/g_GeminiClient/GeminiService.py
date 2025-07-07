@@ -4,33 +4,44 @@ import logging
 # Configure logging for this module
 logger = logging.getLogger(__name__)
 
-class GeminiService:
+# Assuming LlmServiceBase is in a sibling directory 'j_LlmManager'
+# Adjust import path if the directory structure is different or if using a central 'interfaces' package
+from src.e_Infra.j_LlmManager.LlmServiceBase import LlmServiceBase
+
+
+class GeminiService(LlmServiceBase):
     """
-    A service class to encapsulate interactions with the Google Gemini API.
+    A service class to encapsulate interactions with the Google Gemini API,
+    adhering to the LlmServiceBase interface.
     """
-    def __init__(self, api_key: str):
+    DEFAULT_MODEL_NAME = 'gemini-pro'
+
+    def __init__(self, api_key: str, model_name: str = None):
         """
         Initializes the GeminiService.
 
         Args:
             api_key (str): The Google Gemini API key.
-
+            model_name (str, optional): The specific Gemini model name to use.
+                                        Defaults to 'gemini-pro'.
         Raises:
             ValueError: If the API key is not provided.
+            RuntimeError: If configuration of the genai client fails.
         """
         if not api_key:
-            logger.error("Gemini API key not provided during GeminiService initialization.")
+            logger.error("API key not provided for GeminiService initialization.")
             raise ValueError("API key for Google Gemini must be provided.")
 
+        self.api_key = api_key # Store for potential re-configuration or logging if needed
+        self.model_name = model_name or self.DEFAULT_MODEL_NAME
+
         try:
-            genai.configure(api_key=api_key)
-            # Initialize the model. You might want to make the model name configurable later.
-            self.model = genai.GenerativeModel('gemini-pro')
-            logger.info("GeminiService initialized and configured successfully.")
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel(self.model_name)
+            logger.info(f"GeminiService initialized and configured successfully with model: {self.model_name}.")
         except Exception as e:
-            logger.error(f"Error during GeminiService initialization or genai.configure: {e}", exc_info=True)
-            # Re-raise the exception or handle it as appropriate for your application's startup
-            raise RuntimeError(f"Failed to initialize Gemini Service: {e}")
+            logger.error(f"Error during GeminiService initialization (model: {self.model_name}): {e}", exc_info=True)
+            raise RuntimeError(f"Failed to initialize Gemini Service (model: {self.model_name}): {e}")
 
     def generate_text(self, prompt: str) -> str:
         """
