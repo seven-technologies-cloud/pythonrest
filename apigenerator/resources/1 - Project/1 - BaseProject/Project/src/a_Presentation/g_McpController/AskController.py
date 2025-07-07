@@ -1,42 +1,49 @@
-from flask import Blueprint, request, jsonify # current_app no longer needed here directly
+from flask import Blueprint, request, jsonify
 import logging
-from typing import List # For type hinting BaseMessage list
+from typing import List, Dict # For type hinting BaseMessage list
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage, SystemMessage
 
-# Import the new McpAgentService and ModelLoader (for healthcheck)
+# Import the new McpAgentService
 from src.b_Application.b_Service.c_McpService.McpAgentService import McpAgentService
-from src.e_Infra.g_McpModels.ModelLoader import load_model, CURRENT_CONFIGURED_MODEL_NAME
-from src.e_Infra.g_Environment.EnvironmentVariables import SELECTED_LLM_PROVIDER, BASE_URL, ENDPOINTS
-
+# For healthcheck, to log which provider/model is configured
+from src.e_Infra.g_Environment.EnvironmentVariables import SELECTED_LLM_PROVIDER
+# ModelLoader might not be needed here if McpAgentService handles its own model status for healthcheck
 
 logger = logging.getLogger(__name__)
 ask_bp = Blueprint('ask_bp', __name__)
 
-# Initialize service instance once, potentially.
-# However, if its internal state (like agent or context) could become stale or
-# if it's very lightweight to instantiate, creating per request is also an option.
-# For an agent that might load specs or models, once per app context or on first use is better.
-# Let's try lazy instantiation on first request for now.
-mcp_agent_service_instance: McpAgentService = None
+# Lazy initialization for McpAgentService
+_mcp_agent_service_instance: McpAgentService = None
+_mcp_agent_service_init_error: Exception = None
 
-def get_mcp_agent_service():
-    global mcp_agent_service_instance
-    if mcp_agent_service_instance is None:
-        logger.info("First request to /mcp/ask, initializing McpAgentService...")
+def get_mcp_agent_service() -> McpAgentService:
+    global _mcp_agent_service_instance, _mcp_agent_service_init_error
+    if _mcp_agent_service_instance is None and _mcp_agent_service_init_error is None:
+        logger.info("First request or retry after error: Initializing McpAgentService...")
         try:
-            mcp_agent_service_instance = McpAgentService()
-            logger.info("McpAgentService initialized successfully.")
+            _mcp_agent_service_instance = McpAgentService()
+            logger.info("McpAgentService initialized successfully for AskController.")
         except Exception as e:
-            logger.critical(f"Failed to initialize McpAgentService during first use: {e}", exc_info=True)
-            mcp_agent_service_instance = None # Ensure it remains None if init fails
-            raise # Re-raise to signal critical failure at controller level
-    return mcp_agent_service_instance
+            _mcp_agent_service_init_error = e
+            logger.critical(f"Failed to initialize McpAgentService for AskController: {e}", exc_info=True)
+            # Do not raise here; let endpoint handle it to return proper HTTP error
+
+    if _mcp_agent_service_init_error:
+        # If there was an init error on previous attempt, raise it so each request doesn't retry indefinitely
+        # if the error is persistent (e.g. bad API key).
+        # For some errors, we might want a retry mechanism, but for now, fail fast after first error.
+        raise RuntimeError(f"McpAgentService previously failed to initialize: {_mcp_agent_service_init_error}")
+
+    if _mcp_agent_service_instance is None : # Should be caught by the raise above if error occurred
+         raise RuntimeError("McpAgentService is not available and no initialization error was caught. This state should not be reached.")
+
+    return _mcp_agent_service_instance
 
 @ask_bp.route('/ask', methods=['POST'])
 def ask_mcp_agent():
     """
-    Handles natural language questions using the MCP Agent.
-    Also provides a healthcheck for the configured LLM model initialization.
+    Handles natural language questions using the MCP LangGraph Agent.
+    Also provides a healthcheck for the agent's core components.
     """
     data = request.get_json()
     if not data or 'question' not in data:
@@ -48,89 +55,74 @@ def ask_mcp_agent():
     # --- Healthcheck Logic ---
     if question_text.lower() == "healthcheck":
         logger.info("Healthcheck requested for /mcp/ask.")
-        # Try to load the model as a basic health indicator for the selected provider
-        # This also implicitly checks if API key is valid (or not a placeholder)
-        # and if BASE_URL/ENDPOINTS are set (as McpAgentService init might use them for tool context).
-        provider_to_check = SELECTED_LLM_PROVIDER # From EnvironmentVariables
-        model_to_check = None
-        status = "no"
-        reason = ""
+        health_status = {"answer": "no", "provider_configured": SELECTED_LLM_PROVIDER, "details": ""}
         try:
-            # Attempt to get service, which initializes model and tools context
-            service_for_healthcheck = get_mcp_agent_service() # This will try to init the agent
-            if service_for_healthcheck and service_for_healthcheck.llm: # Check if LLM loaded
-                 # The tools also need valid context (BASE_URL, ENDPOINTS)
-                if not service_for_healthcheck.context.get("base_url") or not service_for_healthcheck.context.get("endpoints"):
-                    reason = "BASE_URL or ENDPOINTS not configured for tools."
-                    logger.warning(f"Healthcheck: {reason}")
+            service = get_mcp_agent_service() # This attempts initialization
+
+            # Check LLM (part of agent)
+            if service.llm_for_healthcheck: # Accessing the LLM instance from the agent service
+                health_status["llm_status"] = f"{type(service.llm_for_healthcheck).__name__} loaded."
+            else: # Should not happen if service init succeeded without error
+                health_status["llm_status"] = "LLM instance not found in service (unexpected)."
+                health_status["details"] += "LLM instance missing post-initialization. "
+
+            # Check Spec Provider & aggregated spec
+            if service.spec_provider_for_healthcheck:
+                spec = service.spec_provider_for_healthcheck.get_aggregated_spec()
+                if spec and spec.get("info", {}).get("title", "").startswith("Error:"):
+                    health_status["spec_status"] = f"Error state: {spec.get('info', {}).get('title')}"
+                    health_status["details"] += f"Spec aggregation issue: {spec.get('info', {}).get('description', '')}. "
+                elif spec and spec.get("paths"):
+                    health_status["spec_status"] = f"Aggregated (found {len(spec.get('paths',{}))} paths)."
                 else:
-                    # A more thorough healthcheck for the agent might try a dummy invoke or check tools.
-                    # For now, successful McpAgentService init (which loads model and prepares tools) is a good sign.
-                    status = "yes"
-                    reason = f"McpAgentService initialized successfully with {provider_to_check}."
-                    logger.info(f"Healthcheck: {reason}")
-            else: # Should not happen if get_mcp_agent_service raises on failure
-                reason = f"LLM for provider '{provider_to_check}' (model: {CURRENT_CONFIGURED_MODEL_NAME or 'Unknown'}) failed to initialize properly."
-                logger.warning(f"Healthcheck: {reason}")
+                    health_status["spec_status"] = "Aggregated spec is empty or has no paths."
+                    health_status["details"] += "Aggregated spec seems empty. "
+            else: # Should not happen
+                health_status["spec_status"] = "SpecProviderService instance not found (unexpected)."
+                health_status["details"] += "SpecProviderService missing. "
 
-        except ValueError as ve: # Config errors from ModelLoader or McpAgentService init
-            logger.error(f"Healthcheck: Configuration error for provider '{provider_to_check}': {ve}", exc_info=True)
-            reason = f"Configuration error for {provider_to_check}: {ve}"
-        except RuntimeError as re: # Critical errors during service/agent init
-            logger.error(f"Healthcheck: Runtime error initializing service for '{provider_to_check}': {re}", exc_info=True)
-            reason = f"Runtime error initializing service for {provider_to_check}: {re}"
-        except Exception as e:
-            logger.error(f"Healthcheck: Unexpected error for provider '{provider_to_check}': {e}", exc_info=True)
-            reason = f"An unexpected error occurred: {str(e)}"
+            # If we reached here without major exceptions from get_mcp_agent_service()
+            # and the above checks are reasonable, consider it 'yes'
+            if "Error" not in health_status.get("spec_status", "") and "not found" not in health_status.get("llm_status", "") :
+                 health_status["answer"] = "yes"
+                 health_status["details"] = health_status["details"] or "McpAgentService components appear initialized."
+            else: # One of the components reported an issue
+                 health_status["details"] = health_status["details"] or "One or more components reported an issue."
 
-        return jsonify({
-            "answer": status,
-            "provider_checked": provider_to_check,
-            "model_configured": CURRENT_CONFIGURED_MODEL_NAME if status == "yes" else "N/A due to error",
-            "reason": reason if status == "no" else "OK"
-        }), 200
+
+            logger.info(f"Healthcheck result: {health_status}")
+            return jsonify(health_status), 200
+
+        except Exception as e: # Catch errors from get_mcp_agent_service() or during checks
+            logger.error(f"Healthcheck: Critical failure during McpAgentService access or checks: {e}", exc_info=True)
+            health_status["details"] = f"Critical failure: {str(e)}"
+            return jsonify(health_status), 200 # Still 200 for healthcheck, but indicates failure
 
     # --- Standard Question Logic ---
-    # For now, we'll use a stateless approach for history per request.
-    # A more advanced version would use Flask sessions or a DB to maintain history.
-    # The SystemMessage is part of the agent built by McpAgentService.
-
+    # For this version, conversation history is stateless per request.
+    # McpAgentService prepends its own system message.
     history: List[BaseMessage] = [HumanMessage(content=question_text)]
 
     try:
-        service = get_mcp_agent_service()
-        if not service: # Should have been caught by healthcheck's attempt or raised earlier
-             return jsonify({"error": "MCP Agent Service is not available due to initialization errors."}), 503
+        service = get_mcp_agent_service() # Get (or initialize) the service
 
         response_messages = service.process_message(history)
 
-        ai_reply = "Sorry, I couldn't generate a response." # Default if no AIMessage found
+        ai_reply = "Sorry, I couldn't generate a response from the agent."
         if response_messages:
-            # Find the last AIMessage in the response
-            for msg in reversed(response_messages):
+            for msg in reversed(response_messages): # Find the last AIMessage
                 if isinstance(msg, AIMessage):
                     ai_reply = msg.content
                     break
 
         return jsonify({"answer": ai_reply}), 200
 
-    except ValueError as ve: # Config errors if somehow not caught by healthcheck logic / first use
-        logger.error(f"LLM Service configuration error for question processing: {ve}", exc_info=True)
-        return jsonify({"error": f"LLM Service not configured correctly: {ve}"}), 503
     except RuntimeError as re: # Errors from McpAgentService initialization or processing
-        logger.error(f"MCP Agent Service runtime error: {re}", exc_info=True)
-        return jsonify({"error": f"An error occurred while processing your question with the agent: {re}"}), 500
+        logger.error(f"MCP Agent Service runtime error for question '{question_text}': {re}", exc_info=True)
+        return jsonify({"error": f"An error occurred: {re}"}), 503 # Service Unavailable if agent can't run
     except Exception as e:
-        logger.error(f"Unexpected error in /ask endpoint: {e}", exc_info=True)
+        logger.error(f"Unexpected error in /ask endpoint for question '{question_text}': {e}", exc_info=True)
         return jsonify({"error": "An unexpected internal error occurred."}), 500
 
-# Configuration routes are removed as per the new design focusing on env vars.
-# The old /ask/configure GET and POST functions are deleted.
-
-# Note on imports:
-# Ensure all necessary langchain components (messages, tools, agent creation)
-# and your custom modules (McpAgentService, ModelLoader, EnvironmentVariables)
-# are correctly structured and importable.
-# The `from . import McpTools` in McpAgentService assumes McpTools.py is in the same directory.
-# If `current_app` was used by PathResolver, it would need to be available, but PathResolver was removed.
-# McpTools now has its own root path detection.
+# Removed /ask/configure GET and POST routes and their functions.
+# All configuration is now via environment variables.

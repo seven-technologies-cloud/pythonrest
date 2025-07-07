@@ -74,18 +74,8 @@ except ValueError:
 
 # LLM_CONFIG_FILE_PATH is removed as llm_config.json is no longer used in this agent-based approach.
 
-# --- Agent/Tools Specific Variables ---
-BASE_URL = os.getenv("BASE_URL", "").rstrip("/")
-# Ensure ast is imported if not already at the top of the file for ENDPOINTS
-try:
-    ENDPOINTS = ast.literal_eval(os.getenv("ENDPOINTS", "[]"))
-    if not isinstance(ENDPOINTS, list):
-        logger.warning(f"ENDPOINTS environment variable did not evaluate to a list (got {type(ENDPOINTS)}). Defaulting to empty list.")
-        ENDPOINTS = []
-except (ValueError, SyntaxError) as e:
-    logger.error(f"Error parsing ENDPOINTS environment variable: {e}. Defaulting to empty list. Ensure it's a valid Python list string e.g., '[\"/api/v1/users\", \"/api/v1/items\"]'")
-    ENDPOINTS = []
-
+# BASE_URL and ENDPOINTS are removed as the agent will now use locally aggregated Swagger/OpenAPI specs.
+# The necessary context (like base URL for curl commands) will be derived from the aggregated spec itself.
 
 # --- Logging setup (basic, if not already handled elsewhere more centrally) ---
 import logging
