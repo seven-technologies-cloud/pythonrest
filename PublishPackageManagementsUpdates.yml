@@ -59,12 +59,12 @@ jobs:
       fi
 
   - job: CreateGitHubRelease
-  displayName: 'Create GitHub Release'
-  dependsOn: ExtractVersion
-  pool:
+    displayName: 'Create GitHub Release'
+    dependsOn: CheckPypiVersionBeforePublishing
+    pool:
     vmImage: ubuntu-latest
   variables:
-    RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
+    RELEASE_VERSION: $[ dependencies.CheckPypiVersionBeforePublishing.outputs['VersionExtractionStep.packageVersion'] ]
   steps:
   - checkout: self
     persistCredentials: true
@@ -116,8 +116,8 @@ jobs:
         echo "Error: DYNAMIC_GITHUB_REPO_NAME could not be determined."
         exit 1
       fi
-      if [ -z "$VERSION" ]; then # Check bash environment variable for VERSION
-        echo "Error: VERSION is not set (should come from previous job)."
+      if [ -z "$RELEASE_VERSION" ]; then # Check bash environment variable for VERSION
+        echo "Error: RELEASE_VERSION is not set (should come from previous job)."
         exit 1
       fi
 
