@@ -59,41 +59,29 @@ jobs:
       fi
 
   - job: CreateGitHubRelease
-  displayName: '2. Create GitHub Release'
+  displayName: 'Create GitHub Release'
   dependsOn: ExtractVersion
   pool:
     vmImage: ubuntu-latest
   variables:
-    # Map the output variable from ExtractVersion job to a local variable in this job
     RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
-    # GITHUB_TOKEN should be a secret pipeline variable (e.g., from a variable group or configured in UI)
-    # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are defined at the pipeline level or can be overridden here/passed from group
   steps:
-  - checkout: self # Checkout self to ensure git commands work, e.g. git rev-parse HEAD
+  - checkout: self
     persistCredentials: true
   - script: |
-      # Script to create a GitHub Release (from previous step)
-      # Environment variables expected by this script:
-      # GITHUB_TOKEN: (mapped from Azure Pipelines secret $(GITHUB_TOKEN))
-      # VERSION: (this is mapped to $(RELEASE_VERSION) which comes from the previous job)
-      # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are now determined dynamically within this script.
-
       echo "--- GitHub Release Script ---"
       echo "Version from previous job: $(RELEASE_VERSION)"
       
-      # Debug: Check if GITHUB_TOKEN is available (without revealing the actual token)
       if [ -n "$GITHUB_TOKEN" ]; then
         echo "GITHUB_TOKEN is available (length: ${#GITHUB_TOKEN})"
       else
         echo "WARNING: GITHUB_TOKEN is not available or empty"
       fi
       
-      # Get the commit message for the release body
       git fetch --all --unshallow
       last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
       echo "Last commit message: $last_commit_message"
 
-      # --- Determine Repository Owner and Name Dynamically ---
       REPO_FULL_NAME="$(Build.Repository.Name)" # e.g., "your-username/pythonrest"
       DYNAMIC_GITHUB_REPO_OWNER=""
       DYNAMIC_GITHUB_REPO_NAME=""
@@ -108,19 +96,14 @@ jobs:
         exit 1
       fi
 
-      # --- Configuration (TEMPORARY FOR MANUAL TESTING) ---
-      # Using dynamic version from previous job for testing
-      TAG_NAME="v$(RELEASE_VERSION)-test"
-      RELEASE_NAME="Test Release $(RELEASE_VERSION)"
-      RELEASE_BODY="This is a test release for version $(RELEASE_VERSION) generated from commit: $last_commit_message"
+      TAG_NAME="v$(RELEASE_VERSION)"
+      RELEASE_NAME="$(RELEASE_VERSION)"
+      RELEASE_BODY="Release for version $(RELEASE_VERSION) generated from commit: $last_commit_message"
 
-      # Consider these for safer testing:
-      IS_DRAFT="false"        # Creates a draft release on GitHub (not public)
-      IS_PRERELEASE="false"   # Marks it as a pre-release
-      # --- End of Temporary Configuration ---
+      IS_DRAFT="false"
+      IS_PRERELEASE="false"
 
 
-      # --- Validate Inputs ---
       if [ -z "$GITHUB_TOKEN" ]; then # Check bash environment variable for GITHUB_TOKEN
         echo "Error: GITHUB_TOKEN is not set or not available as a secret."
         exit 1
@@ -143,8 +126,6 @@ jobs:
       echo "Tag Name: ${TAG_NAME}"
       echo "Release Name: ${RELEASE_NAME}"
 
-      # --- Construct JSON Payload ---
-      # Using current commit from the checkout
       TARGET_COMMITISH=$(git rev-parse HEAD)
       echo "Target Commit: ${TARGET_COMMITISH}"
 
@@ -163,7 +144,6 @@ jobs:
       echo "Payload:"
       echo "${JSON_PAYLOAD}"
 
-      # --- Make API Call ---
       API_URL="https://api.github.com/repos/${DYNAMIC_GITHUB_REPO_OWNER}/${DYNAMIC_GITHUB_REPO_NAME}/releases"
 
       response=$(curl -s -w "%{http_code}" \
@@ -179,11 +159,9 @@ jobs:
       response_body=$(sed '$ d' <<< "$response")
 
       echo "GitHub API Response Code: ${http_code}"
-      # echo "GitHub API Response Body: ${response_body}" # Can be verbose
 
       if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
         echo "Successfully created GitHub Release: ${RELEASE_NAME}"
-        # Output the release URL for information
         release_url=$(echo "$response_body" | grep -oP '"html_url":\s*"\K[^"]*')
         if [ -n "$release_url" ]; then
             echo "Release URL: $release_url"
@@ -199,11 +177,8 @@ jobs:
       fi
     displayName: 'Execute GitHub Release Script'
     env:
-      # Map Azure DevOps pipeline variables (including secrets) to environment variables for the script
-      GITHUB_TOKEN: $(GITHUB_TOKEN) # $(GITHUB_TOKEN) is the ADO way to reference the secret
-      # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are now determined dynamically within the script
-      VERSION: $(RELEASE_VERSION) # Pass the version to the script's expected VERSION env var
-      # Map necessary variables from variable group 'pythonrest-cli'
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
+      VERSION: $(RELEASE_VERSION)
       pypi_app_name: $(pypi_app_name)
       pip_api_key: $(pip_api_key)
 
