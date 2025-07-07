@@ -70,10 +70,12 @@ jobs:
     vmImage: ubuntu-latest
   steps:
   - script: |
-      echo "Value of test_secret_echo: $(test_secret_echo)"
+      echo "Value of test_secret_echo: $test_secret_echo"
+      echo "Non-secret value: $pypi_app_name" 
     displayName: 'Echo test_secret_echo'
     env:
       test_secret_echo: $(test_secret_echo) # Ensure the secret is mapped to the environment variable
+      pypi_app_name: $(pypi_app_name)
 
 - job: CreateGitHubRelease
   displayName: '2. Create GitHub Release'
