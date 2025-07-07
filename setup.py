@@ -80,7 +80,9 @@ setup(
         "**Version 0.3.3**\n"
         "* Adding powershell test scripts for mysql, postgresql and sqlserver\n\n"
         "**Version 0.3.4**\n"
-        "* Fix CORS issue by properly configuration of after request decorator function.\n"
+        "* Fix CORS issue by properly configuration of after request decorator function.\n\n"
+        "**Version 0.3.5**\n"
+        "* Synchronization between the versions of your package on PyPI and the releases on GitHub.\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
