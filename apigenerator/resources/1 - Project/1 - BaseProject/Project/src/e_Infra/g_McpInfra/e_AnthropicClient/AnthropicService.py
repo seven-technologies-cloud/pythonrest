@@ -10,20 +10,22 @@ class AnthropicService(LlmServiceBase):
     A service class to encapsulate interactions with the Anthropic API,
     adhering to the LlmServiceBase interface.
     """
-    DEFAULT_MODEL_NAME = "claude-3-haiku-20240307"
-    DEFAULT_TEMPERATURE = 0.7
+    DEFAULT_MODEL_NAME = "claude-3-haiku-20240307" # As per new defaults
+    DEFAULT_TEMPERATURE = 0.7                      # As per new defaults
+    DEFAULT_MAX_OUTPUT_TOKENS = 2048               # As per new defaults (Anthropic uses max_tokens_to_sample or max_tokens in messages.create)
 
-    def __init__(self, api_key: str, model_name: str = None, temperature: float = None):
+    def __init__(self, api_key: str, model_name: str = None, temperature: float = None, max_output_tokens: int = None):
         """
         Initializes the AnthropicService.
 
         Args:
             api_key (str): The Anthropic API key.
-            model_name (str, optional): The specific Anthropic model name to use. Defaults to "claude-3-haiku-20240307".
+            model_name (str, optional): Specific Anthropic model. Defaults to self.DEFAULT_MODEL_NAME.
             temperature (float, optional): Sampling temperature. Defaults to self.DEFAULT_TEMPERATURE.
+            max_output_tokens (int, optional): Max tokens for response. Defaults to self.DEFAULT_MAX_OUTPUT_TOKENS.
         Raises:
-            ValueError: If the API key is not provided or temperature is invalid.
-            RuntimeError: If initialization of the Anthropic client fails.
+            ValueError: If API key is not provided or params are invalid.
+            RuntimeError: If Anthropic client initialization fails.
         """
         if not api_key:
             logger.error("API key not provided for AnthropicService initialization.")
@@ -38,14 +40,26 @@ class AnthropicService(LlmServiceBase):
                 if not (0.0 <= self.temperature <= 1.0): # Anthropic typical range
                      logger.warning(f"Temperature {self.temperature} for Anthropic is outside typical range (0.0-1.0). Using it anyway.")
             except ValueError:
-                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default.")
+                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default {self.DEFAULT_TEMPERATURE}.")
                 self.temperature = self.DEFAULT_TEMPERATURE
         else:
             self.temperature = self.DEFAULT_TEMPERATURE
 
+        if max_output_tokens is not None:
+            try:
+                self.max_output_tokens = int(max_output_tokens)
+                if self.max_output_tokens <= 0:
+                    logger.warning(f"Invalid max_output_tokens {self.max_output_tokens}. Must be positive. Using default {self.DEFAULT_MAX_OUTPUT_TOKENS}.")
+                    self.max_output_tokens = self.DEFAULT_MAX_OUTPUT_TOKENS
+            except ValueError:
+                logger.error(f"Invalid max_output_tokens value '{max_output_tokens}'. Must be an int. Using default {self.DEFAULT_MAX_OUTPUT_TOKENS}.")
+                self.max_output_tokens = self.DEFAULT_MAX_OUTPUT_TOKENS
+        else:
+            self.max_output_tokens = self.DEFAULT_MAX_OUTPUT_TOKENS
+
         try:
             self.client = anthropic.Anthropic(api_key=self.api_key)
-            logger.info(f"AnthropicService initialized: model='{self.model_name}', temperature={self.temperature}.")
+            logger.info(f"AnthropicService initialized: model='{self.model_name}', temperature={self.temperature}, max_output_tokens={self.max_output_tokens}.")
         except Exception as e:
             logger.error(f"Error during AnthropicService init (model: {self.model_name}): {e}", exc_info=True)
             raise RuntimeError(f"Failed to initialize Anthropic Service (model: {self.model_name}): {e}")
@@ -71,7 +85,7 @@ class AnthropicService(LlmServiceBase):
         try:
             message = self.client.messages.create(
                 model=self.model_name,
-                max_tokens=2048,
+                max_tokens=self.max_output_tokens,
                 temperature=self.temperature,
                 messages=[
                     {
@@ -103,7 +117,8 @@ class AnthropicService(LlmServiceBase):
         try:
             self.client.messages.create(
                 model=self.model_name,
-                max_tokens=10,
+                max_tokens=10, # Minimal tokens for a health check
+                temperature=self.temperature, # Use configured temperature
                 messages=[{"role": "user", "content": "Health check."}]
             )
             logger.info("Anthropic API connection check successful (via minimal generation).")

@@ -10,20 +10,22 @@ class OpenAIService(LlmServiceBase):
     A service class to encapsulate interactions with the OpenAI API,
     adhering to the LlmServiceBase interface.
     """
-    DEFAULT_MODEL_NAME = "gpt-3.5-turbo"
-    DEFAULT_TEMPERATURE = 0.7
+    DEFAULT_MODEL_NAME = "gpt-3.5-turbo"    # As per new defaults
+    DEFAULT_TEMPERATURE = 0.2              # As per new defaults
+    DEFAULT_MAX_OUTPUT_TOKENS = 2000       # As per new defaults
 
-    def __init__(self, api_key: str, model_name: str = None, temperature: float = None):
+    def __init__(self, api_key: str, model_name: str = None, temperature: float = None, max_output_tokens: int = None):
         """
         Initializes the OpenAIService.
 
         Args:
             api_key (str): The OpenAI API key.
-            model_name (str, optional): The specific OpenAI model name to use. Defaults to "gpt-3.5-turbo".
+            model_name (str, optional): Specific OpenAI model. Defaults to self.DEFAULT_MODEL_NAME.
             temperature (float, optional): Sampling temperature. Defaults to self.DEFAULT_TEMPERATURE.
+            max_output_tokens (int, optional): Max tokens for response. Defaults to self.DEFAULT_MAX_OUTPUT_TOKENS.
         Raises:
-            ValueError: If the API key is not provided or temperature is invalid.
-            RuntimeError: If initialization of the OpenAI client fails.
+            ValueError: If API key is not provided or params are invalid.
+            RuntimeError: If OpenAI client initialization fails.
         """
         if not api_key:
             logger.error("API key not provided for OpenAIService initialization.")
@@ -38,14 +40,26 @@ class OpenAIService(LlmServiceBase):
                 if not (0.0 <= self.temperature <= 2.0): # OpenAI typical range
                      logger.warning(f"Temperature {self.temperature} for OpenAI is outside typical range (0.0-2.0). Using it anyway.")
             except ValueError:
-                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default.")
+                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default {self.DEFAULT_TEMPERATURE}.")
                 self.temperature = self.DEFAULT_TEMPERATURE
         else:
             self.temperature = self.DEFAULT_TEMPERATURE
 
+        if max_output_tokens is not None:
+            try:
+                self.max_output_tokens = int(max_output_tokens)
+                if self.max_output_tokens <= 0:
+                    logger.warning(f"Invalid max_output_tokens {self.max_output_tokens}. Must be positive. Using default {self.DEFAULT_MAX_OUTPUT_TOKENS}.")
+                    self.max_output_tokens = self.DEFAULT_MAX_OUTPUT_TOKENS
+            except ValueError:
+                logger.error(f"Invalid max_output_tokens value '{max_output_tokens}'. Must be an int. Using default {self.DEFAULT_MAX_OUTPUT_TOKENS}.")
+                self.max_output_tokens = self.DEFAULT_MAX_OUTPUT_TOKENS
+        else:
+            self.max_output_tokens = self.DEFAULT_MAX_OUTPUT_TOKENS
+
         try:
             self.client = openai.OpenAI(api_key=self.api_key)
-            logger.info(f"OpenAIService initialized: model='{self.model_name}', temperature={self.temperature}.")
+            logger.info(f"OpenAIService initialized: model='{self.model_name}', temperature={self.temperature}, max_output_tokens={self.max_output_tokens}.")
         except Exception as e:
             logger.error(f"Error during OpenAIService init (model: {self.model_name}): {e}", exc_info=True)
             raise RuntimeError(f"Failed to initialize OpenAI Service (model: {self.model_name}): {e}")
@@ -78,6 +92,7 @@ class OpenAIService(LlmServiceBase):
                 ],
                 model=self.model_name,
                 temperature=self.temperature,
+                max_tokens=self.max_output_tokens
             )
             if chat_completion.choices and chat_completion.choices[0].message and chat_completion.choices[0].message.content:
                 return chat_completion.choices[0].message.content.strip()

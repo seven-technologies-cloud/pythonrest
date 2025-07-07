@@ -140,7 +140,8 @@ def set_llm_configuration():
     - "update_provider_settings": {
           "provider_name": { (e.g., "openai")
               "model": "model_string",
-              "temperature": float_value
+              "temperature": float_value,
+              "max_output_tokens": int_value
           }
       }
     - "clear_provider_settings": "provider_name"
