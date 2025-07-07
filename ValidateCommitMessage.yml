@@ -64,6 +64,17 @@ jobs:
       grep "pythonrest_version" ./pythonrest.py
     name: VersionExtractionStep # Step name to reference its output variable
 
+- job: EchoSecret
+  displayName: '3. Echo Secret Variable'
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - script: |
+      echo "Value of test_secret_echo: $(test_secret_echo)"
+    displayName: 'Echo test_secret_echo'
+    env:
+      test_secret_echo: $(test_secret_echo) # Ensure the secret is mapped to the environment variable
+
 - job: CreateGitHubRelease
   displayName: '2. Create GitHub Release'
   dependsOn: ExtractVersion
