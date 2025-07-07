@@ -3,7 +3,8 @@ import logging
 
 # Assuming CustomVariables are directly importable from src.e_Infra
 # Adjust the import path if your project structure resolves it differently at runtime
-from src.e_Infra.CustomVariables import OPENAPI_SPEC_PATH
+# OPENAPI_SPEC_PATH is no longer used here as ApiQueryService handles spec discovery internally.
+# from src.e_Infra.CustomVariables import OPENAPI_SPEC_PATH
 # LlmServiceFactory and LlmServiceBase are now re-exported by g_McpInfra's __init__
 from src.e_Infra.g_McpInfra import LlmServiceFactory, LlmServiceBase
 from src.b_Application.b_Service.c_McpService.ApiQueryService import ApiQueryService
@@ -73,28 +74,26 @@ def ask_api_question():
         logger.error(f"Unexpected error getting LLM service: {e}", exc_info=True)
         return jsonify({"error": f"Unexpected error configuring LLM service: {e}"}), 500
 
-
-    if not OPENAPI_SPEC_PATH: # Though it has a default in CustomVariables
-        logger.error("Cannot answer question: OPENAPI_SPEC_PATH not configured.")
-        # This check might be redundant if CustomVariables always provides a default.
-        return jsonify({"error": "Service not configured: Missing OpenAPI spec path"}), 503
+    # The OPENAPI_SPEC_PATH check is removed as ApiQueryService handles its own spec discovery.
+    # ApiQueryService will raise FileNotFoundError or other errors if it cannot load specs,
+    # which will be caught by the generic try-except block below.
 
     try:
-        # ApiQueryService now takes the generic llm_service_instance
+        # ApiQueryService now only takes the llm_service_instance
         api_query_service = ApiQueryService(
-            llm_service=llm_service_instance,
-            openapi_spec_path=OPENAPI_SPEC_PATH
+            llm_service=llm_service_instance
         )
 
         answer = api_query_service.answer_api_question(question)
         return jsonify({"answer": answer}), 200
 
-    except FileNotFoundError as fnfe:
-        logger.error(f"OpenAPI spec file not found: {fnfe}", exc_info=True)
-        return jsonify({"error": f"API Specification file not found at {OPENAPI_SPEC_PATH}. Please configure the path correctly."}), 503
-    except ValueError as ve: # Could be from GeminiService init or ApiQueryService
+    except FileNotFoundError as fnfe: # This might be raised by ApiQueryService if no specs are found
+        logger.error(f"OpenAPI spec file(s) not found by ApiQueryService: {fnfe}", exc_info=True)
+        # Provide a more generic message as the exact path is internal to ApiQueryService now
+        return jsonify({"error": "API Specification file(s) not found or not accessible."}), 503
+    except ValueError as ve: # Could be from LLM service init or ApiQueryService logic
         logger.error(f"Configuration or input error: {ve}", exc_info=True)
-        return jsonify({"error": f"Invalid configuration or input: {ve}"}), 400 # Or 500 if server config issue
+        return jsonify({"error": f"Invalid configuration or input: {ve}"}), 400
     except RuntimeError as re: # Errors from GeminiService or ApiQueryService during operation
         logger.error(f"Service runtime error: {re}", exc_info=True)
         return jsonify({"error": f"An error occurred while processing your question: {re}"}), 500
