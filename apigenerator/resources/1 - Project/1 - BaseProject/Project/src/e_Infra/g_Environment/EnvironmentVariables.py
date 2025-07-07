@@ -72,9 +72,7 @@ except ValueError:
     logger.warning(f"Invalid ANTHROPIC_MAX_OUTPUT_TOKENS '{_anthropic_max_tokens_str}'. Using default 2048.")
     ANTHROPIC_MAX_OUTPUT_TOKENS = 2048
 
-# --- Runtime LLM Configuration File Path ---
-LLM_CONFIG_FILE_PATH = os.getenv('LLM_CONFIG_FILE_PATH', 'llm_config.json')
-
+# LLM_CONFIG_FILE_PATH is now determined by PathResolver.py, no longer an environment variable here.
 
 # --- Other General Variables (from user snippet, may or may not be used by MCP) ---
 # BASE_URL = os.getenv("BASE_URL", "").rstrip("/")

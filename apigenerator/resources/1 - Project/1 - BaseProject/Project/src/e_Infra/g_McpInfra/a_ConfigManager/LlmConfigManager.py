@@ -2,13 +2,14 @@ import json
 import os
 import logging
 import threading # For basic thread safety on file access
-# Updated to import from EnvironmentVariables.py
+# Import new PathResolver utility
+from src.e_Infra.g_McpInfra.PathResolver import get_llm_runtime_config_path
+# Updated to import from EnvironmentVariables.py (LLM_CONFIG_FILE_PATH removed from here)
 from src.e_Infra.g_Environment.EnvironmentVariables import (
-    LLM_CONFIG_FILE_PATH,
-    SELECTED_LLM_PROVIDER, # Changed from ENV_DEFAULT_LLM_PROVIDER
-    GEMINI_MODEL, OPENAI_MODEL, ANTHROPIC_MODEL, # Changed from ENV_DEFAULT_..._MODEL_NAME
-    GEMINI_TEMPERATURE, OPENAI_TEMPERATURE, ANTHROPIC_TEMPERATURE, # Changed from ENV_DEFAULT_..._TEMPERATURE
-    GEMINI_MAX_OUTPUT_TOKENS, OPENAI_MAX_OUTPUT_TOKENS, ANTHROPIC_MAX_OUTPUT_TOKENS # New
+    SELECTED_LLM_PROVIDER,
+    GEMINI_MODEL, OPENAI_MODEL, ANTHROPIC_MODEL,
+    GEMINI_TEMPERATURE, OPENAI_TEMPERATURE, ANTHROPIC_TEMPERATURE,
+    GEMINI_MAX_OUTPUT_TOKENS, OPENAI_MAX_OUTPUT_TOKENS, ANTHROPIC_MAX_OUTPUT_TOKENS
 )
 
 logger = logging.getLogger(__name__)
@@ -16,23 +17,25 @@ logger = logging.getLogger(__name__)
 class LlmConfigManager:
     """
     Manages dynamic LLM configurations stored in a JSON file.
+    The path to this JSON file is now determined by PathResolver.
     It allows reading and writing runtime configurations that can override
     initial defaults set by environment variables.
-    API keys themselves are NOT managed here; they are sourced from CustomVariables (env vars).
+    API keys themselves are NOT managed here; they are sourced from EnvironmentVariables.py.
     """
     _lock = threading.Lock() # Class-level lock for file operations
 
-    def __init__(self, config_file_path: str = None):
+    def __init__(self):
         """
         Initializes the LlmConfigManager.
-
-        Args:
-            config_file_path (str, optional): Path to the LLM config JSON file.
-                                              Defaults to LLM_CONFIG_FILE_PATH from CustomVariables.
+        The config file path is determined internally using PathResolver.
         """
-        self.config_file_path = config_file_path or LLM_CONFIG_FILE_PATH
+        self.config_file_path = get_llm_runtime_config_path()
         # Ensure the directory for the config file exists
-        os.makedirs(os.path.dirname(self.config_file_path) or '.', exist_ok=True)
+        # get_llm_runtime_config_path() returns an absolute path, so os.path.dirname will work.
+        config_dir = os.path.dirname(self.config_file_path)
+        if not os.path.exists(config_dir): # Check if dir exists before trying to create
+             os.makedirs(config_dir, exist_ok=True) # exist_ok=True handles race conditions
+        logger.info(f"LlmConfigManager initialized. Config file: {self.config_file_path}")
 
 
     def _load_config(self) -> dict:

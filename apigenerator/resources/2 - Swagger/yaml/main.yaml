@@ -88,6 +88,7 @@ components:
               $ref: '#/components/schemas/McpProviderEffectiveSettings'
             anthropic:
               $ref: '#/components/schemas/McpProviderEffectiveSettings'
+        # llm_config_file_path removed as it's now a fixed convention
 
     McpProviderEffectiveSettings:
       type: object
