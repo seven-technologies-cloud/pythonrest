@@ -23,8 +23,8 @@ jobs:
       # Find the last non-merge commit before the merge commit (PR source commit)
       last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
 
-      if [[ $last_commit_message =~ version\ ?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-        extracted_version="${BASH_REMATCH[0]//version/}"
+      if [[ $last_commit_message =~ version[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+        extracted_version="${BASH_REMATCH[1]}"
         echo "Extracted version: $extracted_version"
       else
         echo "Error: The commit message does not contain a valid version format (versionX.X.X)."
