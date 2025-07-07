@@ -41,6 +41,7 @@ jobs:
       
       grep "version=" ./setup.py
       grep "pythonrest_version" ./pythonrest.py
+    name: VersionExtractionStep
   - script: |
       latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null)
       echo "Latest version on PyPI: $latest_version"
@@ -57,6 +58,7 @@ jobs:
       else
         echo "Versions are the same. Skipping PyPI upload."
       fi
+    name: PypiPublishStep
 
   - job: CreateGitHubRelease
     displayName: 'Create GitHub Release'
@@ -97,7 +99,7 @@ jobs:
       fi
 
       TAG_NAME="v$(RELEASE_VERSION)"
-      RELEASE_NAME="$(RELEASE_VERSION)"
+      RELEASE_NAME="$TAG_NAME"
       RELEASE_BODY="Release for version $(RELEASE_VERSION) generated from commit: $last_commit_message"
 
       IS_DRAFT="false"
@@ -179,8 +181,6 @@ jobs:
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       VERSION: $(RELEASE_VERSION)
-      pypi_app_name: $(pypi_app_name)
-      pip_api_key: $(pip_api_key)
 
 # - job: CheckChocoCLIVersion
 #   displayName: 'Check Choco CLI version'
