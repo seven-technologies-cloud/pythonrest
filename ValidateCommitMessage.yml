@@ -121,7 +121,7 @@ jobs:
       RELEASE_BODY="This is a test release for version $(RELEASE_VERSION) generated from commit: $last_commit_message"
 
       # Consider these for safer testing:
-      IS_DRAFT="true"        # Creates a draft release on GitHub (not public)
+      IS_DRAFT="false"        # Creates a draft release on GitHub (not public)
       IS_PRERELEASE="true"   # Marks it as a pre-release
       # --- End of Temporary Configuration ---
 
