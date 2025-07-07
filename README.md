@@ -83,6 +83,9 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.4:**
 * Fix CORS issue by properly configuration of after request decorator function
 
+**Version 0.3.5:**
+* Synchronization between the versions on PyPI and the releases on GitHub
+
 
 
 ## Installation

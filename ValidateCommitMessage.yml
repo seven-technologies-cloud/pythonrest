@@ -39,5 +39,3 @@ jobs:
       pip install --upgrade pip setuptools wheel
       python setup.py sdist
     displayName: 'Validate pip package build'
-
-
