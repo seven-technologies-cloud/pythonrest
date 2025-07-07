@@ -71,7 +71,8 @@ jobs:
     vmImage: ubuntu-latest
   variables:
     # Map the output variable from ExtractVersion job to a local variable in this job
-    RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
+    # RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
+    RELEASE_VERSION: v0.3.6
     # GITHUB_TOKEN should be a secret pipeline variable (e.g., from a variable group or configured in UI)
     # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are defined at the pipeline level or can be overridden here/passed from group
   steps:
