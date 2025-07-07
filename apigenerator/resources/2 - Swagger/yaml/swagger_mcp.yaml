@@ -1,0 +1,283 @@
+openapi: 3.0.3
+info:
+  title: MCP API Endpoints
+  version: "1.0.0"
+  description: |-
+    Endpoints for interacting with the Multi-LLM Configuration Platform (MCP)
+    for querying the API's own specification and managing LLM configurations.
+
+tags:
+  - name: MCP - Ask
+    description: Query the API's specification using an LLM.
+  - name: MCP - Configure
+    description: Configure LLM providers and settings for the MCP Ask service.
+
+components:
+  schemas:
+    McpAskRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          description: The natural language question about the API, or "healthcheck".
+          example: "What endpoints are available for items?"
+
+    McpAskResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: The LLM-generated answer to the question about the API.
+          example: "The API provides GET /items and POST /items for item management."
+
+    McpHealthcheckResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          enum: ["yes", "no"]
+          description: "Indicates if the healthcheck passed ('yes') or failed ('no')."
+        provider_checked:
+          type: string
+          description: The name of the LLM provider that was checked (e.g., "Gemini", "OpenAI").
+          example: "Gemini"
+        provider_attempted: # Only present on some "no" answers if provider determination was the issue
+          type: string
+          description: The LLM provider that was attempted if the check failed due to configuration.
+          example: "unspecified_default"
+        reason:
+          type: string
+          description: Details if the healthcheck failed (e.g., "API connection test failed", "Configuration error: API_KEY not set").
+          example: "API connection test failed"
+
+    McpErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A summary of the error.
+        details:
+          type: string
+          description: Optional additional details about the error.
+          nullable: true
+
+    McpEffectiveConfigResponse:
+      type: object
+      description: "Shows the current effective LLM configuration, merging runtime settings and environment defaults."
+      properties:
+        determined_default_provider:
+          type: string
+          description: The LLM provider currently acting as the default.
+        config_source_default_provider:
+          type: string
+          description: Where the default provider setting was sourced from (runtime or environment).
+        providers:
+          type: object
+          description: Configuration details for each supported LLM provider.
+          properties:
+            gemini:
+              $ref: '#/components/schemas/McpProviderEffectiveSettings'
+            openai:
+              $ref: '#/components/schemas/McpProviderEffectiveSettings'
+            anthropic:
+              $ref: '#/components/schemas/McpProviderEffectiveSettings'
+        # llm_config_file_path was removed from LlmConfigManager's output for this
+
+    McpProviderEffectiveSettings:
+      type: object
+      properties:
+        model:
+          type: string
+          description: The model name being used.
+        model_source:
+          type: string
+          description: Where the model setting was sourced from.
+        temperature:
+          oneOf:
+            - type: number
+              format: float
+            - type: string # To account for "Service Default" or "Invalid Format"
+          description: The temperature setting being used.
+        temperature_source:
+          type: string
+          description: Where the temperature setting was sourced from.
+
+    McpConfigureRequest:
+      type: object
+      description: Payload for configuring LLM settings. Send one or more actions.
+      properties:
+        set_runtime_default_provider:
+          type: string
+          nullable: true
+          description: "Set the runtime default LLM provider (e.g., 'gemini', 'openai', 'anthropic'). Set to null to clear runtime default and revert to ENV_DEFAULT_LLM_PROVIDER."
+          example: "openai"
+        update_provider_settings:
+          type: object
+          description: "Update specific settings for one or more providers."
+          additionalProperties:
+            $ref: '#/components/schemas/McpProviderConfigurableSettings'
+          example:
+            openai:
+              model: "gpt-4o"
+              temperature: 0.6
+            gemini:
+              temperature: 0.85
+        clear_provider_settings:
+          type: string
+          description: "Clear all runtime settings for a specific provider name (e.g., 'openai'). Reverts to ENV defaults for that provider."
+          example: "gemini"
+        clear_all_runtime_settings:
+          type: boolean
+          description: "If true, clears all runtime configurations from llm_config.json, reverting all settings to ENV defaults."
+          example: true
+      # It's good to ensure at least one action is specified, but that's more business logic
+      # minProperties: 1
+
+    McpProviderConfigurableSettings:
+      type: object
+      description: Settings that can be configured per provider.
+      properties:
+        model:
+          type: string
+          description: The model name to use for this provider.
+          example: "gpt-4-turbo"
+        temperature:
+          type: number
+          format: float
+          description: The sampling temperature to use (e.g., 0.0 to 2.0, provider-dependent).
+          example: 0.7
+      # Allow additional properties to be flexible, or set additionalProperties: false for strictness
+
+    McpConfigureResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        actions_performed:
+          type: array
+          items:
+            type: string
+        errors:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+  parameters:
+    XProviderHeader:
+      name: X-Provider
+      in: header
+      required: false
+      description: |-
+        Optional. Specifies an LLM provider (e.g., "gemini", "openai", "anthropic")
+        to use for this specific request, overriding the configured default.
+        The API key for this provider must be set in the environment.
+      schema:
+        type: string
+        enum: ["gemini", "openai", "anthropic"]
+
+paths:
+  /mcp/ask:
+    post:
+      tags:
+        - MCP - Ask
+      summary: Ask a question about the API or perform a healthcheck.
+      description: |-
+        Sends a natural language question to be answered by an LLM based on the API's
+        OpenAPI specification.
+        If the question is "healthcheck", it verifies the connectivity and configuration
+        of the determined LLM provider.
+      parameters:
+        - $ref: '#/components/parameters/XProviderHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpAskRequest'
+      responses:
+        '200':
+          description: Successful response for a question or healthcheck.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/McpAskResponse'
+                  - $ref: '#/components/schemas/McpHealthcheckResponse'
+        '400':
+          description: Bad Request (e.g., malformed payload, missing question, validation error for configure).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+        '503':
+          description: Service Unavailable (e.g., LLM service not configured correctly, missing API key).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+
+  /mcp/ask/configure:
+    get:
+      tags:
+        - MCP - Configure
+      summary: View current LLM configuration.
+      description: |-
+        Displays the effective current LLM configuration, which is a merge of
+        runtime settings from `llm_config.json` and initial defaults from
+        environment variables. Does NOT display API keys.
+      responses:
+        '200':
+          description: Effective LLM configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpEffectiveConfigResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+    post:
+      tags:
+        - MCP - Configure
+      summary: Set or update LLM runtime configurations.
+      description: |-
+        Allows setting the runtime default LLM provider and overriding model/temperature
+        settings for specific providers. Changes are saved to `llm_config.json`.
+        API Keys themselves are NOT configured here; they must be set as environment variables.
+        This endpoint should be secured in a production environment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpConfigureRequest'
+      responses:
+        '200':
+          description: LLM configuration updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpConfigureResponse'
+        '400':
+          description: Bad Request (e.g., invalid payload, validation error).
+          content:
+            application/json:
+              schema: # Could also point to McpConfigureResponse if errors are included there
+                $ref: '#/components/schemas/McpErrorResponse'
+        '500':
+          description: Internal Server Error (e.g., failed to save configuration).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
