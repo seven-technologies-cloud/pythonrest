@@ -9,18 +9,19 @@ class OpenAIService(LlmServiceBase):
     A service class to encapsulate interactions with the OpenAI API,
     adhering to the LlmServiceBase interface.
     """
-    DEFAULT_MODEL_NAME = "gpt-3.5-turbo" # A common and effective default
+    DEFAULT_MODEL_NAME = "gpt-3.5-turbo"
+    DEFAULT_TEMPERATURE = 0.7
 
-    def __init__(self, api_key: str, model_name: str = None):
+    def __init__(self, api_key: str, model_name: str = None, temperature: float = None):
         """
         Initializes the OpenAIService.
 
         Args:
             api_key (str): The OpenAI API key.
-            model_name (str, optional): The specific OpenAI model name to use.
-                                        Defaults to "gpt-3.5-turbo".
+            model_name (str, optional): The specific OpenAI model name to use. Defaults to "gpt-3.5-turbo".
+            temperature (float, optional): Sampling temperature. Defaults to self.DEFAULT_TEMPERATURE.
         Raises:
-            ValueError: If the API key is not provided.
+            ValueError: If the API key is not provided or temperature is invalid.
             RuntimeError: If initialization of the OpenAI client fails.
         """
         if not api_key:
@@ -30,14 +31,22 @@ class OpenAIService(LlmServiceBase):
         self.api_key = api_key
         self.model_name = model_name or self.DEFAULT_MODEL_NAME
 
+        if temperature is not None:
+            try:
+                self.temperature = float(temperature)
+                if not (0.0 <= self.temperature <= 2.0): # OpenAI typical range
+                     logger.warning(f"Temperature {self.temperature} for OpenAI is outside typical range (0.0-2.0). Using it anyway.")
+            except ValueError:
+                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default.")
+                self.temperature = self.DEFAULT_TEMPERATURE
+        else:
+            self.temperature = self.DEFAULT_TEMPERATURE
+
         try:
-            # The OpenAI library uses the OPENAI_API_KEY environment variable by default if api_key is not passed
-            # directly to the client constructor. Or, you can pass it explicitly.
-            # For clarity and consistency with other services, we'll pass it explicitly.
             self.client = openai.OpenAI(api_key=self.api_key)
-            logger.info(f"OpenAIService initialized successfully for model: {self.model_name}.")
+            logger.info(f"OpenAIService initialized: model='{self.model_name}', temperature={self.temperature}.")
         except Exception as e:
-            logger.error(f"Error during OpenAIService initialization (model: {self.model_name}): {e}", exc_info=True)
+            logger.error(f"Error during OpenAIService init (model: {self.model_name}): {e}", exc_info=True)
             raise RuntimeError(f"Failed to initialize OpenAI Service (model: {self.model_name}): {e}")
 
     def generate_text(self, prompt: str) -> str:
@@ -70,6 +79,8 @@ class OpenAIService(LlmServiceBase):
                     }
                 ],
                 model=self.model_name,
+                temperature=self.temperature,
+                # Add other parameters like max_tokens if needed
             )
             # Ensure there's a choice and a message with content
             if chat_completion.choices and chat_completion.choices[0].message and chat_completion.choices[0].message.content:

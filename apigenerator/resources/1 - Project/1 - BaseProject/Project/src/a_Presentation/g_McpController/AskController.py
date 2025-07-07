@@ -30,33 +30,41 @@ def ask_api_question():
     question = data['question']
 
     # --- Healthcheck Logic ---
+    # The healthcheck will test the provider determined by X-Provider header, or the configured default.
     if question.lower() == "healthcheck":
+        x_provider_header = request.headers.get('X-Provider')
+        provider_for_healthcheck = x_provider_header # Can be None
+
         try:
-            # LlmServiceFactory will check for LLM_PROVIDER and relevant API key
-            llm_service_instance = LlmServiceFactory.get_llm_service()
+            # LlmServiceFactory will use header if present, then runtime config, then env default provider
+            llm_service_instance = LlmServiceFactory.get_llm_service(x_provider_header=provider_for_healthcheck)
+            provider_name_checked = type(llm_service_instance).__name__.replace("Service", "")
+
             if llm_service_instance.check_connection():
-                logger.info(f"Healthcheck: {type(llm_service_instance).__name__} connection successful.")
-                return jsonify({"answer": "yes", "provider": type(llm_service_instance).__name__}), 200
+                logger.info(f"Healthcheck: {provider_name_checked} connection successful.")
+                return jsonify({"answer": "yes", "provider_checked": provider_name_checked}), 200
             else:
-                logger.warn(f"Healthcheck: {type(llm_service_instance).__name__} API connection test failed.")
-                return jsonify({"answer": "no", "reason": f"{type(llm_service_instance).__name__} API connection test failed"}), 200
+                logger.warn(f"Healthcheck: {provider_name_checked} API connection test failed.")
+                return jsonify({"answer": "no", "provider_checked": provider_name_checked, "reason": "API connection test failed"}), 200
         except ValueError as ve: # Catch configuration errors from LlmServiceFactory or service init
-            logger.error(f"Healthcheck: Configuration error: {ve}", exc_info=True)
-            # Return 200 as per original healthcheck spec, but indicate error in body
-            return jsonify({"answer": "no", "reason": f"Configuration error: {ve}"}), 200
+            logger.error(f"Healthcheck: Configuration error (Provider attempted: {provider_for_healthcheck or 'determined default'}): {ve}", exc_info=True)
+            return jsonify({"answer": "no", "provider_attempted": provider_for_healthcheck or 'determined default', "reason": f"Configuration error: {ve}"}), 200
         except RuntimeError as re: # Catch runtime errors from service init or check_connection
-            logger.error(f"Healthcheck: Runtime error with LLM service: {re}", exc_info=True)
-            return jsonify({"answer": "no", "reason": f"Runtime error with LLM service: {re}"}), 200
+            logger.error(f"Healthcheck: Runtime error with LLM service (Provider attempted: {provider_for_healthcheck or 'determined default'}): {re}", exc_info=True)
+            return jsonify({"answer": "no", "provider_attempted": provider_for_healthcheck or 'determined default', "reason": f"Runtime error with LLM service: {re}"}), 200
         except Exception as e: # Catch-all for unexpected errors
-            logger.error(f"Healthcheck: Unexpected error: {e}", exc_info=True)
-            return jsonify({"answer": "no", "reason": f"An unexpected error occurred during healthcheck: {e}"}), 200
+            logger.error(f"Healthcheck: Unexpected error (Provider attempted: {provider_for_healthcheck or 'determined default'}): {e}", exc_info=True)
+            return jsonify({"answer": "no", "provider_attempted": provider_for_healthcheck or 'determined default', "reason": f"An unexpected error: {e}"}), 200
 
     # --- Standard Question Logic ---
+    x_provider_header = request.headers.get('X-Provider')
     llm_service_instance: LlmServiceBase
     try:
-        llm_service_instance = LlmServiceFactory.get_llm_service()
+        # LlmServiceFactory handles X-Provider header, runtime config, and env defaults
+        llm_service_instance = LlmServiceFactory.get_llm_service(x_provider_header=x_provider_header)
+        logger.info(f"Using LLM provider: {type(llm_service_instance).__name__} for question.")
     except ValueError as ve: # Configuration error from factory
-        logger.error(f"LLM Service configuration error: {ve}", exc_info=True)
+        logger.error(f"LLM Service configuration error (X-Provider: {x_provider_header}): {ve}", exc_info=True)
         return jsonify({"error": f"LLM Service not configured correctly: {ve}"}), 503 # Service Unavailable
     except RuntimeError as re: # Service initialization error
         logger.error(f"LLM Service runtime error during initialization: {re}", exc_info=True)

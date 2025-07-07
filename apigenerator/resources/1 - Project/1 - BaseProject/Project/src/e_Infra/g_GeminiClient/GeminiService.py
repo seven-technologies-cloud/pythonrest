@@ -15,32 +15,49 @@ class GeminiService(LlmServiceBase):
     adhering to the LlmServiceBase interface.
     """
     DEFAULT_MODEL_NAME = 'gemini-pro'
+    DEFAULT_TEMPERATURE = 0.7 # A common default temperature
 
-    def __init__(self, api_key: str, model_name: str = None):
+    def __init__(self, api_key: str, model_name: str = None, temperature: float = None):
         """
         Initializes the GeminiService.
 
         Args:
             api_key (str): The Google Gemini API key.
-            model_name (str, optional): The specific Gemini model name to use.
-                                        Defaults to 'gemini-pro'.
+            model_name (str, optional): The specific Gemini model name to use. Defaults to 'gemini-pro'.
+            temperature (float, optional): Sampling temperature. Defaults to self.DEFAULT_TEMPERATURE.
         Raises:
-            ValueError: If the API key is not provided.
+            ValueError: If the API key is not provided or temperature is invalid.
             RuntimeError: If configuration of the genai client fails.
         """
         if not api_key:
             logger.error("API key not provided for GeminiService initialization.")
             raise ValueError("API key for Google Gemini must be provided.")
 
-        self.api_key = api_key # Store for potential re-configuration or logging if needed
+        self.api_key = api_key
         self.model_name = model_name or self.DEFAULT_MODEL_NAME
+
+        if temperature is not None:
+            try:
+                self.temperature = float(temperature)
+                if not (0.0 <= self.temperature <= 1.0): # Gemini typical range, can be up to 2.0 for some models
+                     logger.warning(f"Temperature {self.temperature} for Gemini is outside typical effective range (0.0-1.0). Using it anyway.")
+            except ValueError:
+                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default.")
+                self.temperature = self.DEFAULT_TEMPERATURE
+        else:
+            self.temperature = self.DEFAULT_TEMPERATURE
+
+        self.generation_config = genai.types.GenerationConfig(
+            temperature=self.temperature
+            # Add other generation parameters here if needed, e.g., top_p, top_k, max_output_tokens
+        )
 
         try:
             genai.configure(api_key=self.api_key)
             self.model = genai.GenerativeModel(self.model_name)
-            logger.info(f"GeminiService initialized and configured successfully with model: {self.model_name}.")
+            logger.info(f"GeminiService initialized: model='{self.model_name}', temperature={self.temperature}.")
         except Exception as e:
-            logger.error(f"Error during GeminiService initialization (model: {self.model_name}): {e}", exc_info=True)
+            logger.error(f"Error during GeminiService init (model: {self.model_name}): {e}", exc_info=True)
             raise RuntimeError(f"Failed to initialize Gemini Service (model: {self.model_name}): {e}")
 
     def generate_text(self, prompt: str) -> str:
@@ -61,11 +78,11 @@ class GeminiService(LlmServiceBase):
             return ""
 
         try:
-            response = self.model.generate_content(prompt)
-            # TODO: Add more sophisticated error handling for response.prompt_feedback if needed
-            # e.g., if response.prompt_feedback.block_reason:
-            # logger.error(f"Content generation blocked: {response.prompt_feedback.block_reason}")
-            # raise RuntimeError(f"Content generation blocked: {response.prompt_feedback.block_reason}")
+            response = self.model.generate_content(
+                prompt,
+                generation_config=self.generation_config
+            )
+            # TODO: Add more sophisticated error handling for response.prompt_feedback
             return response.text
         except Exception as e:
             logger.error(f"Error during Gemini text generation: {e}", exc_info=True)

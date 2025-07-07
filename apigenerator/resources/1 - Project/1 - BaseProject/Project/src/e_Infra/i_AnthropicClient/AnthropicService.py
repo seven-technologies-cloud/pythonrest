@@ -11,17 +11,18 @@ class AnthropicService(LlmServiceBase):
     """
     # Using a common, recent Haiku model as default. Update as new models become standard.
     DEFAULT_MODEL_NAME = "claude-3-haiku-20240307"
+    DEFAULT_TEMPERATURE = 0.7
 
-    def __init__(self, api_key: str, model_name: str = None):
+    def __init__(self, api_key: str, model_name: str = None, temperature: float = None):
         """
         Initializes the AnthropicService.
 
         Args:
             api_key (str): The Anthropic API key.
-            model_name (str, optional): The specific Anthropic model name to use.
-                                        Defaults to "claude-3-haiku-20240307".
+            model_name (str, optional): The specific Anthropic model name to use. Defaults to "claude-3-haiku-20240307".
+            temperature (float, optional): Sampling temperature. Defaults to self.DEFAULT_TEMPERATURE.
         Raises:
-            ValueError: If the API key is not provided.
+            ValueError: If the API key is not provided or temperature is invalid.
             RuntimeError: If initialization of the Anthropic client fails.
         """
         if not api_key:
@@ -31,11 +32,22 @@ class AnthropicService(LlmServiceBase):
         self.api_key = api_key
         self.model_name = model_name or self.DEFAULT_MODEL_NAME
 
+        if temperature is not None:
+            try:
+                self.temperature = float(temperature)
+                if not (0.0 <= self.temperature <= 1.0): # Anthropic typical range
+                     logger.warning(f"Temperature {self.temperature} for Anthropic is outside typical range (0.0-1.0). Using it anyway.")
+            except ValueError:
+                logger.error(f"Invalid temperature value '{temperature}'. Must be a float. Using default.")
+                self.temperature = self.DEFAULT_TEMPERATURE
+        else:
+            self.temperature = self.DEFAULT_TEMPERATURE
+
         try:
             self.client = anthropic.Anthropic(api_key=self.api_key)
-            logger.info(f"AnthropicService initialized successfully for model: {self.model_name}.")
+            logger.info(f"AnthropicService initialized: model='{self.model_name}', temperature={self.temperature}.")
         except Exception as e:
-            logger.error(f"Error during AnthropicService initialization (model: {self.model_name}): {e}", exc_info=True)
+            logger.error(f"Error during AnthropicService init (model: {self.model_name}): {e}", exc_info=True)
             raise RuntimeError(f"Failed to initialize Anthropic Service (model: {self.model_name}): {e}")
 
     def generate_text(self, prompt: str) -> str:
@@ -62,6 +74,7 @@ class AnthropicService(LlmServiceBase):
             message = self.client.messages.create(
                 model=self.model_name,
                 max_tokens=2048, # Adjust as needed, consider making configurable
+                temperature=self.temperature,
                 messages=[
                     {
                         "role": "user",
@@ -73,11 +86,12 @@ class AnthropicService(LlmServiceBase):
             if message.content and isinstance(message.content, list) and len(message.content) > 0:
                 # Assuming the first content block is of type 'text'
                 # You might want to iterate or check block types if more complex content is expected
+                # Also, ensure the text attribute exists, which it should for text blocks.
                 if hasattr(message.content[0], 'text'):
                     return message.content[0].text.strip()
-                else:
-                    logger.error("Anthropic API returned a content block without text.")
-                    raise RuntimeError("Anthropic API returned no text content in the first block.")
+                else: # Should not happen if content block is text type
+                    logger.error("Anthropic API returned a content block of unexpected type or without text.")
+                    raise RuntimeError("Anthropic API returned no text content in the expected block type.")
             else:
                 logger.error("Anthropic API returned an unexpected response structure or empty content.")
                 raise RuntimeError("Anthropic API returned no content.")
