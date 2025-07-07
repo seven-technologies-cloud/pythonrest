@@ -18,3 +18,4 @@ python-ulid==3.0.0
 flask-login==0.6.3
 WTForms==3.1.2
 marshmallow==3.26.1
+google-generativeai>=0.3
