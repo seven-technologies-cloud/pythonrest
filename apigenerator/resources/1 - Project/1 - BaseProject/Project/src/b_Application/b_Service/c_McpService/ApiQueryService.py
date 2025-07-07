@@ -59,28 +59,39 @@ class ApiQueryService:
             # If app.py is inside 'src', then current_app.root_path is '.../src', so we go up one level.
 
             # A common way for Flask apps: current_app.root_path is the app's root folder.
-            # If your app's main file (e.g. app.py) is at GeneratedProjectRoot/app.py, then current_app.root_path is GeneratedProjectRoot.
-            # If your app's main file is at GeneratedProjectRoot/src/app.py, then current_app.root_path is GeneratedProjectRoot/src.
-            # The template structure seems to have app.py at GeneratedProjectRoot/Project/app.py,
-            # and src at GeneratedProjectRoot/Project/src.
-            # And the target config is GeneratedProjectRoot/Project/config.
-            # So, if current_app.root_path is '.../Project/src', going up one level is '.../Project'.
-            # If current_app.root_path is '.../Project' (where app.py is), then it's fine.
-
-            # Let's assume current_app.root_path points to '.../Project/' directory where app.py resides.
-            # In this case, it's already the project root from which 'config/' and 'src/' are direct children.
+            # If your app's main file (e.g. app.py) is at GeneratedProjectRoot/Project/app.py, then current_app.root_path is '.../Project/'.
+            # The 'config' directory is expected to be a direct child of this path.
             project_root = current_app.root_path
-            # If app.py is inside src, then project_root = os.path.abspath(os.path.join(current_app.root_path, ".."))
-            # Based on apigenerator/resources/1 - Project/1 - BaseProject/Project/app.py, app.py is at the Project/ level.
-            logger.info(f"Using Flask app context. current_app.root_path: {current_app.root_path}")
-            return project_root
+            logger.info(f"Attempting to use current_app.root_path: {project_root}")
+            # Verification: Check if 'config' and 'src' are plausible from this root_path
+            # This is a sanity check, actual file/dir existence is checked later.
+            if os.path.isdir(os.path.join(project_root, "src")) or os.path.isdir(os.path.join(project_root, PROJECT_ROOT_CONFIG_SWAGGER_DIR)):
+                logger.info(f"Using current_app.root_path as project_root: {project_root}")
+                return project_root
+            else:
+                # This case might occur if current_app.root_path is, for example, an 'instance' folder
+                # or deep inside 'src'. We try to go up one level.
+                project_root_adjusted = os.path.abspath(os.path.join(project_root, ".."))
+                logger.warning(f"current_app.root_path ({project_root}) does not seem to be the project root. Trying its parent: {project_root_adjusted}")
+                # Add a more specific check if this adjusted path is likely the project root
+                if os.path.isdir(os.path.join(project_root_adjusted, "src")) and os.path.isdir(os.path.join(project_root_adjusted, PROJECT_ROOT_CONFIG_SWAGGER_DIR)):
+                    logger.info(f"Using adjusted project_root (parent of current_app.root_path): {project_root_adjusted}")
+                    return project_root_adjusted
+                # If still not found, we'll fall through to the general fallback, which is risky.
+                logger.error(f"Could not confidently determine project root from current_app.root_path: {project_root}. Proceeding to fallback, but this may be unreliable.")
+                # Fall through to the broader fallback if adjustment doesn't work.
 
         except RuntimeError: # Outside of application context
-            # Fallback: assumes this file is at src/b_Application/b_Service/c_McpService/ApiQueryService.py
-            # Go up 5 levels to reach GeneratedProjectRoot/
-            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", ".."))
-            logger.warning(f"Flask current_app not available. Using inferred project_root: {project_root}. Ensure this correctly points to the generated API's root directory.")
-            return project_root
+            logger.warning("Flask current_app not available. Using fallback path determination.")
+            pass # Fall through to the next determination method
+
+        # Fallback path determination if Flask context is not available or didn't yield a good root
+        # Assumes ApiQueryService.py is at YourProjectRoot/src/b_Application/b_Service/c_McpService/ApiQueryService.py
+        # We want to go up 4 levels to YourProjectRoot/ (which is .../Project/ in the template structure)
+        current_file_dir = os.path.abspath(os.path.dirname(__file__))
+        project_root = os.path.abspath(os.path.join(current_file_dir, "..", "..", "..", ".."))
+        logger.info(f"Determined project_root via fallback: {project_root}")
+        return project_root
 
 
     def _load_and_parse_openapi_specs(self):
