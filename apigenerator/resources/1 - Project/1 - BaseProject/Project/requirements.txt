@@ -21,3 +21,9 @@ marshmallow==3.26.1
 google-generativeai>=0.3
 openai>=1.0
 anthropic>=0.20
+# Langchain and LangGraph dependencies for MCP Agent
+langchain-core>=0.1.0
+langchain-google-genai>=0.1.0
+langchain-openai>=0.1.0
+langchain-anthropic>=0.1.0
+langgraph>=0.0.30
