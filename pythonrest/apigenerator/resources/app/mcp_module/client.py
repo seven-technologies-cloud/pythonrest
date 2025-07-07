@@ -75,6 +75,28 @@ class MCPClient:
             print(f"Error interacting with Gemini API: {e}")
             return "Sorry, I encountered an error trying to answer your question."
 
+    def check_gemini_connection(self) -> bool:
+        """
+        Performs a lightweight check to see if the configured Gemini API key
+        is valid and can connect to the Gemini service.
+
+        Returns:
+            bool: True if the connection and a simple API call succeed, False otherwise.
+        """
+        try:
+            # Listing models is a lightweight way to check API key validity and connectivity.
+            models = genai.list_models()
+            # Check if 'gemini-pro' (or any model) is in the list of available models
+            # This step is optional but confirms the service is behaving as expected.
+            # For simplicity, just checking if the list operation succeeded is enough.
+            # Example: if any(m.name == 'models/gemini-pro' for m in models):
+            #    return True
+            # return False
+            return True # If list_models() didn't raise an exception, connection is likely fine.
+        except Exception as e:
+            print(f"Gemini API connection check failed: {e}")
+            return False
+
 # Example usage (for testing purposes, not part of the Flask app directly here):
 if __name__ == '__main__':
     # This part would not be run by the Flask app.
