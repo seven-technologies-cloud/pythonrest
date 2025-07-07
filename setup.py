@@ -33,7 +33,7 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.3.4',
+    version='0.3.5',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
     long_description=(
         "# PythonREST\n\n"
@@ -82,7 +82,7 @@ setup(
         "**Version 0.3.4**\n"
         "* Fix CORS issue by properly configuration of after request decorator function.\n\n"
         "**Version 0.3.5**\n"
-        "* Synchronization between the versions of your package on PyPI and the releases on GitHub.\n"
+        "* Synchronization between the versions on PyPI and the releases on GitHub.\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
