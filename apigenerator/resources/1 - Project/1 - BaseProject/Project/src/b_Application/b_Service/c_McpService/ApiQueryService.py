@@ -7,9 +7,12 @@ import collections.abc # For deep_merge_dicts type check
 from flask import current_app # To get app root path for finding swagger files
 
 from src.e_Infra.g_McpInfra import LlmServiceBase
-from src.e_Infra.CustomVariables import SWAGGER_FILES_DIR # Using the conventional directory
+# SWAGGER_FILES_DIR is no longer in CustomVariables, it's a fixed path now.
 
 logger = logging.getLogger(__name__)
+
+# Fixed conventional path relative to the generated project root
+PYTHONRESTAPI_CONFIG_SWAGGER_DIR = "PythonRestAPI/config/"
 
 def deep_merge_dicts(source, destination):
     """
@@ -76,20 +79,23 @@ class ApiQueryService:
             base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
             logger.warning(f"Flask current_app not available. Using inferred base_path: {base_path} for Swagger files. Ensure this is correct.")
 
-        swagger_dir_path = os.path.join(base_path, SWAGGER_FILES_DIR)
+        # Use the new fixed path and scan recursively
+        swagger_base_dir_path = os.path.join(base_path, PYTHONRESTAPI_CONFIG_SWAGGER_DIR)
 
-        logger.info(f"Scanning for Swagger YAML files in: {swagger_dir_path}")
+        logger.info(f"Scanning for Swagger YAML files recursively in: {swagger_base_dir_path}")
 
         yaml_files = []
-        yaml_files.extend(glob.glob(os.path.join(swagger_dir_path, "*.yaml")))
-        yaml_files.extend(glob.glob(os.path.join(swagger_dir_path, "*.yml")))
+        for root, _, files in os.walk(swagger_base_dir_path):
+            for file in files:
+                if file.endswith((".yaml", ".yml")):
+                    yaml_files.append(os.path.join(root, file))
 
         if not yaml_files:
-            logger.error(f"No Swagger YAML files found in {swagger_dir_path}. Cannot build API specification.")
+            logger.error(f"No Swagger YAML files found in {swagger_base_dir_path} or its subdirectories. Cannot build API specification.")
             self.api_spec = { # Provide a minimal valid spec to prevent downstream errors
                 "openapi": "3.0.0",
                 "info": {"title": "Error: No API Specification Found", "version": "0.0.0",
-                         "description": f"No Swagger/OpenAPI YAML files were found in the expected directory: {swagger_dir_path}"},
+                         "description": f"No Swagger/OpenAPI YAML files were found in the expected directory: {swagger_base_dir_path} (and subdirectories)"},
                 "paths": {},
                 "components": {}
             }
