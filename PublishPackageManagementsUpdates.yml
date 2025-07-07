@@ -1,9 +1,4 @@
-# trigger:
-  # branches:
-    # include:
-    #  - main
-trigger: none
-pr:
+trigger:
   branches:
     include:
       - main
@@ -12,23 +7,15 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: pythonrest-cli # This group likely contains pip_api_key, pypi_app_name
-# GITHUB_REPO_OWNER and GITHUB_REPO_NAME will now be determined dynamically.
-# These can be kept as fallbacks or for reference, but the script will prioritize dynamic values.
-# - name: GITHUB_REPO_OWNER
-#   value: 'your-github-username-or-org' # Fallback or reference
-# - name: GITHUB_REPO_NAME
-#   value: 'pythonrest' # Fallback or reference
-# GITHUB_TOKEN will be a secret variable, configured in Azure DevOps UI
+- group: pythonrest-cli
 
 jobs:
-- job: ExtractVersion
-  displayName: '1. Extract Version & Prepare Files'
+- job: CheckPypiVersionBeforePublishing
+  displayName: Version Check to publish or not
   pool:
     vmImage: ubuntu-latest
   steps:
-  - checkout: self # Checks out the repository
-    persistCredentials: true # Important for git operations if needed later, and for commit sha
+  - checkout: self
   - script: |
       # Ensure we have full commit history in the CI environment
       git fetch --all --unshallow
@@ -36,16 +23,16 @@ jobs:
       # Find the last non-merge commit before the merge commit (PR source commit)
       last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
 
-      if [[ $last_commit_message =~ version\ ?([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-        extracted_version="${BASH_REMATCH[1]}"
+      if [[ $last_commit_message =~ version\ ?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        extracted_version="${BASH_REMATCH[0]//version/}"
         echo "Extracted version: $extracted_version"
-        # Set the output variable for this job, accessible by other jobs in the same stage
-        echo "##vso[task.setvariable variable=packageVersion;isOutput=true]$extracted_version"
       else
-        echo "Error: The commit message does not contain a valid version format (version X.X.X)."
+        echo "Error: The commit message does not contain a valid version format (versionX.X.X)."
         echo "Last commit message: $last_commit_message"
         exit 1
       fi
+
+      echo "##vso[task.setvariable variable=packageVersion;isOutput=true]$extracted_version"
 
       sed -i "s/version='[0-9]\+\.[0-9]\+\.[0-9]\+'$/version='$extracted_version'/" ./setup.py
       sed -i "s/pythonrest_version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/pythonrest_version = \"$extracted_version\"/" ./pythonrest.py
@@ -54,9 +41,24 @@ jobs:
       
       grep "version=" ./setup.py
       grep "pythonrest_version" ./pythonrest.py
-    name: VersionExtractionStep # Step name to reference its output variable
+  - script: |
+      latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null)
+      echo "Latest version on PyPI: $latest_version"
 
-- job: CreateGitHubRelease
+      local_version=$(python3 setup.py --version)
+      echo "Local version in setup.py: $local_version"
+
+      if [ "$latest_version" != "$local_version" ]; then
+        echo "Versions are different. Uploading to PyPI."
+        pip3 install -U packaging==24.2
+        pip3 install twine==6.1.0
+        python3 setup.py sdist
+        python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
+      else
+        echo "Versions are the same. Skipping PyPI upload."
+      fi
+
+  - job: CreateGitHubRelease
   displayName: '2. Create GitHub Release'
   dependsOn: ExtractVersion
   pool:
@@ -64,7 +66,7 @@ jobs:
   variables:
     # Map the output variable from ExtractVersion job to a local variable in this job
     # RELEASE_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
-    RELEASE_VERSION:
+    RELEASE_VERSION: v0.3.7
     # GITHUB_TOKEN should be a secret pipeline variable (e.g., from a variable group or configured in UI)
     # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are defined at the pipeline level or can be overridden here/passed from group
   steps:
@@ -79,6 +81,18 @@ jobs:
 
       echo "--- GitHub Release Script ---"
       echo "Version from previous job: $(RELEASE_VERSION)"
+      
+      # Debug: Check if GITHUB_TOKEN is available (without revealing the actual token)
+      if [ -n "$GITHUB_TOKEN" ]; then
+        echo "GITHUB_TOKEN is available (length: ${#GITHUB_TOKEN})"
+      else
+        echo "WARNING: GITHUB_TOKEN is not available or empty"
+      fi
+      
+      # Get the commit message for the release body
+      git fetch --all --unshallow
+      last_commit_message=$(git log -1 --pretty=%s $(git rev-list --no-merges -n 1 HEAD))
+      echo "Last commit message: $last_commit_message"
 
       # --- Determine Repository Owner and Name Dynamically ---
       REPO_FULL_NAME="$(Build.Repository.Name)" # e.g., "your-username/pythonrest"
@@ -96,25 +110,19 @@ jobs:
       fi
 
       # --- Configuration (TEMPORARY FOR MANUAL TESTING) ---
-      # Comment out or remove these lines:
-      # TAG_NAME="v$(RELEASE_VERSION)"
-      # RELEASE_NAME="Version $(RELEASE_VERSION)"
-      # RELEASE_BODY="Release of version $(RELEASE_VERSION)."
-
-      # Add these lines for manual testing:
-      TEST_VERSION="test-release-0.0.1"  # <<< CHANGE THIS FOR EACH TEST RUN
-      TAG_NAME="v${TEST_VERSION}"
-      RELEASE_NAME="Test Release ${TEST_VERSION}"
-      RELEASE_BODY="This is a manual test release for version ${TEST_VERSION}."
+      # Using dynamic version from previous job for testing
+      TAG_NAME="v$(RELEASE_VERSION)-test"
+      RELEASE_NAME="Test Release $(RELEASE_VERSION)"
+      RELEASE_BODY="This is a test release for version $(RELEASE_VERSION) generated from commit: $last_commit_message"
 
       # Consider these for safer testing:
-      IS_DRAFT="true"        # Creates a draft release on GitHub (not public)
-      IS_PRERELEASE="true"   # Marks it as a pre-release
+      IS_DRAFT="false"        # Creates a draft release on GitHub (not public)
+      IS_PRERELEASE="false"   # Marks it as a pre-release
       # --- End of Temporary Configuration ---
 
 
       # --- Validate Inputs ---
-      if [ -z "$(GITHUB_TOKEN)" ]; then # Check Azure DevOps variable syntax for GITHUB_TOKEN
+      if [ -z "$GITHUB_TOKEN" ]; then # Check bash environment variable for GITHUB_TOKEN
         echo "Error: GITHUB_TOKEN is not set or not available as a secret."
         exit 1
       fi
@@ -126,8 +134,8 @@ jobs:
         echo "Error: DYNAMIC_GITHUB_REPO_NAME could not be determined."
         exit 1
       fi
-      if [ -z "$(RELEASE_VERSION)" ]; then
-        echo "Error: RELEASE_VERSION is not set (should come from previous job)."
+      if [ -z "$VERSION" ]; then # Check bash environment variable for VERSION
+        echo "Error: VERSION is not set (should come from previous job)."
         exit 1
       fi
 
@@ -162,7 +170,7 @@ jobs:
       response=$(curl -s -w "%{http_code}" \
         -X POST \
         -H "Accept: application/vnd.github.v3+json" \
-        -H "Authorization: token $(GITHUB_TOKEN)" \
+        -H "Authorization: token $GITHUB_TOKEN" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
         -H "Content-Type: application/json" \
         -d "${JSON_PAYLOAD}" \
@@ -196,58 +204,59 @@ jobs:
       GITHUB_TOKEN: $(GITHUB_TOKEN) # $(GITHUB_TOKEN) is the ADO way to reference the secret
       # GITHUB_REPO_OWNER and GITHUB_REPO_NAME are now determined dynamically within the script
       VERSION: $(RELEASE_VERSION) # Pass the version to the script's expected VERSION env var
-
-- job: PublishToPyPi
-  displayName: '3. Publish to PyPI'
-  dependsOn: CreateGitHubRelease # Depends on the GitHub Release job
-  pool:
-    vmImage: ubuntu-latest
-  variables:
-    # Map the output variable from ExtractVersion job
-    LOCAL_SETUP_VERSION: $[ dependencies.ExtractVersion.outputs['VersionExtractionStep.packageVersion'] ]
-  steps:
-  - checkout: self # Need to checkout again to have setup.py and pythonrest.py (which were modified in ExtractVersion)
-                  # If ExtractVersion published artifacts, this job could download them instead.
-                  # For simplicity, checking out again is fine if modifications are idempotent or source is clean.
-                  # The files modified (setup.py, pythonrest.py) are part of the repo, so checkout brings them.
-                  # We need to ensure the file modifications from ExtractVersion are present.
-                  # A better way would be to pass setup.py and pythonrest.py as artifacts.
-                  # For now, re-running the sed commands to ensure file state if checkout is clean.
-  - script: |
-      echo "Ensuring setup.py and pythonrest.py are updated with version $(LOCAL_SETUP_VERSION)..."
-      sed -i "s/version='[0-9]\+\.[0-9]\+\.[0-9]\+'$/version='$(LOCAL_SETUP_VERSION)'/" ./setup.py
-      sed -i "s/pythonrest_version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/pythonrest_version = \"$(LOCAL_SETUP_VERSION)\"/" ./pythonrest.py
-
-      echo "Updated setup.py and pythonrest.py version to $(LOCAL_SETUP_VERSION) for PyPI job."
-      grep "version=" ./setup.py
-      grep "pythonrest_version" ./pythonrest.py
-
-      # The rest of the original PyPI publishing script
-      latest_version=$(curl -s https://pypi.org/pypi/$(pypi_app_name)/json | jq -r '.info.version' 2>/dev/null || echo "0.0.0")
-      echo "Latest version on PyPI: $latest_version"
-
-      # local_version variable is now LOCAL_SETUP_VERSION from the previous job
-      echo "Local version for setup.py (from previous job): $(LOCAL_SETUP_VERSION)"
-
-      if [ "$latest_version" != "$(LOCAL_SETUP_VERSION)" ]; then
-        echo "Versions are different. Uploading to PyPI."
-        pip3 install --upgrade pip
-        pip3 install --upgrade packaging twine setuptools wheel
-        python3 setup.py sdist bdist_wheel # Build both sdist and wheel
-        python3 -m twine upload dist/* --username __token__ --password $(pip_api_key)
-      else
-        echo "Versions are the same ($(LOCAL_SETUP_VERSION)). Skipping PyPI upload."
-      fi
-    displayName: 'Check Version and Publish to PyPI'
-    env:
       # Map necessary variables from variable group 'pythonrest-cli'
       pypi_app_name: $(pypi_app_name)
       pip_api_key: $(pip_api_key)
 
-# Commented out Chocolatey jobs for brevity, assuming they are not directly affected by this change
 # - job: CheckChocoCLIVersion
-#   ...
+#   displayName: 'Check Choco CLI version'
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   variables:
+#     NEEDS_MANUAL_APPROVAL: $[eq(variables['choco_cli_version'], variables['nuspecVersion'])]
+#   steps:
+#   - bash: |
+#       source .env
+
+#       nuspecVersion=$(grep -m 1 '<version>' $(app_name).nuspec | sed -n 's/.*<version>\(.*\)<\/version>.*/\1/p')
+#       cliVersion="$CLI_VERSION"
+
+#       if [ "$cliVersion" != "$nuspecVersion" ]; then
+#           echo "Value for variable choco_cli_version = '$CLI_VERSION' does not match the one in .nuspec file: nuspec_version."
+#           exit 1
+#       fi
+
+#       echo "The versions match. Proceeding to Manual Approval..."
+#     displayName: 'Verify Choco CLI Version'
+
 # - job: manual_approval
-#   ...
+#   dependsOn: CheckChocoCLIVersion
+#   displayName: Manual Approval
+#   pool: server
+#   steps:
+#   - task: ManualValidation@0
+#     timeoutInMinutes: 1440
+#     inputs:
+#       notifyUsers: ${{ parameters.USERS_EMAILS_TO_NOTIFY }}
+#       instructions: "Are you sure you want to update the CLI version? A new package will be generated and will be sent to Chocolatey's approval process."
+#       onTimeout: "reject"
+
 # - job: PublishPackageToChocolatey
-#   ...
+#   dependsOn: manual_approval
+#   displayName: 'Publish Package to Chocolatey'
+#   pool:
+#     vmImage: 'windows-latest'
+#   steps: 
+#   - powershell: |
+#       pip install pyinstaller
+#       pyinstaller $(app_name).spec
+
+#       $sha256Hash = Get-FileHash -Path "./dist/$(app_name).exe" -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+#       $md5Hash = Get-FileHash "./dist/$(app_name).exe" -Algorithm MD5 | Select-Object -ExpandProperty Hash
+
+#       $verificationPath = "./tools/VERIFICATION.txt"
+#       (Get-Content -Path $verificationPath) -replace 'MD5: .+', "MD5: $md5Hash" -replace 'SHA-256: .+', "SHA-256: $sha256Hash" | Set-Content -Path $verificationPath
+
+#       choco pack
+#       choco push $(app_name).$(choco_cli_version).nupkg -s https://chocolatey.org/ --api-key $(choco_api_key)
+#     displayName: 'Continue After Manual Approval'
