@@ -1,221 +1,136 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify # current_app no longer needed here directly
 import logging
+from typing import List # For type hinting BaseMessage list
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage, SystemMessage
 
-# Assuming CustomVariables are directly importable from src.e_Infra
-# Adjust the import path if your project structure resolves it differently at runtime
-# OPENAPI_SPEC_PATH is no longer used here as ApiQueryService handles spec discovery internally.
-# from src.e_Infra.CustomVariables import OPENAPI_SPEC_PATH
-# LlmServiceFactory and LlmServiceBase are now re-exported by g_McpInfra's __init__
-from src.e_Infra.g_McpInfra import LlmServiceFactory, LlmServiceBase
-from src.b_Application.b_Service.c_McpService.ApiQueryService import ApiQueryService
+# Import the new McpAgentService and ModelLoader (for healthcheck)
+from src.b_Application.b_Service.c_McpService.McpAgentService import McpAgentService
+from src.e_Infra.g_McpModels.ModelLoader import load_model, CURRENT_CONFIGURED_MODEL_NAME
+from src.e_Infra.g_Environment.EnvironmentVariables import SELECTED_LLM_PROVIDER, BASE_URL, ENDPOINTS
 
-# Configure logging for this module
+
 logger = logging.getLogger(__name__)
-
-# Define the Blueprint
-# The URL prefix can be defined here or when registering the blueprint in app.py
-# For example, if registered with url_prefix='/mcp', this route '/ask' becomes '/mcp/ask'
 ask_bp = Blueprint('ask_bp', __name__)
 
+# Initialize service instance once, potentially.
+# However, if its internal state (like agent or context) could become stale or
+# if it's very lightweight to instantiate, creating per request is also an option.
+# For an agent that might load specs or models, once per app context or on first use is better.
+# Let's try lazy instantiation on first request for now.
+mcp_agent_service_instance: McpAgentService = None
+
+def get_mcp_agent_service():
+    global mcp_agent_service_instance
+    if mcp_agent_service_instance is None:
+        logger.info("First request to /mcp/ask, initializing McpAgentService...")
+        try:
+            mcp_agent_service_instance = McpAgentService()
+            logger.info("McpAgentService initialized successfully.")
+        except Exception as e:
+            logger.critical(f"Failed to initialize McpAgentService during first use: {e}", exc_info=True)
+            mcp_agent_service_instance = None # Ensure it remains None if init fails
+            raise # Re-raise to signal critical failure at controller level
+    return mcp_agent_service_instance
+
 @ask_bp.route('/ask', methods=['POST'])
-def ask_api_question():
+def ask_mcp_agent():
     """
-    Handles natural language questions about the API.
-    Also provides a healthcheck for the Gemini API connection.
+    Handles natural language questions using the MCP Agent.
+    Also provides a healthcheck for the configured LLM model initialization.
     """
     data = request.get_json()
     if not data or 'question' not in data:
-        logger.warn("'/ask' endpoint called with missing 'question' in payload.")
+        logger.warning("'/ask' endpoint called with missing 'question' in payload.")
         return jsonify({"error": "Missing 'question' in request payload"}), 400
 
-    question = data['question']
+    question_text = data['question']
 
     # --- Healthcheck Logic ---
-    # The healthcheck will test the provider determined by X-Provider header, or the configured default.
-    if question.lower() == "healthcheck":
-        x_provider_header = request.headers.get('X-Provider')
-        provider_for_healthcheck = x_provider_header # Can be None
-
+    if question_text.lower() == "healthcheck":
+        logger.info("Healthcheck requested for /mcp/ask.")
+        # Try to load the model as a basic health indicator for the selected provider
+        # This also implicitly checks if API key is valid (or not a placeholder)
+        # and if BASE_URL/ENDPOINTS are set (as McpAgentService init might use them for tool context).
+        provider_to_check = SELECTED_LLM_PROVIDER # From EnvironmentVariables
+        model_to_check = None
+        status = "no"
+        reason = ""
         try:
-            # LlmServiceFactory will use header if present, then runtime config, then env default provider
-            llm_service_instance = LlmServiceFactory.get_llm_service(x_provider_header=provider_for_healthcheck)
-            provider_name_checked = type(llm_service_instance).__name__.replace("Service", "")
+            # Attempt to get service, which initializes model and tools context
+            service_for_healthcheck = get_mcp_agent_service() # This will try to init the agent
+            if service_for_healthcheck and service_for_healthcheck.llm: # Check if LLM loaded
+                 # The tools also need valid context (BASE_URL, ENDPOINTS)
+                if not service_for_healthcheck.context.get("base_url") or not service_for_healthcheck.context.get("endpoints"):
+                    reason = "BASE_URL or ENDPOINTS not configured for tools."
+                    logger.warning(f"Healthcheck: {reason}")
+                else:
+                    # A more thorough healthcheck for the agent might try a dummy invoke or check tools.
+                    # For now, successful McpAgentService init (which loads model and prepares tools) is a good sign.
+                    status = "yes"
+                    reason = f"McpAgentService initialized successfully with {provider_to_check}."
+                    logger.info(f"Healthcheck: {reason}")
+            else: # Should not happen if get_mcp_agent_service raises on failure
+                reason = f"LLM for provider '{provider_to_check}' (model: {CURRENT_CONFIGURED_MODEL_NAME or 'Unknown'}) failed to initialize properly."
+                logger.warning(f"Healthcheck: {reason}")
 
-            if llm_service_instance.check_connection():
-                logger.info(f"Healthcheck: {provider_name_checked} connection successful.")
-                return jsonify({"answer": "yes", "provider_checked": provider_name_checked}), 200
-            else:
-                logger.warn(f"Healthcheck: {provider_name_checked} API connection test failed.")
-                return jsonify({"answer": "no", "provider_checked": provider_name_checked, "reason": "API connection test failed"}), 200
-        except ValueError as ve: # Catch configuration errors from LlmServiceFactory or service init
-            logger.error(f"Healthcheck: Configuration error (Provider attempted: {provider_for_healthcheck or 'determined default'}): {ve}", exc_info=True)
-            return jsonify({"answer": "no", "provider_attempted": provider_for_healthcheck or 'determined default', "reason": f"Configuration error: {ve}"}), 200
-        except RuntimeError as re: # Catch runtime errors from service init or check_connection
-            logger.error(f"Healthcheck: Runtime error with LLM service (Provider attempted: {provider_for_healthcheck or 'determined default'}): {re}", exc_info=True)
-            return jsonify({"answer": "no", "provider_attempted": provider_for_healthcheck or 'determined default', "reason": f"Runtime error with LLM service: {re}"}), 200
-        except Exception as e: # Catch-all for unexpected errors
-            logger.error(f"Healthcheck: Unexpected error (Provider attempted: {provider_for_healthcheck or 'determined default'}): {e}", exc_info=True)
-            return jsonify({"answer": "no", "provider_attempted": provider_for_healthcheck or 'determined default', "reason": f"An unexpected error: {e}"}), 200
+        except ValueError as ve: # Config errors from ModelLoader or McpAgentService init
+            logger.error(f"Healthcheck: Configuration error for provider '{provider_to_check}': {ve}", exc_info=True)
+            reason = f"Configuration error for {provider_to_check}: {ve}"
+        except RuntimeError as re: # Critical errors during service/agent init
+            logger.error(f"Healthcheck: Runtime error initializing service for '{provider_to_check}': {re}", exc_info=True)
+            reason = f"Runtime error initializing service for {provider_to_check}: {re}"
+        except Exception as e:
+            logger.error(f"Healthcheck: Unexpected error for provider '{provider_to_check}': {e}", exc_info=True)
+            reason = f"An unexpected error occurred: {str(e)}"
+
+        return jsonify({
+            "answer": status,
+            "provider_checked": provider_to_check,
+            "model_configured": CURRENT_CONFIGURED_MODEL_NAME if status == "yes" else "N/A due to error",
+            "reason": reason if status == "no" else "OK"
+        }), 200
 
     # --- Standard Question Logic ---
-    x_provider_header = request.headers.get('X-Provider')
-    llm_service_instance: LlmServiceBase
-    try:
-        # LlmServiceFactory handles X-Provider header, runtime config, and env defaults
-        llm_service_instance = LlmServiceFactory.get_llm_service(x_provider_header=x_provider_header)
-        logger.info(f"Using LLM provider: {type(llm_service_instance).__name__} for question.")
-    except ValueError as ve: # Configuration error from factory
-        logger.error(f"LLM Service configuration error (X-Provider: {x_provider_header}): {ve}", exc_info=True)
-        return jsonify({"error": f"LLM Service not configured correctly: {ve}"}), 503 # Service Unavailable
-    except RuntimeError as re: # Service initialization error
-        logger.error(f"LLM Service runtime error during initialization: {re}", exc_info=True)
-        return jsonify({"error": f"LLM Service initialization failed: {re}"}), 503
-    except Exception as e: # Other unexpected errors from factory
-        logger.error(f"Unexpected error getting LLM service: {e}", exc_info=True)
-        return jsonify({"error": f"Unexpected error configuring LLM service: {e}"}), 500
+    # For now, we'll use a stateless approach for history per request.
+    # A more advanced version would use Flask sessions or a DB to maintain history.
+    # The SystemMessage is part of the agent built by McpAgentService.
 
-    # The OPENAPI_SPEC_PATH check is removed as ApiQueryService handles its own spec discovery.
-    # ApiQueryService will raise FileNotFoundError or other errors if it cannot load specs,
-    # which will be caught by the generic try-except block below.
+    history: List[BaseMessage] = [HumanMessage(content=question_text)]
 
     try:
-        # ApiQueryService now only takes the llm_service_instance
-        api_query_service = ApiQueryService(
-            llm_service=llm_service_instance
-        )
+        service = get_mcp_agent_service()
+        if not service: # Should have been caught by healthcheck's attempt or raised earlier
+             return jsonify({"error": "MCP Agent Service is not available due to initialization errors."}), 503
 
-        answer = api_query_service.answer_api_question(question)
-        return jsonify({"answer": answer}), 200
+        response_messages = service.process_message(history)
 
-    except FileNotFoundError as fnfe: # This might be raised by ApiQueryService if no specs are found
-        logger.error(f"OpenAPI spec file(s) not found by ApiQueryService: {fnfe}", exc_info=True)
-        # Provide a more generic message as the exact path is internal to ApiQueryService now
-        return jsonify({"error": "API Specification file(s) not found or not accessible."}), 503
-    except ValueError as ve: # Could be from LLM service init or ApiQueryService logic
-        logger.error(f"Configuration or input error: {ve}", exc_info=True)
-        return jsonify({"error": f"Invalid configuration or input: {ve}"}), 400
-    except RuntimeError as re: # Errors from GeminiService or ApiQueryService during operation
-        logger.error(f"Service runtime error: {re}", exc_info=True)
-        return jsonify({"error": f"An error occurred while processing your question: {re}"}), 500
+        ai_reply = "Sorry, I couldn't generate a response." # Default if no AIMessage found
+        if response_messages:
+            # Find the last AIMessage in the response
+            for msg in reversed(response_messages):
+                if isinstance(msg, AIMessage):
+                    ai_reply = msg.content
+                    break
+
+        return jsonify({"answer": ai_reply}), 200
+
+    except ValueError as ve: # Config errors if somehow not caught by healthcheck logic / first use
+        logger.error(f"LLM Service configuration error for question processing: {ve}", exc_info=True)
+        return jsonify({"error": f"LLM Service not configured correctly: {ve}"}), 503
+    except RuntimeError as re: # Errors from McpAgentService initialization or processing
+        logger.error(f"MCP Agent Service runtime error: {re}", exc_info=True)
+        return jsonify({"error": f"An error occurred while processing your question with the agent: {re}"}), 500
     except Exception as e:
         logger.error(f"Unexpected error in /ask endpoint: {e}", exc_info=True)
         return jsonify({"error": "An unexpected internal error occurred."}), 500
 
+# Configuration routes are removed as per the new design focusing on env vars.
+# The old /ask/configure GET and POST functions are deleted.
+
 # Note on imports:
-# The paths like `from src.e_Infra.CustomVariables ...` assume that when the Flask app runs,
-# the 'src' directory (or its parent 'Project') is in PYTHONPATH or recognized as the root package.
-# This is a common setup for Flask projects structured this way.
-# If issues arise at runtime, these import paths might need adjustment based on how the
-# generated app's execution environment is configured.
-
-
-# --- Configuration Routes ---
-# LlmConfigManager is now re-exported by g_McpInfra's __init__
-from src.e_Infra.g_McpInfra import LlmConfigManager
-
-# Note: No explicit security is added to these configuration endpoints as per user instruction.
-# In a production environment, these should be appropriately secured.
-
-@ask_bp.route('/ask/configure', methods=['GET'])
-def get_llm_configuration():
-    """
-    Displays the effective current LLM configuration, merging runtime settings
-    from llm_config.json with environment variable defaults.
-    Does NOT display API keys.
-    """
-    try:
-        manager = LlmConfigManager()
-        effective_config = manager.get_effective_config()
-        return jsonify(effective_config), 200
-    except Exception as e:
-        logger.error(f"Error getting LLM configuration: {e}", exc_info=True)
-        return jsonify({"error": "Failed to retrieve LLM configuration", "details": str(e)}), 500
-
-@ask_bp.route('/ask/configure', methods=['POST'])
-def set_llm_configuration():
-    """
-    Sets LLM runtime configurations.
-    Payload can specify:
-    - "set_runtime_default_provider": "provider_name" (e.g., "gemini", "openai", "anthropic")
-    - "update_provider_settings": {
-          "provider_name": { (e.g., "openai")
-              "model": "model_string",
-              "temperature": float_value,
-              "max_output_tokens": int_value
-          }
-      }
-    - "clear_provider_settings": "provider_name"
-    - "clear_all_runtime_settings": true
-    API Keys are NOT configured here; they must be set as environment variables.
-    """
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid JSON payload"}), 400
-
-    manager = LlmConfigManager()
-    actions_performed = []
-    errors = []
-
-    try:
-        # Set runtime default provider
-        if "set_runtime_default_provider" in data:
-            provider_to_set_default = data["set_runtime_default_provider"]
-            if provider_to_set_default is None or isinstance(provider_to_set_default, str):
-                # Basic validation for known providers, could be stricter
-                if provider_to_set_default and provider_to_set_default.lower() not in ["gemini", "openai", "anthropic", None]:
-                     errors.append(f"Invalid provider name '{provider_to_set_default}' for default. Must be one of 'gemini', 'openai', 'anthropic' or null.")
-                else:
-                    manager.set_runtime_default_provider(provider_to_set_default)
-                    actions_performed.append(f"Runtime default provider set to: {provider_to_set_default or 'None (revert to ENV default)'}")
-            else:
-                errors.append("'set_runtime_default_provider' must be a string or null.")
-
-        # Update specific provider settings
-        if "update_provider_settings" in data:
-            provider_updates = data["update_provider_settings"]
-            if isinstance(provider_updates, dict):
-                for provider_name, settings in provider_updates.items():
-                    if isinstance(settings, dict):
-                        # Further validation can be added here for model/temp values
-                        manager.update_provider_settings(provider_name, settings)
-                        actions_performed.append(f"Settings updated for provider: {provider_name} with {settings}")
-                    else:
-                        errors.append(f"Settings for '{provider_name}' must be a dictionary.")
-            else:
-                errors.append("'update_provider_settings' must be a dictionary.")
-
-        # Clear settings for a specific provider
-        if "clear_provider_settings" in data:
-            provider_to_clear = data["clear_provider_settings"]
-            if isinstance(provider_to_clear, str) and provider_to_clear:
-                manager.clear_provider_settings(provider_to_clear)
-                actions_performed.append(f"Cleared runtime settings for provider: {provider_to_clear}")
-            else:
-                errors.append("'clear_provider_settings' must be a non-empty string (provider name).")
-
-        # Clear all runtime settings
-        if data.get("clear_all_runtime_settings") is True:
-            manager.clear_all_runtime_settings()
-            actions_performed.append("Cleared all runtime LLM configurations. System will use environment defaults.")
-            # If other specific actions were requested, they might be redundant now, but process anyway.
-
-        if not actions_performed and not errors:
-            return jsonify({"message": "No configuration actions specified or performed.", "valid_actions": ["set_runtime_default_provider", "update_provider_settings", "clear_provider_settings", "clear_all_runtime_settings"]}), 400
-
-        if errors:
-            return jsonify({"message": "Configuration updated with some errors.", "actions_performed": actions_performed, "errors": errors}), 400 if actions_performed else 400
-
-        return jsonify({"message": "LLM configuration updated successfully.", "actions_performed": actions_performed}), 200
-
-    except ValueError as ve:
-        logger.error(f"ValueError during LLM configuration update: {ve}", exc_info=True)
-        errors.append(f"Invalid input: {ve}")
-        return jsonify({"message": "Error updating LLM configuration.", "actions_performed": actions_performed, "errors": errors}), 400
-    except RuntimeError as re:
-        logger.error(f"RuntimeError during LLM configuration update: {re}", exc_info=True)
-        errors.append(f"Failed to save configuration: {re}")
-        return jsonify({"message": "Error saving LLM configuration.", "actions_performed": actions_performed, "errors": errors}), 500
-    except Exception as e:
-        logger.error(f"Unexpected error during LLM configuration update: {e}", exc_info=True)
-        errors.append(f"An unexpected error occurred: {str(e)}")
-        return jsonify({"message": "An unexpected error occurred.", "actions_performed": actions_performed, "errors": errors}), 500
+# Ensure all necessary langchain components (messages, tools, agent creation)
+# and your custom modules (McpAgentService, ModelLoader, EnvironmentVariables)
+# are correctly structured and importable.
+# The `from . import McpTools` in McpAgentService assumes McpTools.py is in the same directory.
+# If `current_app` was used by PathResolver, it would need to be available, but PathResolver was removed.
+# McpTools now has its own root path detection.

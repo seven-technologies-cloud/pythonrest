@@ -16,8 +16,8 @@ from src.a_Presentation.g_McpController.AskController import ask_bp
 # If 'app_handler' is not the app, or if blueprint registration is centralized elsewhere
 # (e.g. inside EnvironmentVariables.py or a factory function), this will need adjustment.
 if 'app_handler' in globals() and hasattr(app_handler, 'register_blueprint'):
-    app_handler.register_blueprint(ask_bp, url_prefix='/mcp') # for /mcp/ask and /mcp/ask/configure
-    print("INFO: MCP blueprint 'ask_bp' (including /ask and /ask/configure routes) registered under /mcp prefix.")
+    app_handler.register_blueprint(ask_bp, url_prefix='/mcp') # for /mcp/ask
+    print("INFO: MCP blueprint 'ask_bp' (for /mcp/ask route) registered under /mcp prefix.")
 else:
     # Fallback or warning if app_handler is not found as expected.
     # This indicates a potential misunderstanding of how the app object is exposed.
