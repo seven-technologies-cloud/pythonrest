@@ -33,7 +33,7 @@ def list_files_by_extension(directory='.', extension=()):
 
 setup(
     name='pythonrest3',
-    version='0.3.4',
+    version='0.3.6',
     description='A CLI tool that generates a complete API using a connection string for supported databases: mysql, mssql, mariadb and postgres',
     long_description=(
         "# PythonREST\n\n"
@@ -80,7 +80,9 @@ setup(
         "**Version 0.3.3**\n"
         "* Adding powershell test scripts for mysql, postgresql and sqlserver\n\n"
         "**Version 0.3.4**\n"
-        "* Fix CORS issue by properly configuration of after request decorator function.\n"
+        "* Fix CORS issue by properly configuration of after request decorator function.\n\n"
+        "**Version 0.3.6**\n"
+        "* Refactored environment variable access to use os.getenv directly, removing direct imports from EnvironmentVariables.py in various modules.\n"
     ),
     long_description_content_type="text/markdown",
     author='Seven Technologies Cloud',
