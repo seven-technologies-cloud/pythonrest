@@ -1,3 +1,4 @@
+import os
 import logging
 import asyncio # Keep for potential future async agent invocation
 from typing import List, Dict, Any
@@ -7,7 +8,6 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, Base
 from langchain_core.language_models.chat_models import BaseChatModel
 
 # EnvironmentVariables are used by ModelLoader and SpecProviderService now
-from src.e_Infra.g_Environment.EnvironmentVariables import SELECTED_LLM_PROVIDER
 from src.e_Infra.g_McpModels.ModelLoader import load_model
 from .McpTools import ( # Import refactored tools
     find_endpoint,
@@ -45,8 +45,9 @@ class McpAgentService:
             if McpAgentService._agent_executor is None:
                 logger.info("McpAgentService: First initialization. Building agent...")
                 try:
-                    self.llm: BaseChatModel = load_model(SELECTED_LLM_PROVIDER)
-                    logger.info(f"LLM loaded: {type(self.llm).__name__} for provider: {SELECTED_LLM_PROVIDER}")
+                    selected_provider = os.getenv("SELECTED_LLM_PROVIDER", "gemini").lower()
+                    self.llm: BaseChatModel = load_model(selected_provider)
+                    logger.info(f"LLM loaded: {type(self.llm).__name__} for provider: {selected_provider}")
 
                     self.spec_provider = SpecProviderService()
                     self.aggregated_spec: Dict[str, Any] = self.spec_provider.get_aggregated_spec()
@@ -111,7 +112,7 @@ class McpAgentService:
              raise RuntimeError("McpAgentService could not be initialized. Check logs for critical errors during first setup.")
 
         # Store references for healthcheck or direct access if needed
-        self.llm_for_healthcheck = McpAgentService._agent_executor.graph.nodes["agent"].bound # Accessing the actual LLM
+        self.llm_for_healthcheck = McpAgentService._agent_executor.nodes["agent"].bound # Accessing the actual LLM
         self.spec_provider_for_healthcheck = self.spec_provider # To check spec status
 
 

@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, jsonify
 import logging
 from typing import List, Dict # For type hinting BaseMessage list
@@ -6,7 +7,6 @@ from langchain_core.messages import HumanMessage, AIMessage, BaseMessage, System
 # Import the new McpAgentService
 from src.b_Application.b_Service.c_McpService.McpAgentService import McpAgentService
 # For healthcheck, to log which provider/model is configured
-from src.e_Infra.g_Environment.EnvironmentVariables import SELECTED_LLM_PROVIDER
 # ModelLoader might not be needed here if McpAgentService handles its own model status for healthcheck
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ def ask_mcp_agent():
     # --- Healthcheck Logic ---
     if question_text.lower() == "healthcheck":
         logger.info("Healthcheck requested for /mcp/ask.")
-        health_status = {"answer": "no", "provider_configured": SELECTED_LLM_PROVIDER, "details": ""}
+        health_status = {"answer": "no", "provider_configured": os.getenv("SELECTED_LLM_PROVIDER", "Not Set"), "details": ""}
         try:
             service = get_mcp_agent_service() # This attempts initialization
 

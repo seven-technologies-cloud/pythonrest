@@ -5,12 +5,6 @@ import threading # For basic thread safety on file access
 # Import new PathResolver utility
 from src.e_Infra.g_McpInfra.PathResolver import get_llm_runtime_config_path
 # Updated to import from EnvironmentVariables.py (LLM_CONFIG_FILE_PATH removed from here)
-from src.e_Infra.g_Environment.EnvironmentVariables import (
-    SELECTED_LLM_PROVIDER,
-    GEMINI_MODEL, OPENAI_MODEL, ANTHROPIC_MODEL,
-    GEMINI_TEMPERATURE, OPENAI_TEMPERATURE, ANTHROPIC_TEMPERATURE,
-    GEMINI_MAX_OUTPUT_TOKENS, OPENAI_MAX_OUTPUT_TOKENS, ANTHROPIC_MAX_OUTPUT_TOKENS
-)
 
 logger = logging.getLogger(__name__)
 
@@ -146,18 +140,30 @@ class LlmConfigManager:
         """
         runtime_config = self._load_config()
         effective_config = {
-            "determined_default_provider": self.get_runtime_default_provider() or SELECTED_LLM_PROVIDER or "Not Set",
+            "determined_default_provider": self.get_runtime_default_provider() or os.getenv("SELECTED_LLM_PROVIDER", "gemini").lower() or "Not Set",
             "config_source_default_provider": "runtime (llm_config.json)" if self.get_runtime_default_provider() else \
-                                           f"environment (SELECTED_LLM_PROVIDER: {SELECTED_LLM_PROVIDER})" if SELECTED_LLM_PROVIDER else "None",
+                                           f"environment (SELECTED_LLM_PROVIDER: {os.getenv('SELECTED_LLM_PROVIDER', 'gemini').lower()})" if os.getenv("SELECTED_LLM_PROVIDER") else "None",
             "providers": {
                 "gemini": {}, "openai": {}, "anthropic": {}
             }
         }
 
         provider_env_defaults = {
-            "gemini": {"model": GEMINI_MODEL, "temperature": GEMINI_TEMPERATURE, "max_output_tokens": GEMINI_MAX_OUTPUT_TOKENS},
-            "openai": {"model": OPENAI_MODEL, "temperature": OPENAI_TEMPERATURE, "max_output_tokens": OPENAI_MAX_OUTPUT_TOKENS},
-            "anthropic": {"model": ANTHROPIC_MODEL, "temperature": ANTHROPIC_TEMPERATURE, "max_output_tokens": ANTHROPIC_MAX_OUTPUT_TOKENS}
+            "gemini": {
+                "model": os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
+                "temperature": float(os.getenv("GEMINI_TEMPERATURE", "0.4")),
+                "max_output_tokens": int(os.getenv("GEMINI_MAX_OUTPUT_TOKENS", "2048"))
+            },
+            "openai": {
+                "model": os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+                "temperature": float(os.getenv("OPENAI_TEMPERATURE", "0.2")),
+                "max_output_tokens": int(os.getenv("OPENAI_MAX_OUTPUT_TOKENS", "2000"))
+            },
+            "anthropic": {
+                "model": os.getenv("ANTHROPIC_MODEL", "claude-3-haiku-20240307"),
+                "temperature": float(os.getenv("ANTHROPIC_TEMPERATURE", "0.7")),
+                "max_output_tokens": int(os.getenv("ANTHROPIC_MAX_OUTPUT_TOKENS", "2048"))
+            }
         }
 
         for provider_key in ["gemini", "openai", "anthropic"]:
@@ -177,40 +183,34 @@ class LlmConfigManager:
             temp_val = runtime_settings.get("temperature")
             temp_source = "runtime (llm_config.json)"
             if temp_val is None:
-                temp_val = env_defaults["temperature"] # Already float from EnvironmentVariables.py or default there
+                # Directly use env_defaults which are already converted
+                temp_val = env_defaults["temperature"]
                 temp_source = "environment default"
 
             if temp_val is not None:
-                try:
-                    effective_settings["temperature"] = float(temp_val)
-                except (ValueError, TypeError):
-                    logger.warning(f"Invalid temperature '{temp_val}' for {provider_key}. Using service default.")
-                    effective_settings["temperature"] = "Service Default" # Or None
-                    temp_source = "environment default" if temp_val == env_defaults["temperature"] else "runtime (invalid)"
+                # No need for try-except here as env_defaults are already converted floats
+                effective_settings["temperature"] = float(temp_val)
+                effective_settings["temperature_source"] = temp_source
             else: # Should use service default
                 effective_settings["temperature"] = "Service Default"
-            effective_settings["temperature_source"] = temp_source if temp_val is not None and not isinstance(effective_settings["temperature"], str) else \
-                                                       ("Service Default" if effective_settings["temperature"] == "Service Default" else temp_source)
+                effective_settings["temperature_source"] = "Service Default"
 
 
             # Max Output Tokens
             tokens_val = runtime_settings.get("max_output_tokens")
             tokens_source = "runtime (llm_config.json)"
             if tokens_val is None:
-                tokens_val = env_defaults["max_output_tokens"] # Already int from EnvironmentVariables.py or default there
+                 # Directly use env_defaults which are already converted
+                tokens_val = env_defaults["max_output_tokens"]
                 tokens_source = "environment default"
 
             if tokens_val is not None:
-                try:
-                    effective_settings["max_output_tokens"] = int(tokens_val)
-                except (ValueError, TypeError):
-                    logger.warning(f"Invalid max_output_tokens '{tokens_val}' for {provider_key}. Using service default.")
-                    effective_settings["max_output_tokens"] = "Service Default" # Or None
-                    tokens_source = "environment default" if tokens_val == env_defaults["max_output_tokens"] else "runtime (invalid)"
+                # No need for try-except here as env_defaults are already converted ints
+                effective_settings["max_output_tokens"] = int(tokens_val)
+                effective_settings["max_output_tokens_source"] = tokens_source
             else: # Should use service default
                 effective_settings["max_output_tokens"] = "Service Default"
-            effective_settings["max_output_tokens_source"] = tokens_source if tokens_val is not None and not isinstance(effective_settings["max_output_tokens"], str) else \
-                                                              ("Service Default" if effective_settings["max_output_tokens"] == "Service Default" else tokens_source)
+                effective_settings["max_output_tokens_source"] = "Service Default"
 
             effective_config["providers"][provider_key] = effective_settings
 

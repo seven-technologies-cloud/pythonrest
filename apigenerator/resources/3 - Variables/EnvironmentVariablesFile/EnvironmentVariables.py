@@ -33,3 +33,23 @@ os.environ['display_stacktrace_on_error'] = 'False'
 # Origins enabled #
 os.environ['origins'] = '*'
 os.environ['headers'] = '*'
+
+# ------------------------------------------ MCP ------------------------------------------ #
+
+os.environ['GEMINI_API_KEY'] = 'mock-gemini-api-key'
+os.environ['OPENAI_API_KEY'] = 'mock-openai-api-key'
+os.environ['ANTHROPIC_API_KEY'] = 'mock-anthropic-api-key'
+
+os.environ['GEMINI_MODEL'] = 'gemini-2.5-flash'
+os.environ['OPENAI_MODEL'] = 'gpt-4-turbo'
+os.environ['ANTHROPIC_MODEL'] = 'claude-3-opus'
+
+os.environ['GEMINI_TEMPERATURE'] = '0.6'
+os.environ['OPENAI_TEMPERATURE'] = '0.7'
+os.environ['ANTHROPIC_TEMPERATURE'] = '0.9'
+
+os.environ['GEMINI_MAX_OUTPUT_TOKENS'] = '1024'
+os.environ['OPENAI_MAX_OUTPUT_TOKENS'] = '2048'
+os.environ['ANTHROPIC_MAX_OUTPUT_TOKENS'] = '4096'
+
+os.environ['SELECTED_LLM_PROVIDER'] = 'gemini'

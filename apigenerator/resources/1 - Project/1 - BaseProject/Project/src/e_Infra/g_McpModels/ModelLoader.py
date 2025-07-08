@@ -1,10 +1,5 @@
+import os
 import logging
-from src.e_Infra.g_Environment.EnvironmentVariables import (
-    SELECTED_LLM_PROVIDER,
-    GEMINI_MODEL, GEMINI_TEMPERATURE, # For logging current model details
-    OPENAI_MODEL, OPENAI_TEMPERATURE,
-    ANTHROPIC_MODEL, ANTHROPIC_TEMPERATURE
-)
 from .GoogleAI import google_ai_model
 from .OpenAI import openai_model
 from .AnthropicAI import anthropic_model
@@ -38,25 +33,25 @@ def load_model(provider_name: str = None):
     """
     global CURRENT_CONFIGURED_MODEL_NAME, CURRENT_CONFIGURED_TEMPERATURE
 
-    effective_provider = (provider_name or SELECTED_LLM_PROVIDER).lower()
+    effective_provider = (provider_name or os.getenv("SELECTED_LLM_PROVIDER", "gemini")).lower()
 
     selected_model_instance = None
 
     if effective_provider == "gemini": # "google" was in user snippet, using "gemini" for consistency
-        CURRENT_CONFIGURED_MODEL_NAME = GEMINI_MODEL
-        CURRENT_CONFIGURED_TEMPERATURE = GEMINI_TEMPERATURE
+        CURRENT_CONFIGURED_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        CURRENT_CONFIGURED_TEMPERATURE = float(os.getenv("GEMINI_TEMPERATURE", "0.4"))
         selected_model_instance = google_ai_model
-        logger.info(f"Loading Gemini (Google) model: {GEMINI_MODEL}, Temp: {GEMINI_TEMPERATURE}")
+        logger.info(f"Loading Gemini (Google) model: {CURRENT_CONFIGURED_MODEL_NAME}, Temp: {CURRENT_CONFIGURED_TEMPERATURE}")
     elif effective_provider == "openai":
-        CURRENT_CONFIGURED_MODEL_NAME = OPENAI_MODEL
-        CURRENT_CONFIGURED_TEMPERATURE = OPENAI_TEMPERATURE
+        CURRENT_CONFIGURED_MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+        CURRENT_CONFIGURED_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
         selected_model_instance = openai_model
-        logger.info(f"Loading OpenAI model: {OPENAI_MODEL}, Temp: {OPENAI_TEMPERATURE}")
+        logger.info(f"Loading OpenAI model: {CURRENT_CONFIGURED_MODEL_NAME}, Temp: {CURRENT_CONFIGURED_TEMPERATURE}")
     elif effective_provider == "anthropic":
-        CURRENT_CONFIGURED_MODEL_NAME = ANTHROPIC_MODEL
-        CURRENT_CONFIGURED_TEMPERATURE = ANTHROPIC_TEMPERATURE
+        CURRENT_CONFIGURED_MODEL_NAME = os.getenv("ANTHROPIC_MODEL", "claude-3-haiku-20240307")
+        CURRENT_CONFIGURED_TEMPERATURE = float(os.getenv("ANTHROPIC_TEMPERATURE", "0.7"))
         selected_model_instance = anthropic_model
-        logger.info(f"Loading Anthropic model: {ANTHROPIC_MODEL}, Temp: {ANTHROPIC_TEMPERATURE}")
+        logger.info(f"Loading Anthropic model: {CURRENT_CONFIGURED_MODEL_NAME}, Temp: {CURRENT_CONFIGURED_TEMPERATURE}")
     else:
         logger.error(f"Unsupported LLM provider specified: '{effective_provider}'. Supported: gemini, openai, anthropic.")
         raise ValueError(f"LLM Provider '{effective_provider}' is not supported. Choose from 'gemini', 'openai', or 'anthropic'.")
