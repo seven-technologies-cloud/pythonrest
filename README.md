@@ -1079,3 +1079,172 @@ the project files.
 ## Thank you for riding with us! Feel free to use and contribute to our project. PythonREST CLI Tool generates a COMPLETE API for a relational database based on a connection string. It reduces your API development time by 40-60% and it's OPEN SOURCE!
 
 ## Don't forget to star rate this repo if you like our job!
+
+# Model Context Protocol (MCP) Endpoints
+
+This project includes endpoints under the /mcp prefix that allow interaction with the Model Context Protocol, primarily for managing Language Model (LLM) configurations and interacting with the LLM agent.
+
+1. LLM Configuration Endpoint: /mcp/ask/configure
+This endpoint allows you to view and modify the runtime configuration for the LLM providers used by the application. This configuration overrides the default settings loaded from environment variables.
+
+URL: /mcp/ask/configure
+Purpose: Manage dynamic LLM settings (default provider, model, temperature) without restarting the application. API keys are not managed here; they must be set as environment variables.
+1.1. Getting the Current Configuration (GET Request)
+You can retrieve the currently effective LLM configuration by sending a GET request to this endpoint.
+
+* Method: GET
+Request: No request body is needed.
+Response: A JSON object detailing the effective configuration, including the determined default provider, the source of the configuration (runtime file or environment variables), provider-specific settings (model, temperature), and the path to the runtime config file. API keys are excluded for security.
+
+Example using curl:
+
+curl -X GET http://localhost:5000/mcp/ask/configure
+
+Example Response:
+
+{
+  "determined_default_provider": "openai",
+  "config_source_default_provider": "runtime (llm_config.json)",
+  "providers": {
+    "gemini": {
+      "model": "Service Default",
+      "model_source": "Service Default",
+      "temperature": "Service Default",
+      "temperature_source": "Service Default"
+    },
+    "openai": {
+      "model": "gpt-4o",
+      "model_source": "runtime (llm_config.json)",
+      "temperature": 0.7,
+      "temperature_source": "runtime (llm_config.json)"
+    },
+    "anthropic": {
+      "model": "claude-3-opus",
+      "model_source": "environment default",
+      "temperature": 0.9,
+      "temperature_source": "runtime (llm_config.json)"
+    }
+  },
+  "llm_config_file_path": "config/llm_config.json"
+}
+
+1.2. Setting the Runtime Configuration (POST Request)
+You can modify the runtime LLM configuration by sending a POST request with a JSON payload specifying the desired actions.
+
+* Method: POST
+Request: A JSON payload with one or more of the following keys:
+"set_runtime_default_provider"
+"update_provider_settings"
+"clear_provider_settings"
+"clear_all_runtime_settings"
+Response: A JSON object indicating the actions performed and any errors encountered.
+Here's what each action key in the JSON payload does:
+
+"set_runtime_default_provider":
+
+Purpose: Sets the primary LLM provider to use.
+Value: A string ("gemini", "openai", "anthropic") or null to revert to the environment variable default.
+Example: "set_runtime_default_provider": "openai"
+"update_provider_settings":
+
+Purpose: Updates specific settings (model, temperature) for one or more providers.
+Value: A dictionary where keys are provider names ("gemini", "openai", "anthropic") and values are dictionaries with settings ("model": string, "temperature": float).
+
+Example:
+
+"update_provider_settings": {
+  "openai": {
+    "model": "gpt-4o",
+    "temperature": 0.7
+  },
+  "anthropic": {
+    "temperature": 0.9
+  }
+}
+
+
+"clear_provider_settings":
+
+Purpose: Removes all runtime settings for a specific provider, causing it to use environment variable defaults again.
+Value: A string representing the provider name ("gemini", "openai", or "anthropic").
+Example: "clear_provider_settings": "gemini"
+"clear_all_runtime_settings":
+
+Purpose: Clears the entire runtime configuration file, reverting all settings to environment variable defaults.
+Value: The boolean value true.
+Example: "clear_all_runtime_settings": true
+Example POST Request Payload (combined actions):
+
+{
+  "set_runtime_default_provider": "openai",
+  "update_provider_settings": {
+    "openai": {
+      "model": "gpt-4o",
+      "temperature": 0.7
+    },
+    "anthropic": {
+      "temperature": 0.9
+    }
+  },
+  "clear_provider_settings": "gemini"
+}
+
+Example using curl (to set default provider to openai):
+
+curl -X POST \
+  http://localhost:5000/mcp/ask/configure \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "set_runtime_default_provider": "openai"
+  }'
+
+
+2. LLM Ask Endpoint: /mcp/ask
+This endpoint allows you to send natural language questions or requests to the LLM agent and receive a generated response.
+
+URL: /mcp/ask
+
+Purpose: Interact with the LLM for tasks like getting explanations, code examples, or information based on the system's context.
+
+* Method: POST
+
+Request: A JSON payload with a single key "question" containing your query as a string.
+
+Example Payload:
+
+{
+    "question": "Me mostre como pegar uma lista de tenants"
+}
+
+
+Response: A JSON object with a single key "answer". The value is an array of strings, where each string is a part of the LLM's response. This can include explanations, code blocks (often formatted with Markdown), or other relevant information.
+
+Example using curl:
+
+curl -X POST \
+  http://localhost:5000/mcp/ask \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "question": "Me mostre como pegar uma lista de tenants"
+  }'
+
+
+Example Response (based on your provided output):
+
+{
+    "answer": [
+        "Para obter uma lista de tenants, você pode usar o endpoint `/tenants` com o método `GET`.\n\nAqui está o comando curl de exemplo:",
+        "```bash\ncurl -X GET '<API_BASE_URL_NOT_DEFINED_IN_SPEC>/tenants' \\\n     -H 'accept: application/json' \\\n     -H 'Authorization: Bearer <API_TOKEN>'\n```",
+        "\n\n**Observação:** O URL base da API não foi definido na especificação OpenAPI. Por favor, substitua `<API_BASE_URL_NOT_DEFINED_IN_SPEC>` pelo URL base real da API."
+    ]
+}
+
+Explanation of the Example Response:
+
+The LLM correctly identified that you were asking about retrieving a list of tenants and provided the relevant API endpoint (/tenants) and HTTP method (GET). It also generated a curl command example.
+
+<API_BASE_URL_NOT_DEFINED_IN_SPEC>: This placeholder appears because the LLM likely uses an OpenAPI specification (or similar documentation) to understand the available API endpoints, but the base URL of your running application (http://localhost:5000 in your case) was not defined in that specification. You need to replace this placeholder with the actual base URL of your API.
+
+<API_TOKEN>: The example includes an Authorization: Bearer <API_TOKEN> header. This indicates that the /tenants endpoint requires authentication using a Bearer token. You would need to replace <API_TOKEN> with a valid authentication token obtained through your application's authentication process.
+
+This /mcp/ask endpoint is a powerful way to interact with the LLM's understanding of your project's API and capabilities.
