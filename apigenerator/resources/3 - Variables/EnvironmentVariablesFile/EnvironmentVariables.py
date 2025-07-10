@@ -33,3 +33,33 @@ os.environ['display_stacktrace_on_error'] = 'False'
 # Origins enabled #
 os.environ['origins'] = '*'
 os.environ['headers'] = '*'
+
+# ------------------------------------------ MCP ------------------------------------------ #
+
+os.environ['GEMINI_API_KEY'] = 'mock-gemini-api-key'
+os.environ['OPENAI_API_KEY'] = 'mock-openai-api-key'
+os.environ['ANTHROPIC_API_KEY'] = 'mock-anthropic-api-key'
+
+os.environ['GEMINI_MODEL'] = 'gemini-2.5-flash'
+os.environ['OPENAI_MODEL'] = 'gpt-4-turbo'
+os.environ['ANTHROPIC_MODEL'] = 'claude-3-opus'
+
+os.environ['GEMINI_TEMPERATURE'] = '0.6'
+os.environ['OPENAI_TEMPERATURE'] = '0.7'
+os.environ['ANTHROPIC_TEMPERATURE'] = '0.9'
+
+os.environ['GEMINI_MAX_OUTPUT_TOKENS'] = '1024'
+os.environ['OPENAI_MAX_OUTPUT_TOKENS'] = '2048'
+os.environ['ANTHROPIC_MAX_OUTPUT_TOKENS'] = '4096'
+
+os.environ['SELECTED_LLM_PROVIDER'] = 'gemini'
+
+os.environ['LLM_CONFIG_FILE_PATH'] = 'config/llm_config.json'
+
+ENV_DEFAULT_LLM_PROVIDER = 'SELECTED_LLM_PROVIDER'
+ENV_DEFAULT_GEMINI_MODEL_NAME = 'GEMINI_MODEL'
+ENV_DEFAULT_OPENAI_MODEL_NAME = 'OPENAI_MODEL'
+ENV_DEFAULT_ANTHROPIC_MODEL_NAME = 'ANTHROPIC_MODEL'
+ENV_DEFAULT_GEMINI_TEMPERATURE = 'GEMINI_TEMPERATURE'
+ENV_DEFAULT_OPENAI_TEMPERATURE = 'OPENAI_TEMPERATURE'
+ENV_DEFAULT_ANTHROPIC_TEMPERATURE = 'ANTHROPIC_TEMPERATURE'
