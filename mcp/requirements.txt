@@ -1,0 +1,11 @@
+FastMCP==2.1.1
+uv==0.6.14
+sqlalchemy==2.0.32
+psycopg2-binary==2.9.9
+python-dotenv
+fastapi
+uvicorn
+requests
+langchain_google_genai
+langgraph
+langchain-mcp-adapters

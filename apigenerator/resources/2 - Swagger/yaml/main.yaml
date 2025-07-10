@@ -1,0 +1,398 @@
+openapi: 3.0.3
+info:
+  title: Core Platform Services
+  version: "1.0.0"
+  description: |-
+    Provides core platform functionalities including SQL execution capabilities
+    and an AI-powered interface (MCP) for querying the API's specification.
+
+tags:
+  - name: SQL
+    description: SQL context
+  - name: MCP - Ask
+    description: Query the API's specification using a LangGraph Agent.
+
+components:
+  schemas:
+    McpAskRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          description: The natural language question about the API, or "healthcheck".
+          example: "What endpoints are available for items?"
+
+    McpAskResponse: # For successful question answering
+      type: object
+      properties:
+        answer:
+          type: string
+          description: The LangGraph agent's answer to the question about the API.
+          example: "The API provides GET /items and POST /items for item management."
+
+    McpHealthcheckResponse: # For healthcheck specifically
+      type: object
+      properties:
+        answer:
+          type: string
+          enum: ["yes", "no"]
+          description: "Indicates if the healthcheck passed ('yes') or failed ('no')."
+        provider_checked:
+          type: string
+          description: The name of the LLM provider that was checked (e.g., "gemini", "openai").
+          example: "gemini"
+        model_configured:
+          type: string
+          description: The model name configured for the checked provider.
+          example: "gemini-1.5-flash"
+        reason:
+          type: string
+          description: Details if the healthcheck failed.
+          example: "API key for gemini is missing or is a placeholder."
+          nullable: true
+
+    McpErrorResponse: # Generic error response
+      type: object
+      properties:
+        error:
+          type: string
+          description: A summary of the error.
+        details:
+          type: string
+          description: Optional additional details about the error.
+          nullable: true
+
+    # Schemas from original sql.yaml (minimal, as they are mostly inline in original)
+    # These are kept for the /sql routes
+    SqlErrorResponse:
+      description: "Error response for SQL operations."
+      type: object
+      properties:
+        ErrorMessage:
+          type: string
+          minLength: 1
+      required:
+        - ErrorMessage
+
+    SqlGetSuccessResponse:
+      type: array
+      description: "Successful response for GET /sql queries."
+      minItems: 1 # Or 0 if an empty result set is valid
+      uniqueItems: false # Rows are not necessarily unique
+      items:
+        type: object # Generic object, actual properties depend on query
+        # additionalProperties: true # Allow any properties
+
+    SqlPostSuccessResponse: # Also used for PATCH, DELETE success
+      description: "Successful response for POST, PATCH, DELETE SQL operations."
+      type: object
+      properties:
+        Message:
+          type: string
+          minLength: 1
+      required:
+        - Message
+
+    SqlStoredProcedureRequest:
+      type: object
+      description: "Body for executing a SQL stored procedure."
+      properties:
+        out: # Output parameters expected
+          type: object
+          description: "Define expected output parameters and their initial/placeholder values if needed."
+          additionalProperties: true
+        in: # Input parameters
+          type: array
+          minItems: 0 # Allow no input parameters if procedure supports it
+          items:
+            type: string # Or a more complex object if parameters have types/values
+      # 'in' might not always be required if a procedure takes no input params
+      # required:
+      #   - in
+
+  parameters:
+    # XProviderHeader removed as provider selection is now solely via ENV VAR SELECTED_LLM_PROVIDER
+
+    SqlQueryHeader:
+      name: query
+      in: header
+      required: true
+      description: The SQL query to execute.
+      schema:
+        type: string
+
+    SqlStoredProcedureHeader:
+      name: storedprocedure
+      in: header
+      required: true
+      description: The name of the SQL stored procedure to execute.
+      schema:
+        type: string
+
+paths:
+  /mcp/ask:
+    post:
+      tags:
+        - MCP - Ask
+      summary: Ask a question about the API or perform a healthcheck via LangGraph Agent.
+      description: |-
+        Sends a natural language question to be answered by a LangGraph agent based
+        on dynamically fetched API specifications.
+        If the question is "healthcheck", it verifies the initialization of the
+        configured LLM provider and agent services.
+      # X-Provider header parameter removed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpAskRequest'
+      responses:
+        '200':
+          description: Successful response for a question or healthcheck.
+          content:
+            application/json:
+              schema:
+                oneOf: # Response can be a standard answer or a healthcheck status
+                  - $ref: '#/components/schemas/McpAskResponse'
+                  - $ref: '#/components/schemas/McpHealthcheckResponse'
+        '400':
+          description: Bad Request (e.g., malformed payload, missing question).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+        '503':
+          description: Service Unavailable (e.g., LLM service or agent not configured/initialized correctly).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpErrorResponse'
+
+  # /mcp/ask/configure GET and POST paths removed
+
+  /sql:
+    get:
+      tags:
+        - SQL
+      summary: Get SQL Query
+      operationId: getSQLQuery
+      parameters:
+        - $ref: '#/components/parameters/SqlQueryHeader'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlGetSuccessResponse'
+              examples:
+                Query:
+                  value:
+                    - id_client: "example_id"
+                      name: "Example Name"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Invalid SQL syntax: { value: { ErrorMessage: Invalid syntax for SQL query } }
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Table does not exist: { value: { ErrorMessage: Table does not exist } }
+      description: Route responsible for retrieving a SQL Query
+    post:
+      tags:
+        - SQL
+      summary: Insert SQL Query
+      operationId: insertSQLQuery
+      parameters:
+        - $ref: '#/components/parameters/SqlQueryHeader'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlPostSuccessResponse'
+              examples:
+                Query successfully persisted: { value: { Message: Query successfully persisted } }
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Invalid SQL syntax: { value: { ErrorMessage: Invalid syntax for SQL query } }
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Table does not exist: { value: { ErrorMessage: Table does not exist } }
+        "406":
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Malformed input data: { value: { ErrorMessage: Malformed input data } }
+      description: Route responsible for inserting a SQL Query
+    patch:
+      tags:
+        - SQL
+      summary: Update SQL Query
+      operationId: updateSQLQuery
+      parameters:
+        - $ref: '#/components/parameters/SqlQueryHeader'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlPostSuccessResponse'
+              examples:
+                Query successfully persisted: { value: { Message: Query successfully persisted } }
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Invalid SQL syntax: { value: { ErrorMessage: Invalid syntax for SQL query } }
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Table does not exist: { value: { ErrorMessage: Table does not exist } }
+        "406":
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Malformed input data: { value: { ErrorMessage: Malformed input data } }
+      description: Route responsible for updating a SQL Query
+    delete:
+      tags:
+        - SQL
+      summary: Delete SQL Query by Full Match Object
+      operationId: deleteSQLQueryByFullMatch
+      parameters:
+        - $ref: '#/components/parameters/SqlQueryHeader'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlPostSuccessResponse'
+              examples:
+                Query successfully persisted: { value: { Message: Query successfully persisted } }
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Invalid SQL syntax: { value: { ErrorMessage: Invalid syntax for SQL query } }
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Table does not exist: { value: { ErrorMessage: Table does not exist } }
+        "406":
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                Malformed input data: { value: { ErrorMessage: Malformed input data } }
+      description: Route responsible for deleting a SQL Query
+
+  /sql/storedprocedure:
+    post:
+      tags:
+        - SQL
+      summary: Execute SQL Stored Procedure
+      operationId: executeSQLStoredProcedure
+      parameters:
+        - $ref: '#/components/parameters/SqlStoredProcedureHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SqlStoredProcedureRequest'
+            examples:
+              StoredProcedureInOutParams: # Changed example key to be valid YAML
+                value:
+                  out: { "client_count_output": 0 }
+                  in: ["client_id", "user_id"]
+        required: true
+        description: Body to send post sql stored procedure data
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlPostSuccessResponse'
+              examples:
+                QuerySuccessfullyPersisted: # Changed example key
+                  value:
+                    Message: Query successfully persisted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                InvalidSQLSyntax: { value: { ErrorMessage: Invalid syntax for SQL query } } # Changed example key
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                TableDoesNotExist: { value: { ErrorMessage: Table does not exist } } # Changed example key
+        "406":
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlErrorResponse'
+              examples:
+                MalformedInputData: { value: { ErrorMessage: Malformed input data } } # Changed example key
+      description: Route responsible for executing a SQL Stored Procedure
