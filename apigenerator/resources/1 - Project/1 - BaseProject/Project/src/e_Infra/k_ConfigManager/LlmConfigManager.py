@@ -6,11 +6,6 @@ import json
 import os
 import logging
 import threading # For basic thread safety on file access
-from src.e_Infra.g_Environment.EnvironmentVariables import (
-    ENV_DEFAULT_LLM_PROVIDER,
-    ENV_DEFAULT_GEMINI_MODEL_NAME, ENV_DEFAULT_OPENAI_MODEL_NAME, ENV_DEFAULT_ANTHROPIC_MODEL_NAME,
-    ENV_DEFAULT_GEMINI_TEMPERATURE, ENV_DEFAULT_OPENAI_TEMPERATURE, ENV_DEFAULT_ANTHROPIC_TEMPERATURE
-)
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +17,6 @@ class LlmConfigManager:
     API keys themselves are NOT managed here; they are sourced from EnvironmentVariables (env vars).
     """
     _lock = threading.Lock() # Class-level lock for file operations
-    # Define a default path for the runtime config file, as LLM_CONFIG_FILE_PATH is removed
     DEFAULT_RUNTIME_CONFIG_PATH = './config/llm_runtime_config.json'
 
     def __init__(self, config_file_path: str = None):
@@ -33,7 +27,6 @@ class LlmConfigManager:
             config_file_path (str, optional): Path to the LLM config JSON file.
                                               Defaults to LLM_CONFIG_FILE_PATH from Environment Variables.
         """
-        # Access LLM_CONFIG_FILE_PATH from environment variables
         self.config_file_path = config_file_path or os.environ.get('LLM_CONFIG_FILE_PATH')
         if not self.config_file_path:
              raise ValueError("LLM_CONFIG_FILE_PATH is not set in environment variables.")
@@ -136,9 +129,9 @@ class LlmConfigManager:
         """
         runtime_config = self._load_config()
         effective_config = {
-            "determined_default_provider": self.get_runtime_default_provider() or ENV_DEFAULT_LLM_PROVIDER or "Not Set",
+            "determined_default_provider": self.get_runtime_default_provider() or os.environ.get("ENV_DEFAULT_LLM_PROVIDER") or "Not Set",
             "config_source_default_provider": "runtime (llm_runtime_config.json)" if self.get_runtime_default_provider() else \
-                                           "environment (ENV_DEFAULT_LLM_PROVIDER)" if ENV_DEFAULT_LLM_PROVIDER else "None",
+                                           "environment (ENV_DEFAULT_LLM_PROVIDER)" if os.environ.get("ENV_DEFAULT_LLM_PROVIDER") else "None",
             "providers": {
                 "gemini": {}, "openai": {}, "anthropic": {}
             },
@@ -152,9 +145,9 @@ class LlmConfigManager:
             model = runtime_provider_settings.get("model")
             model_source = "runtime (llm_runtime_config.json)"
             if not model:
-                if provider == "gemini": model = ENV_DEFAULT_GEMINI_MODEL_NAME
-                elif provider == "openai": model = ENV_DEFAULT_OPENAI_MODEL_NAME
-                elif provider == "anthropic": model = ENV_DEFAULT_ANTHROPIC_MODEL_NAME
+                if provider == "gemini": model = os.environ.get("ENV_DEFAULT_GEMINI_MODEL_NAME")
+                elif provider == "openai": model = os.environ.get("ENV_DEFAULT_OPENAI_MODEL_NAME")
+                elif provider == "anthropic": model = os.environ.get("ENV_DEFAULT_ANTHROPIC_MODEL_NAME")
                 model_source = "environment default"
             # Service will have its own hardcoded default if still None here
             effective_config["providers"][provider]["model"] = model or "Service Default"
@@ -164,9 +157,9 @@ class LlmConfigManager:
             temp_str = runtime_provider_settings.get("temperature")
             temp_source = "runtime (llm_runtime_config.json)"
             if temp_str is None: # Check for None, not just falsy, as 0.0 is valid temp
-                if provider == "gemini": temp_str = ENV_DEFAULT_GEMINI_TEMPERATURE
-                elif provider == "openai": temp_str = ENV_DEFAULT_OPENAI_TEMPERATURE
-                elif provider == "anthropic": temp_str = ENV_DEFAULT_ANTHROPIC_TEMPERATURE
+                if provider == "gemini": temp_str = os.environ.get("ENV_DEFAULT_GEMINI_TEMPERATURE")
+                elif provider == "openai": temp_str = os.environ.get("ENV_DEFAULT_OPENAI_TEMPERATURE")
+                elif provider == "anthropic": temp_str = os.environ.get("ENV_DEFAULT_ANTHROPIC_TEMPERATURE")
                 temp_source = "environment default"
 
             temp_val = None
