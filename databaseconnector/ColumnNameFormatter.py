@@ -14,7 +14,7 @@ def adding_replace_in_column_name_with_python_keys(column_name: str) -> str:
         "break", "class", "continue", "def", "del", "elif", "else", "except",
         "finally", "for", "from", "global", "if", "import", "in", "is",
         "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try",
-        "while", "with", "yield"
+        "while", "with", "yield", "metadata"
     ]
 
     for keyword in python_keywords:
