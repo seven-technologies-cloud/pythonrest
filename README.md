@@ -89,6 +89,9 @@ Support for column names that contain unusual characters, like "-", " ", ".", "/
 **Version 0.3.6:**
 * Introduced Model Context Protocol (MCP) endpoints for dynamic LLM configuration and interaction
 
+**Version 0.3.7:**
+* Adding metadata to reserved keyword formatter
+
 
 ## Installation
 
